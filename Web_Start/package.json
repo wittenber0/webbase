@@ -1,0 +1,15 @@
+{
+  "name": "web_start",
+  "version": "1.0.0",
+  "description": "",
+  "main": "serverexpress.js",
+  "scripts": {
+    "test": "start",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
