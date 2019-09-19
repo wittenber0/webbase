@@ -16,6 +16,10 @@ app.get('/index.js', (req, res) => {
    res.sendFile(path.join(__dirname + '/client/public/index.js'));
 })
 
+app.get('/binance_public.js', (req, res) => {
+  res.sendFile(path.join(__dirname + '/client/public/binance_public.js'));
+})
+
 app.get('/auth', (req, res) => {
   console.log(req.query);
   code = req.query.code;
