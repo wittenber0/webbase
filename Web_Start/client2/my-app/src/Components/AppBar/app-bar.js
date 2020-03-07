@@ -5,6 +5,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import TemporaryDrawer from './temporary-drawer'
+import Search from '../Search/search';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -12,22 +13,29 @@ const useStyles = makeStyles(theme => ({
   },
   title: {
     flexGrow: 1,
+    textAlign: 'left',
+    marginLeft: '30px'
   },
 }));
 
-export default function ButtonAppBar() {
+const sideBarItems = [
+	{display: 'Home', route: '/app'},
+	{display: 'About', route: '/app/about'},
+];
+
+export default function ButtonAppBar(props) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
-          <TemporaryDrawer>
+          <TemporaryDrawer drawerLocation='left' menuList={sideBarItems} history={props.history}>
           </TemporaryDrawer>
           <Typography variant="h6" className={classes.title}>
-            News
+            Sprint Endure
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Search />
         </Toolbar>
       </AppBar>
     </div>
