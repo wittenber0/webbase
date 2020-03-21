@@ -1,9 +1,13 @@
 const express = require('express')
-const app = express()
-const port = 8080
+const bodyParser = require('body-parser');
+const port = 4000
 const path = require('path');
+const auth = require('./serverAuth.js');
 
 
+const app = express()
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 /******************************************************************************
 *********************************ENDPOINTS*************************************
 ******************************************************************************/
@@ -16,11 +20,16 @@ app.get('/index.js', (req, res) => {
    res.sendFile(path.join(__dirname + '/client/public/index.js'));
 })
 
-app.get('/auth', (req, res) => {
-  console.log(req.query);
-  code = req.query.code;
-   res.sendFile(path.join(__dirname + '/client/public/index.html'));
+app.post('/auth', (req, res) => {
+  console.log(req.body);
+  auth.checkRoleForUser(req.body.user, req.body.role).then( v => {
+    console.log('sending... '+ v)
+    res.send(v);
+  }).catch(()=>{
+    res.send(false);
+  })
 })
+
 
 
 /******************************************************************************

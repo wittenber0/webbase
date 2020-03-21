@@ -2,6 +2,19 @@ sysToken = '';
 recentUsers = {};
 users = []
 
+exports.checkRoleForUser = async function(user, role){
+  return await exports.getUserRoles(user).then((roles) => {
+    switch(role){
+      case 'Profile':
+        console.log('profile...')
+        return (roles.filter(r => r.name === 'AppUser').length > 0 ? true : false)
+        break;
+      default:
+        return false;
+    }
+  })
+}
+
 exports.getUserData = async function(user_id) {
     if(!recentUsers.hasOwnProperty(user_id)) {
         recentUsers[user_id] = await getUserFromServer(user_id);
@@ -10,7 +23,8 @@ exports.getUserData = async function(user_id) {
 };
 
 exports.getUserRoles = async function(user_id) {
-    return await getUserRolesFromServer(user_id);
+  console.log(user_id)
+  return await getUserRolesFromServer(user_id);
 }
 
 getUserFromServer = function(user_id){
@@ -49,7 +63,6 @@ getUserRolesFromServer = function(user_id){
         };
         return (request(options)
             .then(response => {
-                console.log('response:')
                 return JSON.parse(response);
             }));
     });

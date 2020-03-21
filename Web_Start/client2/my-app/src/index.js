@@ -10,6 +10,7 @@ import { Route, Router } from 'react-router-dom';
 import { Auth0Provider } from "./Auth/react-auth0-spa";
 import config from "./Auth/auth0-keys.json";
 import { useAuth0 } from "./Auth/react-auth0-spa";
+import PrivateRoute from './Auth/private-route';
 
 //Shared
 import history from './Shared/browser-history';
@@ -47,7 +48,7 @@ const routing = (
       	<App history={history}>
     	  	<div>
     	      <Route path="/app/about" component={About} />
-            <Route path="/app/profile" component={MyProfile} />
+            <Route path="/app/profile"><PrivateRoute component={MyProfile}></PrivateRoute></Route>
             <Route path="/app/notfound" component={NotFound} />
     	    </div>
       	</App>
