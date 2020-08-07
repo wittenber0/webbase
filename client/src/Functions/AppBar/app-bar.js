@@ -27,8 +27,8 @@ export default function ButtonAppBar(props) {
   const classes = useStyles();
 
   return (
-    <div className={classes.root}>
-      <AppBar position="static">
+    <div className="app-bar">
+      <AppBar position="fixed">
         <Toolbar>
           <TemporaryDrawer drawerLocation='left' menuList={sideBarItems} history={props.history}>
           </TemporaryDrawer>

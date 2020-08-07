@@ -1,3 +1,18 @@
+:root {
+  --color-surface: white;
+  --color-solid: black;
+  --color-primary: teal;
+  --color-1: #0D192B;
+  --color-2: #3C424E;
+  --color-3: #CCCCCC;
+  --color-4: #E3F2EA;
+  --color-5: #2B4536;
+  --grey-1: #171B1D;
+  --grey-2: #202528;
+  --grey-3: #282F33;
+
+}
+
 .App {
   text-align: center;
 }
@@ -13,7 +28,7 @@
   }
 }
 
-.App-header {
+/*.App-header {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -22,7 +37,7 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
-}
+}*/
 
 .App-link {
   color: #61dafb;
@@ -35,4 +50,31 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.dark-fill-block {
+  background-color: var(--grey-1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.light-fill-block {
+  background-color: var(--grey-3);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.app-bar {
+  background-color: red;
+  flex-grow: 1;
 }
