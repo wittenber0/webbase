@@ -18,23 +18,15 @@ import theme from './Shared/theme';
 
 //Pages
 import About from './Pages/about';
+import Home from './Pages/home';
 import MyProfile from './Pages/my-profile';
+import Admin from './Pages/admin';
 import NotFound from './Pages/not-found';
+import Callback from './Pages/login-callback'
 
 const onRedirectCallback = appState => {
-  history.push(
-    appState && appState.targetUrl
-      ? appState.targetUrl
-      : window.location.pathname
-  );
+  history.push('/callback');
 };
-
-/*function lockedPage (comp){
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
-
-  console.log(user);
-  return comp
-}*/
 
 const routing = (
   <Router history={history}>
@@ -48,7 +40,11 @@ const routing = (
       	<App history={history}>
     	  	<div>
     	      <Route path="/app/about" component={About} />
-            <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='Profile'></PrivateRoute></Route>
+            <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
+            <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin'></PrivateRoute></Route>
+            <Route exact path="/callback" component={Callback} />
+            <Route exact path="/app" component={Home} />
+            <Route exact path="/" component={NotFound} />
     	    </div>
       	</App>
       </ThemeProvider>

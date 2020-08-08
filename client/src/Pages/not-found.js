@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PageBlock from '../components/page-block';
 
 class NotFoundPage extends Component{
 
@@ -12,8 +13,10 @@ class NotFoundPage extends Component{
 			<div className="not-found-page">
 				<div className="not-found-page-body">
 					<div>
-						<h2>{this.state.title}</h2>
-						<p>this page does not exist, or you do not have access to this page</p>
+						<PageBlock fill="light">
+							<h2>{this.state.title}</h2>
+							<p>this page does not exist, or you do not have access to this page</p>
+						</PageBlock>
 					</div>
 				</div>
 			</div>

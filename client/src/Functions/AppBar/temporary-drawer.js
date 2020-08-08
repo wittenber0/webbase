@@ -22,21 +22,23 @@ const useStyles = makeStyles(theme =>({
   fullList: {
     width: 'auto',
   },
-  drawerPaper:{
-
+  drawerPaper: {
+    backgroundColor: theme.palette.dark.three,
+    color: theme.palette.common.white
   },
   icon:{
-
+    color: theme.palette.common.white
   }
 }));
 
 function Login(){
+  const classes = useStyles();
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
   if(isAuthenticated){
     return(
-      <ListItem button onClick={()=> logout({})}>
-        <ListItemIcon><AccountBoxIcon /></ListItemIcon>
+      <ListItem button onClick={()=> logout({returnTo: 'http://localhost:3000/app'})}>
+        <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
         <ListItemText>Log out</ListItemText>
       </ListItem>
     )
@@ -44,7 +46,7 @@ function Login(){
 
   return(
     <ListItem button onClick={()=> loginWithRedirect({})}>
-      <ListItemIcon><AccountBoxIcon /></ListItemIcon>
+      <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
       <ListItemText>Login</ListItemText>
     </ListItem>
   )
@@ -73,10 +75,8 @@ export default function TemporaryDrawer(props) {
   };
 
   const changeRoute = (route, side) => {
-
-	setState({ ...state, [side]: false });
-	props.history.push(route);
-
+    setState({ ...state, [side]: false });
+    props.history.push(route);
   };
 
   const sideList = side => (
@@ -90,7 +90,7 @@ export default function TemporaryDrawer(props) {
         <Divider />
           {props.menuList.map((item, index) => (
             <ListItem button key={item.route} onClick={toggleDrawer(side, false, item.route)} onKeyDown={toggleDrawer(side, false, item.route)}>
-              <ListItemIcon classes={{root:classes.icon}}>{index % 2 === 0 ? <InboxIcon /> : <MailIcon/>}</ListItemIcon>
+              <ListItemIcon className={classes.icon}>{index % 2 === 0 ? <InboxIcon /> : <MailIcon/>}</ListItemIcon>
               <ListItemText primary={item.display} />
             </ListItem>
           ))}

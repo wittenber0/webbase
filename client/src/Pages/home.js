@@ -2,24 +2,23 @@ import React, { Component } from 'react';
 import logo from '../logo.svg';
 import PageBlock from '../components/page-block';
 
-class AboutPage extends Component{
+class HomePage extends Component{
 
 	constructor(props){
 		super(props);
-		this.state = {title: 'About'};
+		this.state = {title: 'Home'};
 	}
 
 	render(){
 		return(
-			<div className="about">
-				<div className="about-body">
+			<div className="home">
+				<div className="home-body">
 					<PageBlock fill="light">
 						<div><h2>{this.state.title}</h2></div>
-						<p>this is a test</p>
-						<img src={logo} className="App-logo" alt="logo" />
+						<p>welcome to the brain dump of wittenber0</p>
 					</PageBlock>
 					<PageBlock fill="dark">
-						<h2>light block</h2>
+						<h2>more coming soon...</h2>
 					</PageBlock>
 
 				</div>
@@ -29,4 +28,4 @@ class AboutPage extends Component{
 	}
 }
 
-export default AboutPage;
+export default HomePage;

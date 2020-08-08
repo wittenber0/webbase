@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { useAuth0 } from "../Auth/react-auth0-spa";
+import PageBlock from '../components/page-block';
 
 class MyProfilePage extends Component{
 
@@ -12,8 +13,10 @@ class MyProfilePage extends Component{
 		return(
 			<div className="about">
 				<div className="profile-body">
-					<div><h2>{this.state.title}</h2></div>
-					<p>this is a test</p>
+					<PageBlock fill="light">
+						<div><h2>{this.state.title}</h2></div>
+						<p>this is a test</p>
+					</PageBlock>
 				</div>
 			</div>
 		)

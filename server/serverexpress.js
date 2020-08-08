@@ -30,6 +30,11 @@ app.post('/auth', (req, res) => {
   })
 })
 
+app.get('/usercontext', (req, res) => {
+  console.log('usercontext for ' + req.query.id);
+  res.send(true);
+});
+
 
 
 /******************************************************************************

@@ -5,10 +5,13 @@ users = []
 exports.checkRoleForUser = async function(user, role){
   return await exports.getUserRoles(user).then((roles) => {
     switch(role){
-      case 'Profile':
+      case 'profile':
         console.log('profile...')
         return (roles.filter(r => r.name === 'AppUser').length > 0 ? true : false)
         break;
+      case 'admin':
+        console.log('admin...');
+        eturn (roles.filter(r => r.name === 'AppAdmin').length > 0 ? true : false)
       default:
         return false;
     }

@@ -1,20 +1,49 @@
 import React, { Component } from 'react';
 import classNames from 'classnames'
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+	lightFillBlock : {
+	  backgroundColor: theme.palette.dark.two,
+	  minHeight: '100vh',
+	  display: 'flex',
+	  flexDirection: 'column',
+	  alignItems: 'center',
+	  justifyContent: 'center',
+	  fontSize: 'calc(10px + 2vmin)',
+	  color: 'white'
+	},
+	darkFillBlock : {
+	  backgroundColor: theme.palette.dark.one,
+	  minHeight: '100vh',
+	  display: 'flex',
+	  flexDirection: 'column',
+	  alignItems: 'center',
+	  justifyContent: 'center',
+	  fontSize: 'calc(10px + 2vmin)',
+	  color: 'white'
+	},
+});
+
 
 class PageBlock extends Component{
 
 	constructor(props){
 		super(props);
-    if(props.fill === 'light'){
-      this.state = {blockFill : classNames('light-fill-block')}
-    }else{
-      this.state = {blockFill : classNames('dark-fill-block')}
-    }
+
+
 	}
 
 	render(){
+		const {classes} = this.props;
+		var blockFill;
+    if(this.props.fill === 'light'){
+      blockFill = classNames(classes.lightFillBlock);
+    }else{
+      blockFill = classNames(classes.darkFillBlock);
+    }
 		return(
-			<div className={this.state.blockFill}>
+			<div className={blockFill}>
 				<div className="block-body">
 					{this.props.children}
 				</div>
@@ -24,4 +53,4 @@ class PageBlock extends Component{
 	}
 }
 
-export default PageBlock;
+export default withStyles(styles)(PageBlock);

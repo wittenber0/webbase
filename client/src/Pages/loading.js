@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PageBlock from '../components/page-block';
 
 class LoadingPage extends Component{
 
@@ -11,7 +12,10 @@ class LoadingPage extends Component{
 		return(
 			<div className="loading-page">
 				<div className="loading-page-body">
-					<div><h2>{this.state.title}</h2></div>
+					<PageBlock fill="light">
+						<div><h2>{this.state.title}</h2></div>
+					</PageBlock>
+
 				</div>
 			</div>
 		)
