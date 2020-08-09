@@ -12,8 +12,9 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Divider from '@material-ui/core/Divider';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
-import Profile from '../../Auth/profile';
+import Profile from './profile';
 import { useAuth0 } from "../../Auth/react-auth0-spa";
+import Context from '../../Shared/app-context'
 
 const useStyles = makeStyles(theme =>({
   list: {
@@ -31,13 +32,17 @@ const useStyles = makeStyles(theme =>({
   }
 }));
 
+function Logout(l){
+  Context.clearUserCache();
+  l({returnTo: 'http://localhost:3000/app'})
+}
+
 function Login(){
   const classes = useStyles();
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
-
-  if(isAuthenticated){
+  const { loginWithRedirect, logout } = useAuth0();
+  if(Context.user()){
     return(
-      <ListItem button onClick={()=> logout({returnTo: 'http://localhost:3000/app'})}>
+      <ListItem button onClick={()=> Logout(logout)}>
         <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
         <ListItemText>Log out</ListItemText>
       </ListItem>

@@ -7,6 +7,8 @@ import Button from '@material-ui/core/Button';
 import TemporaryDrawer from './temporary-drawer'
 import Search from '../Search/search';
 
+import Context from '../../Shared/app-context';
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -27,7 +29,12 @@ class MyAppBar extends Component{
 
 	constructor(props){
 		super(props);
+    this.state = {items: sideBarItems};
 	}
+
+  componentDidMount(){
+    console.log(Context.user())
+  }
 
 	render(){
     const {classes} = this.props
@@ -35,7 +42,7 @@ class MyAppBar extends Component{
       <div className="app-bar">
         <AppBar position="fixed">
           <Toolbar>
-            <TemporaryDrawer drawerLocation='left' menuList={sideBarItems} history={this.props.history}>
+            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history}>
             </TemporaryDrawer>
             <Typography variant="h6" className={classes.title}>
               wittenber0

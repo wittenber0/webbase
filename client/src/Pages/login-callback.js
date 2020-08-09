@@ -4,6 +4,7 @@ import PageBlock from '../components/page-block';
 import Loading from './loading'
 import history from '../Shared/browser-history';
 import AuthService from '../Shared/auth-service';
+import Context from '../Shared/app-context'
 
 export default function Callback() {
   const { loading, isAuthenticated, loginWithRedirect, user } = useAuth0();
@@ -20,15 +21,16 @@ class LoginCallbackPage extends Component{
 	}
 
   componentDidMount(){
-    console.log(this.props.user);
-    AuthService.userContextGet(this.props.user.sub).then(r => {
-      console.log(r);
+    if(this.props.user){
+      AuthService.userContextGet(this.props.user.sub).then(r => {
+        Context.cacheUser(r);
+        history.push('/app');
+      }).catch(() =>{
+        history.push('/app');
+      });
+    }else{
       history.push('/app');
-    }).catch(() =>{
-      console.log("fail");
-      history.push('/app');
-    });
-
+    }
   }
 
 	render(){

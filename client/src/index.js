@@ -44,7 +44,7 @@ const routing = (
             <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin'></PrivateRoute></Route>
             <Route exact path="/callback" component={Callback} />
             <Route exact path="/app" component={Home} />
-            <Route exact path="/" component={NotFound} />
+            <Route exact path="/" component={Callback} />
     	    </div>
       	</App>
       </ThemeProvider>

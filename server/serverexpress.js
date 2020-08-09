@@ -12,7 +12,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 *********************************ENDPOINTS*************************************
 ******************************************************************************/
 app.get('/', (req, res) => {
-   res.sendFile(path.join(__dirname + '/client/public/index.html'));
+  console.log('redirect');
+  res.redirect('/app');
+   //res.sendFile(path.join(__dirname + '/client/public/index.html'));
 })
 
 app.get('/index.js', (req, res) => {
@@ -32,7 +34,15 @@ app.post('/auth', (req, res) => {
 
 app.get('/usercontext', (req, res) => {
   console.log('usercontext for ' + req.query.id);
-  res.send(true);
+  auth.getUserData(req.query.id).then(u => {
+    auth.getUserRoles(req.query.id).then(roles => {
+      u.app_roles = roles;
+      console.log(u)
+      res.send(u);
+    });
+  }).catch(()=>{
+    res.send({});
+  });
 });
 
 
