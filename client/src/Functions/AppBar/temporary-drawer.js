@@ -14,7 +14,7 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 import Profile from './profile';
 import { useAuth0 } from "../../Auth/react-auth0-spa";
-import Context from '../../Shared/app-context'
+import App from '../../App';
 
 const useStyles = makeStyles(theme =>({
   list: {
@@ -32,17 +32,17 @@ const useStyles = makeStyles(theme =>({
   }
 }));
 
-function Logout(l){
-  Context.clearUserCache();
+function Logout(l, app){
+  app.clearUserCache();
   l({returnTo: 'http://localhost:3000/app'})
 }
 
-function Login(){
+function Login(props){
   const classes = useStyles();
   const { loginWithRedirect, logout } = useAuth0();
-  if(Context.user()){
+  if(App.user()){
     return(
-      <ListItem button onClick={()=> Logout(logout)}>
+      <ListItem button onClick={()=> Logout(logout, props.app)}>
         <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
         <ListItemText>Log out</ListItemText>
       </ListItem>
@@ -91,7 +91,7 @@ export default function TemporaryDrawer(props) {
     >
       <Profile goToProfile={()=>toggleDrawer(side, false, '/app/profile')}/>
       <List>
-        <Login />
+        <Login app={props.app}/>
         <Divider />
           {props.menuList.map((item, index) => (
             <ListItem button key={item.route} onClick={toggleDrawer(side, false, item.route)} onKeyDown={toggleDrawer(side, false, item.route)}>

@@ -6,8 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import TemporaryDrawer from './temporary-drawer'
 import Search from '../Search/search';
-
-import Context from '../../Shared/app-context';
+import App from '../../App';
 
 const styles = theme => ({
   root: {
@@ -29,11 +28,25 @@ class MyAppBar extends Component{
 
 	constructor(props){
 		super(props);
-    this.state = {items: sideBarItems};
+    this.state = {
+      items: sideBarItems,
+      app: props.app
+    };
 	}
 
-  componentDidMount(){
-    console.log(Context.user())
+  static getDerivedStateFromProps(nextProps, prevState){
+    if(prevState.app.getUser() != nextProps.app.getUser()){
+      let o = {};
+      if(App.userHasRole('AppAdmin')){
+        let s = prevState.items
+        s.push({display: 'Administration', route: '/app/admin'});
+        o.items = s;
+      }
+      o.app = nextProps.app;
+      return o;
+    }else{
+      return null
+    }
   }
 
 	render(){
@@ -42,7 +55,7 @@ class MyAppBar extends Component{
       <div className="app-bar">
         <AppBar position="fixed">
           <Toolbar>
-            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history}>
+            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
             </TemporaryDrawer>
             <Typography variant="h6" className={classes.title}>
               wittenber0

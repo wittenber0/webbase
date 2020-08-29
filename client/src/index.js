@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { Route, Router } from 'react-router-dom';
+import App from './App';
 
 //Auth
 import { Auth0Provider } from "./Auth/react-auth0-spa";
@@ -37,16 +37,7 @@ const routing = (
       onRedirectCallback={onRedirectCallback}
     >
       <ThemeProvider theme={theme}>
-      	<App history={history}>
-    	  	<div>
-    	      <Route path="/app/about" component={About} />
-            <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
-            <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin'></PrivateRoute></Route>
-            <Route exact path="/callback" component={Callback} />
-            <Route exact path="/app" component={Home} />
-            <Route exact path="/" component={Callback} />
-    	    </div>
-      	</App>
+        <App history={history}/>
       </ThemeProvider>
     </Auth0Provider>
   </Router>

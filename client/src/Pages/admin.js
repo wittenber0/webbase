@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import logo from '../logo.svg';
 import PageBlock from '../components/page-block';
+import AuthService from '../Shared/auth-service';
+import App from '../App';
 
 class AdminPage extends Component{
 
 	constructor(props){
 		super(props);
 		this.state = {title: 'administration'};
+	}
+
+	componentDidMount(){
+		AuthService.getAllAppRoles(App.user().user_id).then( r => {
+			//console.log(r);
+		})
+
+		AuthService.post('/roleusers').then( r => {
+			console.log(r);
+		})
 	}
 
 	render(){

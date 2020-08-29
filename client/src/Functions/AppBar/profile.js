@@ -5,12 +5,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import Context from '../../Shared/app-context'
+import App from '../../App';
 
 function Profile(props){
-  let user = Context.user();
-  let hasProfileAccess = user ? user.app_roles.filter( r => r.name === 'AppUser').length > 0 : null;
-  if(user && hasProfileAccess){
+  let user = App.user();
+  if(user && App.userHasRole('AppUser')){
     return (
       <Fragment>
         <ListItem button onClick={props.goToProfile()}>

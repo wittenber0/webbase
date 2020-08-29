@@ -3,7 +3,7 @@ import { useAuth0 } from "./react-auth0-spa";
 import NotFound from '../Pages/not-found';
 import Loading from '../Pages/loading'
 import AuthService from '../Shared/auth-service';
-import Context from '../Shared/app-context'
+import App from '../App'
 
 class PrivateRoute extends Component {
 
@@ -13,7 +13,7 @@ class PrivateRoute extends Component {
   }
 
   componentDidMount() {
-    AuthService.validate(Context.user().user_id, this.props.userAccess).then((r)=>{
+    AuthService.validate(App.user().user_id, this.props.userAccess).then((r)=>{
       if (r) {
         this.setState({page: this.props.component})
       }else{
