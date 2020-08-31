@@ -48,7 +48,7 @@ class App extends Component{
 
   render(){
     return (
-      <div>
+      <div className={"App-header"}>
         <ButtonAppBar history={this.props.history} app={this}></ButtonAppBar>
           <div>
             <Route path="/app/about" component={About} />

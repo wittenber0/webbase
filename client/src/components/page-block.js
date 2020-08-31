@@ -23,6 +23,9 @@ const styles = theme => ({
 	  fontSize: 'calc(10px + 2vmin)',
 	  color: 'white'
 	},
+	blockBody : {
+		width: '80%'
+	}
 });
 
 
@@ -44,7 +47,7 @@ class PageBlock extends Component{
     }
 		return(
 			<div className={blockFill}>
-				<div className="block-body">
+				<div className={classes.blockBody}>
 					{this.props.children}
 				</div>
 			</div>

@@ -35,6 +35,10 @@ class AuthService{
     });
   }
 
+  static getAppUsers = async function(userId) {
+    return this.post('/appusers');
+  }
+
   static get = async function(route){
     return await fetch(route)
     .then(res=>{

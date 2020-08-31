@@ -18,14 +18,11 @@ app.get('/', (req, res) => {
 })
 
 app.get('/index.js', (req, res) => {
-  console.log('called')
    res.sendFile(path.join(__dirname + '/client/public/index.js'));
 })
 
 app.post('/auth', (req, res) => {
-  console.log(req.body);
   auth.checkRoleForUser(req.body.user, req.body.role).then( v => {
-    console.log('sending... '+ v)
     res.send(v);
   }).catch(()=>{
     res.send(false);
@@ -37,13 +34,42 @@ app.get('/usercontext', (req, res) => {
   auth.getUserData(req.query.id).then(u => {
     auth.getUserRoles(req.query.id).then(roles => {
       u.app_roles = roles;
-      console.log(u)
+      console.log(u);
       res.send(u);
     });
   }).catch(()=>{
+    console.log('failed somewhere in here')
     res.send({});
   });
 });
+
+app.post('/approles', (req, res) => {
+  auth.getAllAppRoles(req.body.user).then( v => {
+    res.send(v);
+  }).catch(()=>{
+    res.send(false);
+  })
+})
+
+app.post('/roleusers', (req, res) => {
+  console.log('roleusers');
+  auth.getRoleUsers(req.body.user).then( v => {
+    console.log(v);
+    res.send(v);
+  }).catch(()=>{
+    res.send(false);
+  })
+});
+
+app.post('/appusers', (req, res) => {
+  console.log('appusers');
+  auth.getAllUsers(req.body.user).then( v => {
+    console.log(v);
+    res.send(v);
+  }).catch(()=>{
+    res.send(false);
+  })
+})
 
 
 

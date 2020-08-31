@@ -1,17 +1,13 @@
 sysToken = '';
-recentUsers = {};
-users = []
 
 exports.checkRoleForUser = async function(user, role){
   return await exports.getUserRoles(user).then((roles) => {
     switch(role){
       case 'profile':
-        console.log('profile...')
         return (roles.filter(r => r.name === 'AppUser').length > 0 ? true : false)
         break;
       case 'admin':
-        console.log('admin...');
-        eturn (roles.filter(r => r.name === 'AppAdmin').length > 0 ? true : false)
+        return (roles.filter(r => r.name === 'AppAdmin').length > 0 ? true : false)
       default:
         return false;
     }
@@ -19,10 +15,7 @@ exports.checkRoleForUser = async function(user, role){
 }
 
 exports.getUserData = async function(user_id) {
-    if(!recentUsers.hasOwnProperty(user_id)) {
-        recentUsers[user_id] = await getUserFromServer(user_id);
-    }
-    return recentUsers[user_id];
+  return await getUserFromServer(user_id);
 };
 
 exports.getUserRoles = async function(user_id) {
@@ -30,48 +23,112 @@ exports.getUserRoles = async function(user_id) {
   return await getUserRolesFromServer(user_id);
 }
 
+exports.getAllAppRoles = async function(user_id){
+  return exports.checkRoleForUser(user_id, 'admin').then( r => {
+    if(r){
+      return getAllAppRolesFromServer().then( r =>{
+        return r;
+      }).catch(()=>{
+        return [];
+      })
+    }
+  }).catch(() => {
+    console.log('failure');
+    return [];
+  });
+}
+
+exports.getAllUsers = async function(user_id){
+  return exports.checkRoleForUser(user_id, 'admin').then( r => {
+    if(r){
+      return getAllUsersFromServer().then( users => {
+        console.log(users);
+        return Promise.all(users.map( u => {
+          return new Promise((resolve, reject) => {
+            getUserRolesFromServer(u.user_id).then( roles => {
+              u.roles = roles;
+              resolve(u);
+            })
+          })
+        }))
+      })
+    }
+  }).catch( e => {
+    console.log('failed to authenticate');
+    return [];
+  });
+}
+
+exports.getRoleUsers = async function(user_id){
+  return exports.checkRoleForUser(user_id, 'admin').then( r => {
+    console.log("roles");
+    if(r){
+
+      return getAllAppRolesFromServer().then( roles =>{
+        return Promise.all(roles.map( r => {
+          return new Promise((resolve, reject) => {
+            getAllUserForRoleFromServerSync(r.id).then( urs => {
+              r.users = urs;
+              resolve(r);
+            });
+          });
+        }));
+      }).catch(()=>{
+        return [];
+      })
+    }
+  }).catch(() => {
+    console.log('failure');
+    return [];
+  });
+}
+
 getUserFromServer = function(user_id){
-    return exports.getSysToken().then(() => {
-        let request = require("request-promise");
-        let options = {
-            method: 'GET',
-            url: 'https://ryanwwittenberg.auth0.com/api/v2/users/' + user_id,
-            //qs: {fields: 'app_metadata', include_fields: 'true'},
-            headers:
-                {
-                    'content-type': 'application/json',
-                    authorization: `Bearer ${sysToken}`
-                }
-        };
-        return (request(options)
-            .then(response => {
-                console.log('response:')
-                return JSON.parse(response);
-            }));
-    });
+  let url = '/users/'+user_id;
+  return getFromAuth0V2(url);
+};
+
+getAllUsersFromServer = function(){
+  let url = '/users';
+  return getFromAuth0V2(url);
 };
 
 getUserRolesFromServer = function(user_id){
-    return exports.getSysToken().then(() => {
-        let request = require("request-promise");
-        let options = {
-            method: 'GET',
-            url: 'https://ryanwwittenberg.auth0.com/api/v2/users/' + user_id + '/roles',
-            //qs: {fields: 'app_metadata', include_fields: 'true'},
-            headers:
-                {
-                    'content-type': 'application/json',
-                    authorization: `Bearer ${sysToken}`
-                }
-        };
-        return (request(options)
-            .then(response => {
-                return JSON.parse(response);
-            }));
-    });
+  let url = '/users/'+user_id+'/roles';
+  return getFromAuth0V2(url);
 };
 
-exports.getSysToken = function(){
+getAllAppRolesFromServer = function(){
+  return getFromAuth0V2('/roles');
+};
+
+getAllUserForRoleFromServerSync = function(role_id){
+  let url = '/roles/'+role_id+'/users';
+  return getFromAuth0V2(url);
+};
+
+getFromAuth0V2 = function(route){
+  return getSysToken().then(()=>{
+    let request = require("request-promise");
+    let options = {
+        method: 'GET',
+        url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
+        headers:
+            {
+                'content-type': 'application/json',
+                authorization: `Bearer ${sysToken}`
+            }
+    };
+    return (request(options)
+        .then(response => {
+            return JSON.parse(response);
+        }).catch( e => {
+          console.log(e);
+        }));
+  });
+}
+
+getSysToken = function(){
     let request = require("request-promise");
 
     let options = { method: 'POST',
@@ -87,51 +144,5 @@ exports.getSysToken = function(){
     return request(options)
      .then(response => {
             sysToken = response['access_token'];
-        });
-};
-
-exports.getUsers = () => {
-    let request = require("request-promise");
-    let options = {
-        method: 'GET',
-        url: 'https://ryanwwittenberg.auth0.com/api/v2/users',
-        headers:
-            {
-                'content-type': 'application/json',
-                authorization: `Bearer ${sysToken}`
-            }
-    };
-    console.log('[auth] Getting all users');
-    return (request(options)
-        .then(response => {
-            console.log(response);
-            //res.status(200).send(response);
-        }).catch(error => {
-            console.log('[auth] 500 ' + error);
-            //res.status(500).send(error);
-        }));
-};
-
-exports.updateUser = (req, res) => {
-    let request = require("request-promise");
-    let options = {
-        method: 'PATCH',
-        url: `https://ryanwwittenberg.auth0.com/api/v2/users/${req.body.user_id}`,
-        headers:
-            {
-                'content-type': 'application/json',
-                'Authorization': `Bearer ${sysToken}`
-            },
-        body: `{"app_metadata":{"level":"${req.body.newLevel}"}}`
-    };
-    console.log('[auth] Updating user ' + JSON.stringify(req.body));
-    return request(options)
-        .then(response => {
-            console.log('[auth] Success');
-            recentUsers[req.body.user_id] = req.body.newLevel;
-            res.status(200).send(response);
-        }).catch(error => {
-            console.log('[auth] 500 ' + error);
-            res.status(500).send(error);
         });
 };

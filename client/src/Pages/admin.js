@@ -4,11 +4,13 @@ import PageBlock from '../components/page-block';
 import AuthService from '../Shared/auth-service';
 import App from '../App';
 
+import Table from '../Functions/Table/table';
+
 class AdminPage extends Component{
 
 	constructor(props){
 		super(props);
-		this.state = {title: 'administration'};
+		this.state = {title: 'administration', appUsers: null};
 	}
 
 	componentDidMount(){
@@ -16,8 +18,9 @@ class AdminPage extends Component{
 			//console.log(r);
 		})
 
-		AuthService.post('/roleusers').then( r => {
+		AuthService.post('/appusers').then( r => {
 			console.log(r);
+			this.setState({appUsers : r});
 		})
 	}
 
@@ -29,9 +32,15 @@ class AdminPage extends Component{
 						<div><h2>{this.state.title}</h2></div>
 						<p>do admin things below</p>
 					</PageBlock>
-					<PageBlock fill="dark">
-						<h2>more coming soon...</h2>
-					</PageBlock>
+					{this.state.appUsers &&
+						<PageBlock fill="dark">
+							<h2>Manage Users</h2>
+							<Table users={this.state.appUsers}/>
+
+
+						</PageBlock>
+					}
+
 
 				</div>
 			</div>
