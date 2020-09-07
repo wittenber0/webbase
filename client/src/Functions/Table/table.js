@@ -16,10 +16,9 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
+import App from '../../App';
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -47,17 +46,26 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const headCells = [
-  //{ id: 'name', numeric: false, disablePadding: true, label: 'Name', checkbox: false },
-  { id: 'email', numeric: false, disablePadding: false, label: 'Email', checkbox: false, disabled: false },
-  { id: 'AppAdmin', numeric: false, disablePadding: false, label: 'AppAdmin', checkbox: true, disabled: false },
-  { id: 'AppUser', numeric: false, disablePadding: false, label: 'AppUser', checkbox: true, disabled: false },
-  { id: 'BinanceUser', numeric: false, disablePadding: false, label: 'BinanceUser', checkbox: true, disabled: false },
-  { id: 'None', numeric: false, disablePadding: false, label: 'None', checkbox: true, disabled: true }
-];
+
+
+function getHeadCells(roles){
+  let headCells = [
+    { id: 'email', numeric: false, disablePadding: false, label: 'Email', checkbox: false, disabled: false, description: "The user's email", rowDetail: null }
+  ];
+
+  roles.map( r => {
+    headCells.push({ id: r.id, numeric: false, disablePadding: false, label: r.name, checkbox: true, disabled: false, description: r.description, rowDetail: r });
+  });
+
+  headCells.push({ id: 'none', numeric: false, disablePadding: false, label: 'None', checkbox: true, disabled: true, description: "Has no roles", rowDetail: null });
+
+  return headCells;
+}
+
+
 
 function EnhancedTableHead(props) {
-  const { classes, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { classes, order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -65,7 +73,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        {headCells.map((headCell) => (
+        {getHeadCells(props.roles).map((headCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
@@ -189,33 +197,35 @@ export default function EnhancedTable(props) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
-  const [selected, setSelected] = React.useState([]);
+  const [selected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const hasNoRoles = (row) => {
-    return !(row.AppAdmin || row.AppUser || row.BinanceUser);
-  }
+  const [users, setUsers] = React.useState(props.users);
 
   const buildData = () => {
     let d = []
-    props.users.map( u => {
+    users.map( u => {
       d.push(createRow(u))
     });
     return d;
   }
 
   const createRow = (user) => {
-    let AppAdmin = user.roles.filter( r => {return r.name === 'AppAdmin'}).length > 0;
-    let AppUser = user.roles.filter( r => {return r.name === 'AppUser'}).length > 0;
-    let BinanceUser = user.roles.filter( r => {return r.name === 'BinanceUser'}).length > 0;
-    let None = !(AppAdmin || AppUser || BinanceUser);
+    let row = {user, name: user.name, email: user.email};
+    let hasNone = true;
+    props.roles.map( role => {
+      row[role.id] = user.roles.filter( r => {return r.id === role.id}).length > 0;
+      if(row[role.id]){
+        hasNone = false;
+      }
+    });
+    row.none = hasNone;
 
-    return { user, name: user.name, email: user.email, AppAdmin, AppUser, BinanceUser, None };
+    return row;
   }
 
-  let [rows, setRows] = React.useState(buildData());
+  let rows = buildData();
+  //let [rows, setRows] = React.useState(buildData());
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -223,16 +233,22 @@ export default function EnhancedTable(props) {
     setOrderBy(property);
   };
 
-  const updateUsers = (role, user) => {
-    rows.map( row => {
-      if(row.email === user.email){
-        row[role] = !row[role];
-      }
+  const updateUsers = (role, userId) => {
+    let roleId = role.id;
+    users.map( u => {
+      if (u.user_id === userId){
+        if(u.roles.filter( r => r.id === roleId).length > 0){
+          u.roles = u.roles.filter( r => r.id !== roleId);
+          props.adminPage.updateUserRoles(u, [roleId]);
+        }else{
+          u.roles.push(role);
+          props.adminPage.updateUserRoles(u);
+        }
 
-      row.None = hasNoRoles(row);
+      }
     });
-    console.log(rows);
-    setRows(Object.assign([], rows));
+
+    setUsers(Object.assign([], users));
   };
 
   const handleChangePage = (event, newPage) => {
@@ -242,10 +258,6 @@ export default function EnhancedTable(props) {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -258,7 +270,7 @@ export default function EnhancedTable(props) {
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
+            size={'small'}
             aria-label="enhanced table"
           >
             <EnhancedTableHead
@@ -268,13 +280,12 @@ export default function EnhancedTable(props) {
               orderBy={orderBy}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              roles={props.roles}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
@@ -282,14 +293,14 @@ export default function EnhancedTable(props) {
                       tabIndex={-1}
                       key={row.name}
                     >
-                      {headCells.map( (c,i) => {
+                      {getHeadCells(props.roles).map( (c,i) => {
                         return (
                           <TableCell key={c.id} align="left">
                             {c.checkbox ?
                               <Checkbox
                                 checked={row[c.id]}
-                                onClick={(event) => updateUsers(c.id, row.user)}
-                                disabled={c.disabled}
+                                onClick={(event) => updateUsers(c.rowDetail, row.user.user_id)}
+                                disabled={c.disabled || (c.label === 'AppAdmin' && row.user.user_id === App.user().user_id)}
                               /> :
                               <Typography>{row[c.id]}</Typography>
                             }
@@ -301,7 +312,7 @@ export default function EnhancedTable(props) {
                   );
                 })}
               {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                <TableRow style={{ height: 33 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
@@ -318,10 +329,6 @@ export default function EnhancedTable(props) {
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
     </div>
   );
 }

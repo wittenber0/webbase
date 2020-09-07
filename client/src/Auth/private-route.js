@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { useAuth0 } from "./react-auth0-spa";
 import NotFound from '../Pages/not-found';
 import Loading from '../Pages/loading'
 import AuthService from '../Shared/auth-service';
@@ -27,7 +26,11 @@ class PrivateRoute extends Component {
 
   render() {
     let P = this.state.page
-    return <P />
+    if(this.props.app){
+      return <P app={this.props.app}/>
+    }else{
+      return <P />
+    }
   }
 }
 

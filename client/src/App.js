@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ButtonAppBar from './Functions/AppBar/app-bar';
-import { Route, Router } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 //Auth
 import PrivateRoute from './Auth/private-route';
@@ -10,7 +10,6 @@ import About from './Pages/about';
 import Home from './Pages/home';
 import MyProfile from './Pages/my-profile';
 import Admin from './Pages/admin';
-import NotFound from './Pages/not-found';
 import Callback from './Pages/login-callback'
 
 class App extends Component{
@@ -24,8 +23,16 @@ class App extends Component{
     return window.sessionStorage.user_context ? JSON.parse(window.sessionStorage.user_context) : null;
   }
 
+  static userHasRoleFromCache(role){
+    if(App.user() && App.user().roles){
+      return App.user().roles.filter( r => r.name === role).length > 0;
+    }else{
+      return false;
+    }
+  }
+
   getUser(){
-    return window.sessionStorage.user_context ? JSON.parse(window.sessionStorage.user_context) : null;
+    return this.state.usercontext;
   }
 
   clearUserCache(){
@@ -38,9 +45,15 @@ class App extends Component{
     this.setState({usercontext: App.user()})
   }
 
-  static userHasRole(role){
-    if(App.user() && App.user().app_roles){
-      return App.user().app_roles.filter( r => r.name === role).length > 0;
+  updateMyRoles(roles){
+    let u = this.state.usercontext;
+    u.roles = roles;
+    this.cacheUser(u);
+  }
+
+  userHasRole(role){
+    if(this.state.usercontext && this.state.usercontext.roles){
+      return this.state.usercontext.roles.filter( r => r.name === role).length > 0;
     }else{
       return false;
     }
@@ -53,7 +66,7 @@ class App extends Component{
           <div>
             <Route path="/app/about" component={About} />
             <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
-            <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin'></PrivateRoute></Route>
+            <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin' app={this}></PrivateRoute></Route>
             <Route exact path="/callback"><Callback app={this}/></Route>
             <Route exact path="/app" component={Home} />
             <Route exact path="/" component={Callback} />

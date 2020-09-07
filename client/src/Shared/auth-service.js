@@ -39,6 +39,10 @@ class AuthService{
     return this.post('/appusers');
   }
 
+  static updateUserRoles = async function(userId, roleList, removeInd){
+    return this.post('/users/'+userId+'/roles', {user: App.user().user_id, roles: roleList, removeInd: removeInd });
+  }
+
   static get = async function(route){
     return await fetch(route)
     .then(res=>{

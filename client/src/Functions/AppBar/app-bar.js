@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
 import TemporaryDrawer from './temporary-drawer'
 import Search from '../Search/search';
 import App from '../../App';
@@ -19,7 +18,7 @@ const styles = theme => ({
   },
 });
 
-const sideBarItems = [
+let sideBarItems = [
 	{display: 'Home', route: '/app'},
 	{display: 'About', route: '/app/about'},
 ];
@@ -28,16 +27,22 @@ class MyAppBar extends Component{
 
 	constructor(props){
 		super(props);
+    if(props.app.userHasRole('AppAdmin')){
+      sideBarItems.push({display: 'Administration', route: '/app/admin'});
+    }
+
     this.state = {
       items: sideBarItems,
-      app: props.app
+      app: props.app,
+      user: props.app.getUser()
     };
 	}
 
   static getDerivedStateFromProps(nextProps, prevState){
-    if(prevState.app.getUser() != nextProps.app.getUser()){
+
+    if(prevState.user !== nextProps.user){
       let o = {};
-      if(App.userHasRole('AppAdmin')){
+      if(prevState.app.userHasRole('AppAdmin') && !(prevState.items.filter( i => i.display === 'Administration').length > 0)){
         let s = prevState.items
         s.push({display: 'Administration', route: '/app/admin'});
         o.items = s;

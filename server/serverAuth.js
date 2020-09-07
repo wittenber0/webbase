@@ -19,7 +19,6 @@ exports.getUserData = async function(user_id) {
 };
 
 exports.getUserRoles = async function(user_id) {
-  console.log(user_id)
   return await getUserRolesFromServer(user_id);
 }
 
@@ -42,7 +41,6 @@ exports.getAllUsers = async function(user_id){
   return exports.checkRoleForUser(user_id, 'admin').then( r => {
     if(r){
       return getAllUsersFromServer().then( users => {
-        console.log(users);
         return Promise.all(users.map( u => {
           return new Promise((resolve, reject) => {
             getUserRolesFromServer(u.user_id).then( roles => {
@@ -61,7 +59,6 @@ exports.getAllUsers = async function(user_id){
 
 exports.getRoleUsers = async function(user_id){
   return exports.checkRoleForUser(user_id, 'admin').then( r => {
-    console.log("roles");
     if(r){
 
       return getAllAppRolesFromServer().then( roles =>{
@@ -73,6 +70,21 @@ exports.getRoleUsers = async function(user_id){
             });
           });
         }));
+      }).catch(()=>{
+        return [];
+      })
+    }
+  }).catch(() => {
+    console.log('failure');
+    return [];
+  });
+}
+
+exports.updateUserRoles = async function(user_id, role_list, viewer_user_id, to_remove){
+  return exports.checkRoleForUser(viewer_user_id, 'admin').then( r => {
+    if(r){
+      return updateUserRolesFromServer(user_id, role_list, to_remove).then( r =>{
+        return r;
       }).catch(()=>{
         return [];
       })
@@ -107,6 +119,17 @@ getAllUserForRoleFromServerSync = function(role_id){
   return getFromAuth0V2(url);
 };
 
+updateUserRolesFromServer = function(user_id, role_list, to_remove){
+  let url = '/users/'+user_id+'/roles';
+  let body = {roles: role_list};
+
+  if(to_remove){
+    return deleteFromAuth0V2(url, body);
+  }else{
+    return postToAuth0V2(url, body);
+  }
+}
+
 getFromAuth0V2 = function(route){
   return getSysToken().then(()=>{
     let request = require("request-promise");
@@ -124,6 +147,65 @@ getFromAuth0V2 = function(route){
             return JSON.parse(response);
         }).catch( e => {
           console.log(e);
+        }));
+  });
+}
+
+postToAuth0V2 = function(route, body){
+  return getSysToken().then(()=>{
+    let request = require("request-promise");
+    let options = {
+        method: 'POST',
+        url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
+        body: JSON.stringify(body),
+        headers:
+            {
+                'content-type': 'application/json',
+                authorization: `Bearer ${sysToken}`
+            },
+        resolveWithFullResponse: true
+    };
+    return (request(options)
+        .then(response => {
+          if(response.body){
+            return JSON.parse(response.body);
+          }else if(Math.floor(response.statusCode / 100) === 2){
+            return true;
+          }else{
+            return false;
+          }
+        }).catch( e => {
+          console.log(e);
+          return false;
+        }));
+  });
+}
+
+deleteFromAuth0V2 = function(route, body){
+  return getSysToken().then(()=>{
+    let request = require("request-promise");
+    let options = {
+        method: 'DELETE',
+        url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
+        body: JSON.stringify(body),
+        headers:
+            {
+                'content-type': 'application/json',
+                authorization: `Bearer ${sysToken}`
+            },
+        resolveWithFullResponse: true
+    };
+    return (request(options)
+        .then(response => {
+          if(response.body){
+          }else if(Math.floor(response.statusCode / 100) === 2){
+            return true;
+          }else{
+            return false;
+          }
+        }).catch( e => {
+          console.log(e);
+          return false;
         }));
   });
 }

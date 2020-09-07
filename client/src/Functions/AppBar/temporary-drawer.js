@@ -89,7 +89,7 @@ export default function TemporaryDrawer(props) {
       className={classes.list}
       role="presentation"
     >
-      <Profile goToProfile={()=>toggleDrawer(side, false, '/app/profile')}/>
+      <Profile app={props.app} goToProfile={()=>toggleDrawer(side, false, '/app/profile')}/>
       <List>
         <Login app={props.app}/>
         <Divider />

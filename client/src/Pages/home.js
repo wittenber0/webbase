@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
 import PageBlock from '../components/page-block';
 
 class HomePage extends Component{

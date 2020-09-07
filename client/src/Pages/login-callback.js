@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { useAuth0 } from "../Auth/react-auth0-spa";
-import PageBlock from '../components/page-block';
 import Loading from './loading'
 import history from '../Shared/browser-history';
 import AuthService from '../Shared/auth-service';
 
 export default function Callback(props) {
-  const { loading, isAuthenticated, loginWithRedirect, user } = useAuth0();
+  const { loading, user } = useAuth0();
   if(!loading){
     return <LoginCallbackPage user={user} app={props.app}/>
   }
@@ -14,10 +13,6 @@ export default function Callback(props) {
 };
 
 class LoginCallbackPage extends Component{
-
-  constructor(props){
-		super(props);
-	}
 
   componentDidMount(){
     if(this.props.user){

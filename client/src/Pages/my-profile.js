@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { useAuth0 } from "../Auth/react-auth0-spa";
 import PageBlock from '../components/page-block';
 
 class MyProfilePage extends Component{

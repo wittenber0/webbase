@@ -31,12 +31,6 @@ const styles = theme => ({
 
 class PageBlock extends Component{
 
-	constructor(props){
-		super(props);
-
-
-	}
-
 	render(){
 		const {classes} = this.props;
 		var blockFill;

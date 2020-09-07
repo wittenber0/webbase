@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from '../logo.svg';
 import PageBlock from '../components/page-block';
 import AuthService from '../Shared/auth-service';
 import App from '../App';
@@ -10,18 +9,36 @@ class AdminPage extends Component{
 
 	constructor(props){
 		super(props);
-		this.state = {title: 'administration', appUsers: null};
+		console.log(App.user());
+		this.state = {title: 'administration', appUsers: null, appRoles: null};
 	}
 
 	componentDidMount(){
-		AuthService.getAllAppRoles(App.user().user_id).then( r => {
-			//console.log(r);
-		})
+		let dictionaries = [];
+		dictionaries.push(AuthService.getAllAppRoles(App.user().user_id));
+		dictionaries.push(AuthService.post('/appusers'));
 
-		AuthService.post('/appusers').then( r => {
-			console.log(r);
-			this.setState({appUsers : r});
-		})
+		Promise.all(dictionaries).then( values => {
+			this.setState({appUsers : values[1], appRoles: values[0]});
+		});
+
+	}
+
+	updateUserRoles(user, toRemove){
+		let roleList;
+
+		if(toRemove){
+			roleList = toRemove;
+		} else {
+			roleList = user.roles.map( r => r.id);
+		}
+
+		if(user.user_id === App.user().user_id){
+			console.log(user.roles);
+			this.props.app.updateMyRoles(user.roles);
+		}
+
+		AuthService.updateUserRoles(user.user_id, roleList, !!toRemove);
 	}
 
 	render(){
@@ -35,13 +52,9 @@ class AdminPage extends Component{
 					{this.state.appUsers &&
 						<PageBlock fill="dark">
 							<h2>Manage Users</h2>
-							<Table users={this.state.appUsers}/>
-
-
+							<Table users={this.state.appUsers} roles={this.state.appRoles} adminPage={this}/>
 						</PageBlock>
 					}
-
-
 				</div>
 			</div>
 

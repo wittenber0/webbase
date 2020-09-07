@@ -12,9 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 *********************************ENDPOINTS*************************************
 ******************************************************************************/
 app.get('/', (req, res) => {
-  console.log('redirect');
   res.redirect('/app');
-   //res.sendFile(path.join(__dirname + '/client/public/index.html'));
 })
 
 app.get('/index.js', (req, res) => {
@@ -30,11 +28,10 @@ app.post('/auth', (req, res) => {
 })
 
 app.get('/usercontext', (req, res) => {
-  console.log('usercontext for ' + req.query.id);
+  console.log('Usercontext for ' + req.query.id);
   auth.getUserData(req.query.id).then(u => {
     auth.getUserRoles(req.query.id).then(roles => {
-      u.app_roles = roles;
-      console.log(u);
+      u.roles = roles;
       res.send(u);
     });
   }).catch(()=>{
@@ -52,9 +49,7 @@ app.post('/approles', (req, res) => {
 })
 
 app.post('/roleusers', (req, res) => {
-  console.log('roleusers');
   auth.getRoleUsers(req.body.user).then( v => {
-    console.log(v);
     res.send(v);
   }).catch(()=>{
     res.send(false);
@@ -62,9 +57,16 @@ app.post('/roleusers', (req, res) => {
 });
 
 app.post('/appusers', (req, res) => {
-  console.log('appusers');
   auth.getAllUsers(req.body.user).then( v => {
-    console.log(v);
+    res.send(v);
+  }).catch(()=>{
+    res.send(false);
+  })
+});
+
+app.post('/users/:user/roles', (req, res) => {
+  console.log("Updating roles for "+ req.params.user);
+  auth.updateUserRoles(req.params.user, req.body.roles, req.body.user, req.body.removeInd).then( v => {
     res.send(v);
   }).catch(()=>{
     res.send(false);
