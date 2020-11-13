@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 import AuthService from '../Shared/auth-service';
 import App from '../App';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Table from '../Functions/Table/table';
 
@@ -42,19 +43,20 @@ class AdminPage extends Component{
 	}
 
 	render(){
+		console.log(this.state.appUsers);
 		return(
 			<div className="admin">
 				<div className="admin-body">
-					<PageBlock fill="light">
-						<div><h2>{this.state.title}</h2></div>
-						<p>do admin things below</p>
-					</PageBlock>
-					{this.state.appUsers &&
-						<PageBlock fill="dark">
+					{this.state.appUsers===null? <PageBlock fill="light"><CircularProgress size={100} /></PageBlock> :
+						<PageBlock fill="light" waitfor={this.state.appUsers}>
 							<h2>Manage Users</h2>
 							<Table users={this.state.appUsers} roles={this.state.appRoles} adminPage={this}/>
 						</PageBlock>
 					}
+					<PageBlock fill="dark">
+						<div><h2>{this.state.title}</h2></div>
+						<p>do admin things below</p>
+					</PageBlock>
 				</div>
 			</div>
 
