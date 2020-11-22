@@ -21,6 +21,7 @@ const styles = theme => ({
 let sideBarItems = [
 	{display: 'Home', route: '/app'},
 	{display: 'About', route: '/app/about'},
+  {display: 'Non Fungible Tokens', route: '/app/nfts'},
 ];
 
 class MyAppBar extends Component{
