@@ -29,7 +29,7 @@ class NFTPage extends Component{
 						<img src={logo} className="App-logo" alt="logo" />
 					</PageBlock>
 					<PageBlock fill="dark">
-						<h2>light block</h2>
+						<h2>dark block</h2>
 					</PageBlock>
 
 				</div>

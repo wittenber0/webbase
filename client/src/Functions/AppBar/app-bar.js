@@ -58,18 +58,16 @@ class MyAppBar extends Component{
 	render(){
     const {classes} = this.props
     return (
-      <div className="app-bar">
-        <AppBar position="fixed">
-          <Toolbar>
-            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
-            </TemporaryDrawer>
-            <Typography variant="h6" className={classes.title}>
-              wittenber0
-            </Typography>
-            <Search />
-          </Toolbar>
-        </AppBar>
-      </div>
+      <AppBar position="fixed">
+        <Toolbar>
+          <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
+          </TemporaryDrawer>
+          <Typography variant="h6" className={classes.title}>
+            wittenber0
+          </Typography>
+          <Search />
+        </Toolbar>
+      </AppBar>
     );
 	}
 }

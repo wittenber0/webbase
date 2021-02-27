@@ -13,7 +13,7 @@ const theme = createMuiTheme({
     black: '#000000',
     dark: {
       one: '#101010',
-      two: '#141414',
+      two: '#181818',
       three: '#303030'
     },
     light: '#f2f2f2'

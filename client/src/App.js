@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ButtonAppBar from './Functions/AppBar/app-bar';
 import { Route } from 'react-router-dom';
+import { withStyles } from '@material-ui/core/styles';
 
 //Auth
 import PrivateRoute from './Auth/private-route';
@@ -12,6 +13,11 @@ import MyProfile from './Pages/my-profile';
 import Admin from './Pages/admin';
 import Callback from './Pages/login-callback'
 import NFTs from './Pages/nfts'
+
+const styles = theme => ({
+  // Load app bar information from the theme
+  toolbar: theme.mixins.toolbar,
+});
 
 class App extends Component{
 
@@ -61,9 +67,11 @@ class App extends Component{
   }
 
   render(){
+    const {classes} = this.props;
     return (
-      <div className={"App-header"}>
+      <div>
         <ButtonAppBar history={this.props.history} app={this}></ButtonAppBar>
+        <div className={classes.toolbar} />
           <div>
             <Route path="/app/about" component={About} />
             <Route path="/app/nfts" component={NFTs} />
@@ -78,4 +86,4 @@ class App extends Component{
   }
 }
 
-export default App;
+export default withStyles(styles)(App);

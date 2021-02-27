@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import classNames from 'classnames'
 import { withStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 const styles = theme => ({
 	lightFillBlock : {
@@ -25,7 +26,8 @@ const styles = theme => ({
 	},
 	blockBody : {
 		width: '80%'
-	}
+	},
+	toolbar: theme.mixins.toolbar
 });
 
 
@@ -40,11 +42,11 @@ class PageBlock extends Component{
       blockFill = classNames(classes.darkFillBlock);
     }
 		return(
-			<div className={blockFill}>
+			<Container className={blockFill} maxWidth='false'>
 				<div className={classes.blockBody}>
 					{this.props.children}
 				</div>
-			</div>
+			</Container>
 
 		)
 	}
