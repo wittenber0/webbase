@@ -23,15 +23,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/witmac/Documents/webdev/webbase/client/src/contracts/NFLT.sol\":\"NFLT\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/witmac/Documents/webdev/webbase/client/src/contracts/NFLT.sol\":{\"keccak256\":\"0xf61486598a077acb7d9d8f7cc862c5bd2952b214c1e9cbf61fb58b97daabc2b5\",\"urls\":[\"bzz-raw://5ddb2328f5c1f17784082c00aecaaa5c46029af8e45032804c0acf36d1f74a69\",\"dweb:/ipfs/QmSEWBTWjeKpBBDfKzTFoMiKvPdbSuKzwvpVGiwQaBVbBD\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b506112c06000819055506084806100276000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806318160ddd14602d575b600080fd5b60336049565b6040518082815260200191505060405180910390f35b6000548156fea265627a7a7231582030253a2fe10f782abff3c9253f77f58c5a2040136e7deb6d5be15eb09ef1fd7e64736f6c63430005100032",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c806318160ddd14602d575b600080fd5b60336049565b6040518082815260200191505060405180910390f35b6000548156fea265627a7a7231582030253a2fe10f782abff3c9253f77f58c5a2040136e7deb6d5be15eb09ef1fd7e64736f6c63430005100032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":true,\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/witmac/Documents/webdev/webbase/client/src/Crypto/contracts/NFLT.sol\":\"NFLT\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/witmac/Documents/webdev/webbase/client/src/Crypto/contracts/NFLT.sol\":{\"keccak256\":\"0xf61486598a077acb7d9d8f7cc862c5bd2952b214c1e9cbf61fb58b97daabc2b5\",\"urls\":[\"bzz-raw://5ddb2328f5c1f17784082c00aecaaa5c46029af8e45032804c0acf36d1f74a69\",\"dweb:/ipfs/QmSEWBTWjeKpBBDfKzTFoMiKvPdbSuKzwvpVGiwQaBVbBD\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b506112c06000819055506084806100276000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806318160ddd14602d575b600080fd5b60336049565b6040518082815260200191505060405180910390f35b6000548156fea265627a7a72315820432c163430f8a5bbb46387ef613fe4ea68dd192bba509338b2f30f63b5d2026464736f6c63430005100032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c806318160ddd14602d575b600080fd5b60336049565b6040518082815260200191505060405180910390f35b6000548156fea265627a7a72315820432c163430f8a5bbb46387ef613fe4ea68dd192bba509338b2f30f63b5d2026464736f6c63430005100032",
   "sourceMap": "96:188:1:-;;;230:51;8:9:-1;5:2;;;30:1;27;20:12;5:2;230:51:1;271:4;257:11;:18;;;;96:188;;;;;;",
   "deployedSourceMap": "96:188:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;96:188:1;;;;;;;;;;;;;;;;;;;199:26;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;:::o",
   "source": "pragma solidity >=0.4.21 <0.7.0;\n\n//import \"@openzeppelin/contracts/token/ERC721/ERC721.sol\";\n\n\ncontract NFLT {\n\n\n  /*constructor() ERC721(name(), symbol()) public {\n\n  }\n\n  constructor() {\n\n  }*/\n  uint256 public totalSupply;\n\n  constructor() public {\n    totalSupply = 4800;\n\n  }\n\n}\n",
-  "sourcePath": "/Users/witmac/Documents/webdev/webbase/client/src/contracts/NFLT.sol",
+  "sourcePath": "/Users/witmac/Documents/webdev/webbase/client/src/Crypto/contracts/NFLT.sol",
   "ast": {
-    "absolutePath": "/Users/witmac/Documents/webdev/webbase/client/src/contracts/NFLT.sol",
+    "absolutePath": "/Users/witmac/Documents/webdev/webbase/client/src/Crypto/contracts/NFLT.sol",
     "exportedSymbols": {
       "NFLT": [
         45
@@ -185,7 +185,7 @@
     "src": "0:285:1"
   },
   "legacyAST": {
-    "absolutePath": "/Users/witmac/Documents/webdev/webbase/client/src/contracts/NFLT.sol",
+    "absolutePath": "/Users/witmac/Documents/webdev/webbase/client/src/Crypto/contracts/NFLT.sol",
     "exportedSymbols": {
       "NFLT": [
         45
@@ -351,8 +351,7 @@
     }
   },
   "schemaVersion": "3.3.2",
-  "updatedAt": "2020-11-22T23:22:36.250Z",
-  "networkType": "ethereum",
+  "updatedAt": "2021-02-27T01:58:31.200Z",
   "devdoc": {
     "methods": {}
   },

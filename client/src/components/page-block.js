@@ -12,7 +12,8 @@ const styles = theme => ({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white'
+	  color: 'white',
+	  textAlign: 'center'
 	},
 	darkFillBlock : {
 	  backgroundColor: theme.palette.dark.one,
@@ -22,12 +23,12 @@ const styles = theme => ({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white'
+	  color: 'white',
+	  textAlign: 'center'
 	},
 	blockBody : {
 		width: '80%'
-	},
-	toolbar: theme.mixins.toolbar
+	}
 });
 
 
@@ -36,20 +37,20 @@ class PageBlock extends Component{
 	render(){
 		const {classes} = this.props;
 		var blockFill;
-    if(this.props.fill === 'light'){
-      blockFill = classNames(classes.lightFillBlock);
-    }else{
-      blockFill = classNames(classes.darkFillBlock);
-    }
-		return(
-			<Container className={blockFill} maxWidth='false'>
-				<div className={classes.blockBody}>
-					{this.props.children}
-				</div>
-			</Container>
+	    if(this.props.fill === 'light'){
+	      blockFill = classNames(classes.lightFillBlock);
+	    }else{
+	      blockFill = classNames(classes.darkFillBlock);
+	    }
+			return(
+				<Container className={blockFill} maxWidth={false}>
+					<div className={classes.blockBody}>
+						{this.props.children}
+					</div>
+				</Container>
 
-		)
-	}
+			)
+		}
 }
 
 export default withStyles(styles)(PageBlock);
