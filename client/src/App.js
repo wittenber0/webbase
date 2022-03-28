@@ -8,6 +8,7 @@ import PrivateRoute from './Auth/private-route';
 
 //Pages
 import About from './Pages/about';
+import Binance from './Pages/binanceAPI';
 import Home from './Pages/home';
 import MyProfile from './Pages/my-profile';
 import Admin from './Pages/admin';
@@ -77,6 +78,7 @@ class App extends Component{
             <Route path="/app/nfts" component={NFTs} />
             <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
             <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin' app={this}></PrivateRoute></Route>
+            <Route path="/app/binance"><PrivateRoute component={Binance} userAccess='admin' app={this}></PrivateRoute></Route>
             <Route exact path="/callback"><Callback app={this}/></Route>
             <Route exact path="/app" component={Home} />
             <Route exact path="/" component={Callback} />

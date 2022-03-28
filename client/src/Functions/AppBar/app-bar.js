@@ -21,6 +21,7 @@ const styles = theme => ({
 let sideBarItems = [
 	{display: 'Home', route: '/app'},
 	{display: 'About', route: '/app/about'},
+  {display: 'Binance API', route: '/app/binance'},
   {display: 'Non Fungible Tokens', route: '/app/nfts'},
 ];
 
