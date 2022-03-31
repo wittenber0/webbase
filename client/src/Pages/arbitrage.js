@@ -109,7 +109,7 @@ class ArbitragePage extends Component{
 		var bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
 	  var type = odds['type'];
 		this.evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
-		this.evaluateSpread();
+		this.evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
 		this.evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
 	}
 
@@ -123,7 +123,7 @@ class ArbitragePage extends Component{
 	  if(mlHome && mlAway && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
 	    var homeFactor = this.getFactorValue(mlHome);
 			var awayFactor = this.getFactorValue(mlAway);
-			var drawFactor = mlDraw ? this.getFactorValue(mlHome) : 0;
+			var drawFactor = mlDraw ? this.getFactorValue(mlDraw) : 0;
 
 	    if(gameOdds.length > 0){
 	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type));
@@ -161,8 +161,44 @@ class ArbitragePage extends Component{
 		return f;
 	}
 
-	evaluateSpread(){
+	evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+		let betType = 'spread';
+		let line = Math.max(['spread_home'], ['spread_away']);
+	  let spreadHomeLine= odds['spread_home_line'];
+	  let spreadAwayLine = odds['spread_away_line'];
+	  let mlDraw = odds['draw'];
 
+
+	  //evaluate spread
+	  if(line && spreadHomeLine && spreadAwayLine && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
+	    var homeFactor = this.getFactorValue(spreadHomeLine);
+			var awayFactor = this.getFactorValue(spreadAwayLine);
+			var drawFactor = mlDraw ? this.getFactorValue(mlDraw) : 0;
+
+			if(gameOdds.length > 0){
+	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line == line) && (e.betType = betType));
+	      if(go){
+	        go.homeFactors.push(new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine));
+	        go.awayFactors.push(new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine));
+
+	        if(drawFactor > 0){
+	          go.drawFactors.push(new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw));
+	        }
+	      }else{
+	        gameOdds.push(new GameOdd(game,
+	        [new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine)],
+	        [new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine)],
+	        (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
+	        type, betType, line));
+	      }
+	    }else{
+	      gameOdds.push(new GameOdd(game,
+	      [new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine)],
+	      [new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine)],
+	      (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
+	      type, betType, line));
+	    }
+	  }
 	}
 
 	evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
