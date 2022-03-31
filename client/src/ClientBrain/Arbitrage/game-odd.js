@@ -1,11 +1,12 @@
 export default class GameOdd {
-  constructor(game, homeFactors, awayFactors, drawFactors, type, sport, startTime) {
+  constructor(game, homeFactors, awayFactors, drawFactors, type, sport, betType, line) {
     this.homeFactors = homeFactors;
     this.awayFactors = awayFactors;
     this.drawFactors = drawFactors;
     this.type = type;
     this.sport = sport;
-    this.startTime = startTime;
+    this.betType = betType;
+    this.line = line
 
     this.gameId = game['id'];
     this.homeId = game['home_team_id'];

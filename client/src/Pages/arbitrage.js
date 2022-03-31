@@ -10,6 +10,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 import BetOnlineBrain from '../ClientBrain/Arbitrage/bet-online';
 import GameOdd from '../ClientBrain/Arbitrage/game-odd';
+import Factor from '../ClientBrain/Arbitrage/factor';
 
 const styles = theme => ({
   root: {
@@ -62,8 +63,7 @@ class ArbitragePage extends Component{
 		    this.evaluateLeague(allGames[i], gameOdds);
 		  }
 		  this.sortGameOdds(gameOdds);
-			this.setState({allOdds: gameOdds, displayOdds: gameOdds.filter(o => o.houseLine < this.state.houseLineThreshold)})
-			//console.log(this.state.allOdds[0])
+			this.setState({allOdds: gameOdds, displayOdds: gameOdds.filter(o => o.houseLine < this.state.houseLineThreshold)});
 		});
 	}
 
@@ -84,18 +84,24 @@ class ArbitragePage extends Component{
 	}
 
 	evaluateOdds(odds, game, gameOdds){
-	  var mlHome = odds['ml_home'];
-	  var mlAway = odds['ml_away'];
-	  var mlDraw = odds['draw'];
 	  var bookId = odds['book_id'];
 	  var status = game['status'];
 	  var book = this.state.books.find(e => e.id === bookId);
 	  var bookName = book['display_name'];
 		var bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
 	  var type = odds['type'];
+		this.evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
+		this.evaluateSpread();
+		this.evaluateOverUnder();
+	}
 
+	evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+		let betType = 'ml';
+		let mlHome = odds['ml_home'];
+	  let mlAway = odds['ml_away'];
+	  let mlDraw = odds['draw'];
 
-	  //evaluate money line
+		//evaluate money line
 	  if(mlHome && mlAway && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
 	    var homeFactor;
 	    if(mlHome > 0){
@@ -121,27 +127,35 @@ class ArbitragePage extends Component{
 	    if(gameOdds.length > 0){
 	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type));
 	      if(go){
-	        go.homeFactors.push({factor:homeFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlHome});
-	        go.awayFactors.push({factor:awayFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlAway});
+	        go.homeFactors.push(new Factor(homeFactor, bookName, bookId, bookLogo, mlHome));
+	        go.awayFactors.push(new Factor(awayFactor, bookName, bookId, bookLogo, mlAway));
 
 	        if(drawFactor > 0){
-	          go.drawFactors.push({factor:drawFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlDraw});
+	          go.drawFactors.push(new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw));
 	        }
 	      }else{
 	        gameOdds.push(new GameOdd(game,
-	        [{factor:homeFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlHome}],
-	        [{factor:awayFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlAway}],
-	        (drawFactor > 0 ? [{factor:drawFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo, factorLabel:mlDraw}] : []),
-	        type));
+	        [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
+	        [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
+	        (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
+	        type, betType));
 	      }
 	    }else{
 	      gameOdds.push(new GameOdd(game,
-	      [{factor:homeFactor, bookName:bookName, bookLogo: bookLogo, bookId:bookId, factorLabel:mlHome}],
-	      [{factor:awayFactor, bookName:bookName, bookLogo: bookLogo, bookId:bookId, factorLabel:mlAway}],
-	      (drawFactor > 0 ? [{factor:drawFactor, bookName:bookName, bookId:bookId, bookLogo: bookLogo,factorLabel:mlDraw}] : []),
-	      type));
+	      [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
+	      [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
+	      (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
+	      type, betType));
 	    }
 	  }
+	}
+
+	evaluateSpread(){
+
+	}
+
+	evaluateOverUnder(){
+
 	}
 
 	sortGameOdds(gameOdds){
