@@ -3,7 +3,7 @@ import UtilityService from './utility-service';
 const fetch = require('node-fetch');
 
 const bookListUrl = 'https://api.actionnetwork.com/web/v1/books';
-const oddsUrl = 'https://api.actionnetwork.com/web/v1/scoreboard/all?bookIds=8,21,1,3&date=';
+const oddsUrl = 'https://api.actionnetwork.com/web/v1/scoreboard/all?bookIds=';
 const actionLabsBookOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/';
 const actionLabsPlayers = 'https://d3ttxfuywgi7br.cloudfront.net/players/projections/all/actionnetwork/default.json'
 const actionLabsPropEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=66baf522-6536-496c-bcd1-3405d15b434c'
@@ -17,7 +17,7 @@ class ArbitrageService{
     return UtilityService.get(bookListUrl);
   }
 
-  static getAllOddsForDate = async function(d){
+  static getAllOddsForDate = async function(d, selectedBooks){
     let dateString;
     if(d == undefined){
       d = new Date();
@@ -25,7 +25,7 @@ class ArbitrageService{
     dateString = d.getFullYear().toString();
     dateString += (d.getMonth() +1).toString().padStart(2, '0') ;
     dateString += d.getDate().toString().padStart(2, '0');
-    return UtilityService.get(oddsUrl+dateString);
+    return UtilityService.get(oddsUrl + selectedBooks.join() + '&date='+dateString);
   }
 
   static getAtionLabsBookOdds = async function(bookId){

@@ -56,7 +56,7 @@ class ArbitragePage extends Component{
 	}
 
 	populateGameOdds(){
-		ArbitrageService.getAllOddsForDate().then((r)=>{
+		ArbitrageService.getAllOddsForDate(new Date(), selectedBooks).then((r)=>{
 			let allGames = r["all_games"];
 			let gameOdds = [];
 		  for(let i = 0; i< allGames.length; i++){
@@ -64,6 +64,7 @@ class ArbitragePage extends Component{
 		  }
 		  this.sortGameOdds(gameOdds);
 			this.setState({allOdds: gameOdds, displayOdds: gameOdds.filter(o => o.houseLine < this.state.houseLineThreshold)});
+			//console.log(gameOdds);
 		});
 	}
 
@@ -103,26 +104,9 @@ class ArbitragePage extends Component{
 
 		//evaluate money line
 	  if(mlHome && mlAway && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
-	    var homeFactor;
-	    if(mlHome > 0){
-	      homeFactor = Math.round((1 + (mlHome/100))*100)/100;
-	    }else{
-	      homeFactor = Math.round((1 + (-100/mlHome))*100)/100;
-	    }
-
-	    var awayFactor;
-	    if(mlAway > 0){
-	      awayFactor = Math.round((1 + (mlAway/100))*100)/100;
-	    }else{
-	      awayFactor = Math.round((1 + (-100/mlAway))*100)/100;
-	    }
-
-	    var drawFactor = 0;
-	    if(mlDraw && mlDraw > 0){
-	      drawFactor = Math.round((1 + (mlDraw/100))*100)/100;
-	    }else{
-	      drawFactor = Math.round((1 + (-100/mlDraw))*100)/100;
-	    }
+	    var homeFactor = this.getFactorValue(mlHome);
+			var awayFactor = this.getFactorValue(mlAway);
+			var drawFactor = mlDraw ? this.getFactorValue(mlHome) : 0;
 
 	    if(gameOdds.length > 0){
 	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type));
@@ -150,11 +134,21 @@ class ArbitragePage extends Component{
 	  }
 	}
 
+	getFactorValue(ml){
+		let f;
+		if(ml > 0){
+			f = Math.round((1 + (ml/100))*100)/100;
+		}else{
+			f = Math.round((1 + (-100/ml))*100)/100;
+		}
+		return f;
+	}
+
 	evaluateSpread(){
 
 	}
 
-	evaluateOverUnder(){
+	evaluateOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
 
 	}
 
