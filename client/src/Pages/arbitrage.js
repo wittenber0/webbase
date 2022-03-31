@@ -93,11 +93,11 @@ class ArbitragePage extends Component{
 	  var type = odds['type'];
 		this.evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
 		this.evaluateSpread();
-		this.evaluateOverUnder();
+		this.evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
 	}
 
 	evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
-		let betType = 'ml';
+		let betType = 'money-line';
 		let mlHome = odds['ml_home'];
 	  let mlAway = odds['ml_away'];
 	  let mlDraw = odds['draw'];
@@ -122,14 +122,14 @@ class ArbitragePage extends Component{
 	        [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
 	        [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
 	        (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	        type, betType));
+	        type, betType, null, [], []));
 	      }
 	    }else{
 	      gameOdds.push(new GameOdd(game,
 	      [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
 	      [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
 	      (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	      type, betType));
+	      type, betType, null, [], []));
 	    }
 	  }
 	}
@@ -148,20 +148,76 @@ class ArbitragePage extends Component{
 
 	}
 
-	evaluateOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+	evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+		let line = odds['total'];
+		let overML = odds['over'];
+		let underML = odds['under'];
+		let betType = 'total-over';
+
+		if(overML && underML && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
+			let overFactor = this.getFactorValue(overML);
+			let underFactor = this.getFactorValue(underML);
+
+			if(gameOdds.length > 0){
+	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
+	      if(go){
+	        go.overFactors.push(new Factor(overFactor, bookName, bookId, bookLogo, overML));
+	        go.underFactors.push(new Factor(underFactor, bookName, bookId, bookLogo, underML));
+	      }else{
+	        gameOdds.push(new GameOdd(game,
+		        [],
+		        [],
+		        [],
+		        type,
+						betType,
+						line,
+						[new Factor(overFactor, bookName, bookId, bookLogo, overML)],
+						[new Factor(underFactor, bookName, bookId, bookLogo, underML)]
+					));
+	      }
+	    }else{
+				gameOdds.push(new GameOdd(game,
+					[],
+					[],
+					[],
+					type,
+					betType,
+					line,
+					[new Factor(overFactor, bookName, bookId, bookLogo, overML)],
+					[new Factor(underFactor, bookName, bookId, bookLogo, underML)]
+				));
+	    }
+		}
 
 	}
 
 	sortGameOdds(gameOdds){
 	  for(var i =0; i<gameOdds.length; i++){
 	    var game = gameOdds[i];
-	    game.homeFactors.sort((a,b)=>{return b.factor-a.factor});
-	    game.awayFactors.sort((a,b)=>{return b.factor-a.factor});
 
-	    game.bestHomeFactor = game.homeFactors[0];
-			game.homeFactors[0].best = true;
-	    game.bestAwayFactor = game.awayFactors[0];
-			game.awayFactors[0].best = true;
+			if(game.homeFactors.length > 0){
+				game.homeFactors.sort((a,b)=>{return b.factor-a.factor});
+				game.bestHomeFactor = game.homeFactors[0];
+				game.homeFactors[0].best = true;
+			}
+
+			if(game.awayFactors.length > 0){
+				game.awayFactors.sort((a,b)=>{return b.factor-a.factor});
+				game.bestAwayFactor = game.awayFactors[0];
+				game.awayFactors[0].best = true;
+			}
+
+			if(game.overFactors && game.overFactors.length > 0){
+				game.overFactors.sort((a,b)=>{return b.factor-a.factor});
+				game.bestOverFactor = game.overFactors[0];
+				game.overFactors[0].best = true;
+			}
+
+			if(game.underFactors && game.underFactors.length > 0){
+				game.underFactors.sort((a,b)=>{return b.factor-a.factor});
+				game.bestUnderFactor = game.underFactors[0];
+				game.underFactors[0].best = true;
+			}
 
 	    if(game.drawFactors.length > 0 ){
 	      game.drawFactors.sort((a,b)=>{return b.factor-a.factor});
@@ -169,8 +225,10 @@ class ArbitragePage extends Component{
 				game.drawFactors[0].best = true;
 	      game.houseLine = (1/game.bestHomeFactor.factor) + (1/game.bestAwayFactor.factor) + (1/game.bestDrawFactor.factor)
 	      //Logger.log(game.houseLine+ ': '+game.bestHomeFactor.factor+' : '+game.bestAwayFactor.factor +' : '+ game.bestDrawFactor.factor);
-	    }else{
+	    }else if(game.bestHomeFactor && game.bestAwayFactor){
 	      game.houseLine = (1/game.bestHomeFactor.factor) + (1/game.bestAwayFactor.factor);
+	    }else if(game.bestOverFactor && game.bestUnderFactor){
+	      game.houseLine = (1/game.bestOverFactor.factor) + (1/game.bestUnderFactor.factor);
 	    }
 
 
