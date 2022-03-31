@@ -11,7 +11,7 @@ const styles = theme => ({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white'
+	  color: 'white',
 	},
 	darkFillBlock : {
 	  backgroundColor: theme.palette.dark.one,
@@ -21,7 +21,7 @@ const styles = theme => ({
 	  alignItems: 'center',
 	  justifyContent: 'center',
 	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white'
+	  color: 'white',
 	},
 	blockBody : {
 		width: '80%'

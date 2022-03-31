@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 import AuthService from '../Shared/auth-service';
+import UtilityService from '../Shared/utility-service';
 import App from '../App';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
@@ -17,9 +18,10 @@ class AdminPage extends Component{
 	componentDidMount(){
 		let dictionaries = [];
 		dictionaries.push(AuthService.getAllAppRoles(App.user().user_id));
-		dictionaries.push(AuthService.post('/appusers'));
+		dictionaries.push(UtilityService.post('/appusers'));
 
 		Promise.all(dictionaries).then( values => {
+			console.log(values);
 			this.setState({appUsers : values[1], appRoles: values[0]});
 		});
 

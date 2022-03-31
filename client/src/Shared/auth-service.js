@@ -1,11 +1,13 @@
 import App from '../App';
+import UtilityService from './utility-service';
 const fetch = require('node-fetch');
 
+
 class AuthService{
-  static validate = async function(userId, task) {
+  static validate = async function(userId, role) {
     const body = {
       'user': userId,
-      'role': task
+      'role': role
     };
     return await fetch('/auth', { method: 'post', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }})
     .then(res=>{
@@ -18,7 +20,7 @@ class AuthService{
   }
 
   static userContextGet = async function(userId){
-    return this.get('/usercontext?id='+userId);
+    return UtilityService.get('/usercontext?id='+userId);
   }
 
   static getAllAppRoles = async function(userId) {
@@ -36,38 +38,11 @@ class AuthService{
   }
 
   static getAppUsers = async function(userId) {
-    return this.post('/appusers');
+    return UtilityService.post('/appusers');
   }
 
   static updateUserRoles = async function(userId, roleList, removeInd){
-    return this.post('/users/'+userId+'/roles', {user: App.user().user_id, roles: roleList, removeInd: removeInd });
-  }
-
-  static get = async function(route){
-    return await fetch(route)
-    .then(res=>{
-      return(res.json());
-    }).then((json)=> {
-      return(json)
-    }).catch(()=>{
-      return(false);
-    });
-  }
-
-  static post = async function(route, body){
-    if(!body){
-      body = {
-        'user': App.user().user_id
-      };
-    }
-    return await fetch(route, { method: 'post', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }})
-    .then(res=>{
-      return(res.json());
-    }).then((json)=> {
-      return(json)
-    }).catch(()=>{
-      return(false);
-    });
+    return UtilityService.post('/users/'+userId+'/roles', {user: App.user().user_id, roles: roleList, removeInd: removeInd });
   }
 }
 

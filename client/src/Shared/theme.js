@@ -1,8 +1,9 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createTheme } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: {
       main: blue[500]
     },
@@ -14,9 +15,16 @@ const theme = createMuiTheme({
     dark: {
       one: '#101010',
       two: '#141414',
-      three: '#303030'
+      three: '#303030',
+      four: '#505050'
     },
-    light: '#f2f2f2'
+    light: '#f2f2f2',
+    typography: {
+      TextField: {
+        color: '#FFFFFF'
+      }
+    },
+    divider: '#202020'
   }
 });
 

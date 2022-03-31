@@ -8,6 +8,8 @@ exports.checkRoleForUser = async function(user, role){
         break;
       case 'admin':
         return (roles.filter(r => r.name === 'AppAdmin').length > 0 ? true : false)
+      case 'arbitrage':
+          return (roles.filter(r => r.name === 'ArbitrageUser').length > 0 ? true : false)
       default:
         return false;
     }

@@ -20,7 +20,6 @@ const styles = theme => ({
 
 let sideBarItems = [
 	{display: 'Home', route: '/app'},
-	{display: 'About', route: '/app/about'},
 ];
 
 class MyAppBar extends Component{
@@ -29,6 +28,10 @@ class MyAppBar extends Component{
 		super(props);
     if(props.app.userHasRole('AppAdmin')){
       sideBarItems.push({display: 'Administration', route: '/app/admin'});
+    }
+
+    if(props.app.userHasRole('Arbitrage') || props.app.userHasRole('AppAdmin')){
+      sideBarItems.push({display: 'Arbitrage', route: '/app/arbitrage'});
     }
 
     this.state = {
@@ -47,6 +50,11 @@ class MyAppBar extends Component{
         s.push({display: 'Administration', route: '/app/admin'});
         o.items = s;
       }
+      if(prevState.app.userHasRole('ArbitrageUser') && !(prevState.items.filter( i => i.display === 'Arbitrage').length > 0)){
+        let s = prevState.items
+        s.push({display: 'Arbitrage', route: '/app/arbitrage'});
+        o.items = s;
+      }
       o.app = nextProps.app;
       return o;
     }else{
@@ -63,7 +71,7 @@ class MyAppBar extends Component{
             <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
             </TemporaryDrawer>
             <Typography variant="h6" className={classes.title}>
-              wittenber0
+              wittenber0 archives
             </Typography>
             <Search />
           </Toolbar>

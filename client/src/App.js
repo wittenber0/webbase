@@ -6,10 +6,10 @@ import { Route } from 'react-router-dom';
 import PrivateRoute from './Auth/private-route';
 
 //Pages
-import About from './Pages/about';
 import Home from './Pages/home';
 import MyProfile from './Pages/my-profile';
 import Admin from './Pages/admin';
+import Arbitrage from './Pages/arbitrage';
 import Callback from './Pages/login-callback'
 
 class App extends Component{
@@ -63,14 +63,14 @@ class App extends Component{
     return (
       <div className={"App-header"}>
         <ButtonAppBar history={this.props.history} app={this}></ButtonAppBar>
-          <div>
-            <Route path="/app/about" component={About} />
-            <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
-            <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin' app={this}></PrivateRoute></Route>
-            <Route exact path="/callback"><Callback app={this}/></Route>
-            <Route exact path="/app" component={Home} />
-            <Route exact path="/" component={Callback} />
-          </div>
+        <div style={{ marginTop: 64}}>
+          <Route path="/app/profile"><PrivateRoute component={MyProfile} userAccess='profile'></PrivateRoute></Route>
+          <Route path="/app/admin"><PrivateRoute component={Admin} userAccess='admin' app={this}></PrivateRoute></Route>
+          <Route path="/app/arbitrage"><PrivateRoute component={Arbitrage} userAccess='arbitrage' app={this}></PrivateRoute></Route>
+          <Route exact path="/callback"><Callback app={this}/></Route>
+          <Route exact path="/app" component={Home} />
+          <Route exact path="/" component={Callback} />
+        </div>
       </div>
     )
   }

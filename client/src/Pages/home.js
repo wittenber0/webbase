@@ -10,17 +10,14 @@ class HomePage extends Component{
 
 	render(){
 		return(
-			<div className="home">
-				<div className="home-body">
-					<PageBlock fill="light">
-						<div><h2>{this.state.title}</h2></div>
-						<p>welcome to the brain dump of wittenber0</p>
-					</PageBlock>
-					<PageBlock fill="dark">
-						<h2>more coming soon...</h2>
-					</PageBlock>
+			<div className="home-body">
+				<PageBlock fill="light">
+					<h2>welcome to the brain dump of wittenber0</h2>
+				</PageBlock>
+				<PageBlock fill="dark">
+					<h2>more coming soon...</h2>
+				</PageBlock>
 
-				</div>
 			</div>
 
 		)

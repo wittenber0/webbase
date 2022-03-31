@@ -14,7 +14,7 @@ class MyProfilePage extends Component{
 				<div className="profile-body">
 					<PageBlock fill="light">
 						<div><h2>{this.state.title}</h2></div>
-						<p>this is a test</p>
+						<p>...to display profile info soon</p>
 					</PageBlock>
 				</div>
 			</div>
