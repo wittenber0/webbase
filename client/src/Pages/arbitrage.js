@@ -5,7 +5,7 @@ import ArbitrageService from '../Shared/arbitrage-service';
 import GameCard from '../Functions/GameCard/gamecard';
 
 import TextField from '@mui/material/TextField';
-import { Grid, Button } from '@mui/material';
+import { Grid, Button, ButtonGroup } from '@mui/material';
 import { withStyles } from "@material-ui/core/styles";
 
 import BetOnlineBrain from '../ClientBrain/Arbitrage/bet-online';
@@ -34,11 +34,13 @@ class ArbitragePage extends Component{
 			houseLineThreshold: 1.02,
 			thresholdInput: 1.02,
 			myBooks: [],
-			displayOdds: []
+			displayOdds: [],
+			betTypeFilter: 'all'
 		};
 
 		this.refreshHouseLineThreshold = this.refreshHouseLineThreshold.bind(this);
 		this.updateHouseLineThreshold = this.updateHouseLineThreshold.bind(this);
+		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
 	}
 
 	componentDidMount(){
@@ -55,6 +57,13 @@ class ArbitragePage extends Component{
 
 	}
 
+	setBetTypeFilter(e){
+		let btf = e.currentTarget.value;
+		if(e && btf){
+			this.setState({betTypeFilter: btf});
+		}
+	}
+
 	populateGameOdds(){
 		ArbitrageService.getAllOddsForDate(new Date(), selectedBooks).then((r)=>{
 			let allGames = r["all_games"];
@@ -63,7 +72,15 @@ class ArbitragePage extends Component{
 		    this.evaluateLeague(allGames[i], gameOdds);
 		  }
 		  this.sortGameOdds(gameOdds);
-			this.setState({allOdds: gameOdds, displayOdds: gameOdds.filter(o => o.houseLine < this.state.houseLineThreshold)});
+			this.setState({
+				allOdds: gameOdds,
+				displayOdds: gameOdds.filter(o => {
+					if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType){
+						return false;
+					}
+					return o.houseLine < this.state.houseLineThreshold;
+				})
+			});
 			//console.log(gameOdds);
 		});
 	}
@@ -103,7 +120,7 @@ class ArbitragePage extends Component{
 	  let mlDraw = odds['draw'];
 
 		//evaluate money line
-	  if(mlHome && mlAway && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
+	  if(mlHome && mlAway && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
 	    var homeFactor = this.getFactorValue(mlHome);
 			var awayFactor = this.getFactorValue(mlAway);
 			var drawFactor = mlDraw ? this.getFactorValue(mlHome) : 0;
@@ -152,9 +169,9 @@ class ArbitragePage extends Component{
 		let line = odds['total'];
 		let overML = odds['over'];
 		let underML = odds['under'];
-		let betType = 'total-over';
+		let betType = 'over-under-total';
 
-		if(overML && underML && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
+		if(overML && underML && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
 			let overFactor = this.getFactorValue(overML);
 			let underFactor = this.getFactorValue(underML);
 
@@ -251,11 +268,9 @@ class ArbitragePage extends Component{
 			<div className="arbitrage">
 				<div className="arbitrage-body">
 					<PageBlock fill="light">
-						<Grid container spacing={2} justifyContent="center" alignItems="center">
-							<Grid item xs={8}>
-								<div><h2>{this.state.title}</h2></div>
-							</Grid>
-							<Grid item xs={4}>
+						<div><h2>{this.state.title}</h2></div>
+						<Grid container spacing={2} justifyContent="left" alignItems="center">
+							<Grid item>
 								<TextField
 									id="outlined-basic"
 									label="House Line Threshold"
@@ -266,6 +281,42 @@ class ArbitragePage extends Component{
 									onChange={this.updateHouseLineThreshold}
 									size='small'
 								/>
+							</Grid>
+							<Grid item>
+								<ButtonGroup variant="outlined" aria-label="outlined primary button group">
+									<Button
+										onClick={this.setBetTypeFilter}
+										color={this.state.betTypeFilter === "money-line" ? 'secondary': 'primary' }
+										value="money-line">
+										Money Line
+									</Button>
+									<Button
+										onClick={this.setBetTypeFilter}
+										color={this.state.betTypeFilter === "spread" ? 'secondary': 'primary' }
+										value="spread">
+										Spread
+									</Button>
+									<Button
+										onClick={this.setBetTypeFilter}
+										color={this.state.betTypeFilter === "over-under-total" ? 'secondary': 'primary' }
+										value="over-under-total">
+										Over Under (Total)
+									</Button>
+									<Button
+										onClick={this.setBetTypeFilter}
+										color={this.state.betTypeFilter === "over-under-team" ? 'secondary': 'primary' }
+										value="over-under-team">
+										Over Under (Team)
+									</Button>
+									<Button
+										onClick={this.setBetTypeFilter}
+										color={this.state.betTypeFilter === "all" ? 'secondary': 'primary' }
+										value="all">
+										All
+									</Button>
+								</ButtonGroup>
+							</Grid>
+							<Grid item>
 								<Button variant="contained" onClick={this.refreshHouseLineThreshold}>Refresh</Button>
 							</Grid>
 						</Grid>
