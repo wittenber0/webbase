@@ -34,12 +34,13 @@ const useStyles = makeStyles(theme =>({
 
 function Logout(l, app){
   app.clearUserCache();
-  l({returnTo: 'http://localhost:3000/app'})
+  l({returnTo: window.location.origin})
 }
 
 function Login(props){
   const classes = useStyles();
   const { loginWithRedirect, logout } = useAuth0();
+  console.log(App.user());
   if(App.user()){
     return(
       <ListItem button onClick={()=> Logout(logout, props.app)}>
@@ -50,7 +51,7 @@ function Login(props){
   }
 
   return(
-    <ListItem button onClick={()=> loginWithRedirect({})}>
+    <ListItem button onClick={()=> loginWithRedirect()}>
       <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
       <ListItemText>Login</ListItemText>
     </ListItem>

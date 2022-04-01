@@ -66,55 +66,50 @@ export default function GameCard(props){
   const classes = useStyles();
   return(
     <div>
-      <CardContent className={classes.cardPaper}>
-        <Grid container spacing={2}>
-          <Grid item xs={8}>
-            <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block'}}>{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
-            <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block', paddingLeft: '8px'}}>({props.gameOdd.sport} {props.gameOdd.betType})</Typography>
-          </Grid>
-          <Grid item xs={4}>
-          </Grid>
+      <Grid container spacing={2} style={{paddingBottom: '10px', paddingTop: '10px'}}>
+        <Grid item xs={12}>
+          <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block'}}>{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
+          <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block', paddingLeft: '8px'}}>({props.gameOdd.sport} {props.gameOdd.betType})</Typography>
         </Grid>
-        <Grid container spacing={.5}>
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Item>Net EV: {getNetEV(props.gameOdd.houseLine)}%</Item>
-              </Grid>
-              {props.myBooks.map((b) => {
-                return(
-                  <Grid item xs={2} key={b.id}>
-                    <Item>
-                    {b['meta']['logos']['primary'] ? <img src={b['meta']['logos']['primary']}/> :
-                      <Typography>{b['display_name']}</Typography>
-                    }
-                    </Item>
-                  </Grid>
-                );
-              })}
+      </Grid>
+      <Grid container spacing={.5}>
+        <Grid item xs={12}>
+          <Grid container spacing={2}>
+            <Grid item xs={3}>
+              <Item>Net EV: {getNetEV(props.gameOdd.houseLine)}%</Item>
             </Grid>
-          </Grid>
-          {Object.keys(props.gameOdd.pickFactors).map(pfLabel =>{
-            return(
-              <Grid item xs={12} key={pfLabel}>
-                <Grid container spacing={2}>
-                  <Grid item xs={3}>
-                    <Item>{pfLabel}</Item>
-                  </Grid>
-                  {props.myBooks.map((b) => {
-                    return(
-                      <Grid item xs={2} key={b.id}>
-                        {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.id, true)}
-                      </Grid>
-                    );
-                  })}
+            {props.myBooks.map((b) => {
+              return(
+                <Grid item xs={2} key={b.id}>
+                  <Item>
+                  {b['meta']['logos']['primary'] ? <img src={b['meta']['logos']['primary']}/> :
+                    <Typography>{b['display_name']}</Typography>
+                  }
+                  </Item>
                 </Grid>
-              </Grid>
-            )
-          })}
+              );
+            })}
+          </Grid>
         </Grid>
-      </CardContent>
-      <Divider classes={{root: classes.divderColor}}/>
+        {Object.keys(props.gameOdd.pickFactors).map(pfLabel =>{
+          return(
+            <Grid item xs={12} key={pfLabel}>
+              <Grid container spacing={2}>
+                <Grid item xs={3}>
+                  <Item>{pfLabel}</Item>
+                </Grid>
+                {props.myBooks.map((b) => {
+                  return(
+                    <Grid item xs={2} key={b.id}>
+                      {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.id, true)}
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Grid>
+          )
+        })}
+      </Grid>
     </div>
   )
 }
