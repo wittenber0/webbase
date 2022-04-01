@@ -51,7 +51,7 @@ function Login(props){
   }
 
   return(
-    <ListItem button onClick={()=> loginWithRedirect()}>
+    <ListItem button onClick={()=> loginWithRedirect({ appState: { targetUrl: window.location.origin+'/callback' }})}>
       <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
       <ListItemText>Login</ListItemText>
     </ListItem>

@@ -15,7 +15,12 @@ import history from './Shared/browser-history';
 import theme from './Shared/theme';
 
 const onRedirectCallback = appState => {
-  history.push('/callback');
+  console.log(appState);
+  history.push(
+    appState && appState.targetUrl
+      ? appState.targetUrl
+      : window.location.origin+'/callback'
+  );
 };
 
 const routing = (
