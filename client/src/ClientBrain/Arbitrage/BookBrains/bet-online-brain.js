@@ -1,4 +1,4 @@
-import ArbitrageService from '../../Shared/arbitrage-service';
+import ArbitrageService from '../../../Shared/arbitrage-service';
 
 export default class BetOnlineBrain{
 

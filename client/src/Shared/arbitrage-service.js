@@ -87,5 +87,12 @@ class ArbitrageService{
       return(false);
     });;
   }
+
+  static getBovadaOdds = async function(sport){
+    return UtilityService.get("https://www.bovada.lv/services/sports/event/coupon/events/A/description/"+sport+"?marketFilterId=def&preMatchOnly=true&lang=en");
+  }
+
 }
+
+
 export default ArbitrageService

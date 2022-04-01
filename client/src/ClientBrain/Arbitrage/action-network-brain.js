@@ -1,7 +1,9 @@
 import ArbitrageService from '../../Shared/arbitrage-service';
-import GameOdd from './game-odd';
-import Factor from './factor';
+import GameOdd from './Models/game-odd';
+import Odd from './Models/odd';
+import Factor from './Models/factor';
 import BookManager from './book-manager';
+import GameOddManager from './game-odd-manager';
 
 export default class ActionNetworkBrain {
 
@@ -9,6 +11,7 @@ export default class ActionNetworkBrain {
     this.houseLineThreshold = houseLineThreshold;
     this.betTypeFilter = betTypeFilter;
     this.books = books;
+    this.gameOddManager = GameOddManager.getInstance();
   }
 
   async getGameOdds(houseLineThreshold, betTypeFilter, books){
@@ -19,10 +22,10 @@ export default class ActionNetworkBrain {
 			let allGames = r["all_games"];
 			let gameOdds = [];
 		  for(let i = 0; i< allGames.length; i++){
-		    this.evaluateLeague(allGames[i], gameOdds);
+		    this.evaluateLeague(allGames[i]);
 		  }
-		  this.sortGameOdds(gameOdds);
-			return gameOdds;
+		  this.sortGameOdds(this.gameOddManager.gameOdds);
+			return this.gameOddManager.gameOdds;
 		});
 	}
 
@@ -35,11 +38,11 @@ export default class ActionNetworkBrain {
     });
   }
 
-  evaluateLeague(league, gameOdds){
+  evaluateLeague(league){
 	  var games = league['games'];
 	  for(var i = 0; i<games.length; i++){
       games[i].leagueName = league['league_name'];
-	    this.evaluateGame(games[i], gameOdds);
+	    this.evaluateGame(games[i]);
 	  }
 	}
 
@@ -47,21 +50,21 @@ export default class ActionNetworkBrain {
 	  var odds = game['odds'];
 	  if(odds){
 	    for(var i = 0; i<odds.length; i++){
-	      this.evaluateOdds(odds[i], game, gameOdds);
+	      this.evaluateOdd(odds[i], game);
 	    }
 	  }
 	}
 
-	evaluateOdds(odds, game, gameOdds){
-	  var bookId = odds['book_id'];
+	evaluateOdd(odd, game){
+	  var bookId = odd['book_id'];
 	  var status = game['status'];
 	  var book = this.books.find(e => e.id === bookId);
 	  var bookName = book['display_name'];
 		var bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
-	  var type = odds['type'];
-		this.evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
-		this.evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
-		this.evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
+	  var type = odd['type'];
+		this.evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odd, game);
+		this.evaluateSpread(bookId, status, book, bookName, bookLogo, type, odd, game);
+		this.evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odd, game);
 	}
 
   createPickFactors(pickFactorArray, bookName, bookId, bookLogo,){
@@ -77,7 +80,7 @@ export default class ActionNetworkBrain {
     return pf;
   }
 
-  evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType){
+  evaluatePickFactors(book, type, odds, game, pickOptions, betType){
     let bookId = odds['book_id'];
     let bookName = book['display_name'];
 		let bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
@@ -91,8 +94,8 @@ export default class ActionNetworkBrain {
       }
     });
 
-    if(gameOdds.length > 0){
-      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
+    if(this.gameOddManager.gameOdds.length > 0){
+      var go = this.gameOddManager.gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
       if(go){
         pickFactorArray.forEach((pf, i)=>{
           let nf = new Factor(pf.factor, bookName, bookId, bookLogo, pf.ml);
@@ -104,15 +107,15 @@ export default class ActionNetworkBrain {
         });
 
       }else{
-        gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
+        this.gameOddManager.gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
       }
     }else{
-      gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
+      this.gameOddManager.gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
     }
 
   }
 
-	evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+	evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game){
 		let betType = 'money-line';
 		let mlHome = odds['ml_home'];
 	  let mlAway = odds['ml_away'];
@@ -125,7 +128,7 @@ export default class ActionNetworkBrain {
 
 		//evaluate money line
 	  if(mlHome && mlAway && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
-      this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
+      this.evaluatePickFactors(book, type, odds, game, pickOptions, betType);
 	  }
 	}
 
@@ -139,7 +142,7 @@ export default class ActionNetworkBrain {
 		return f;
 	}
 
-	evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+	evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game){
 		let betType = 'spread';
 	  let spreadHomeLine= odds['spread_home_line'];
 	  let spreadAwayLine = odds['spread_away_line'];
@@ -152,11 +155,12 @@ export default class ActionNetworkBrain {
 
 	  //evaluate spread
 	  if(game.line && spreadHomeLine && spreadAwayLine && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
-      this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
+      this.evaluatePickFactors(book, type, odds, game, pickOptions, betType);
 	  }
 	}
 
-	evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
+	evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game){
+    let odd = new Odd();
 		let overML = odds['over'];
 		let underML = odds['under'];
 		let betType = 'over-under-total';
@@ -166,7 +170,7 @@ export default class ActionNetworkBrain {
     pickOptions.push({ml: underML, label: 'Under'});
 
 		if(overML && underML && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
-			this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
+			this.evaluatePickFactors(book, type, odds, game, pickOptions, betType);
     }
 	}
 

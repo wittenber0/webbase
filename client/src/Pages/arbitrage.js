@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import { Grid, Button, ButtonGroup } from '@mui/material';
 import { withStyles } from "@material-ui/core/styles";
 
-import BetOnlineBrain from '../ClientBrain/Arbitrage/bet-online';
+import BetOnlineBrain from '../ClientBrain/Arbitrage/BookBrains/bet-online-brain';
 import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain';
 import BookManager from '../ClientBrain/Arbitrage/book-manager';
 
