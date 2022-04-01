@@ -38,6 +38,7 @@ export default class ActionNetworkBrain {
   evaluateLeague(league, gameOdds){
 	  var games = league['games'];
 	  for(var i = 0; i<games.length; i++){
+      games[i].leagueName = league['league_name'];
 	    this.evaluateGame(games[i], gameOdds);
 	  }
 	}
@@ -63,41 +64,68 @@ export default class ActionNetworkBrain {
 		this.evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds);
 	}
 
+  createPickFactors(pickFactorArray, bookName, bookId, bookLogo,){
+    let pf = {};
+    pickFactorArray.forEach((p, i)=>{
+      let nf = new Factor(p.factor, bookName, bookId, bookLogo, p.ml);
+      if(pf[p.label]){
+        pf[i].push(nf)
+      }else{
+        pf[p.label] = [nf]
+      }
+    });
+    return pf;
+  }
+
+  evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType){
+    let bookId = odds['book_id'];
+    let bookName = book['display_name'];
+		let bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
+    let pickFactorArray = [];
+    let line = game.line;
+
+    pickOptions.forEach((po, i)=>{
+      if(po.ml && po.ml !== 0){
+        po.factor = this.getFactorValue(po.ml);
+        pickFactorArray.push(po);
+      }
+    });
+
+    if(gameOdds.length > 0){
+      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
+      if(go){
+        pickFactorArray.forEach((pf, i)=>{
+          let nf = new Factor(pf.factor, bookName, bookId, bookLogo, pf.ml);
+          if(go.pickFactors[pf.label]){
+            go.pickFactors[pf.label].push(nf)
+          }else{
+            go.pickFactors[pf.label] = [nf]
+          }
+        });
+
+      }else{
+        gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
+      }
+    }else{
+      gameOdds.push(new GameOdd(game, type, betType, line, this.createPickFactors(pickFactorArray, bookName, bookId, bookLogo)));
+    }
+
+  }
+
 	evaluateMoneyLine(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
 		let betType = 'money-line';
 		let mlHome = odds['ml_home'];
 	  let mlAway = odds['ml_away'];
 	  let mlDraw = odds['draw'];
+    let pickOptions = [];
+    pickOptions.push({ml: mlHome, label: 'Home'});
+    pickOptions.push({ml: mlAway, label: 'Away'});
+    pickOptions.push({ml: mlDraw, label: 'Draw'});
+    game.line = 0;
 
 		//evaluate money line
 	  if(mlHome && mlAway && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
-	    var homeFactor = this.getFactorValue(mlHome);
-			var awayFactor = this.getFactorValue(mlAway);
-			var drawFactor = mlDraw ? this.getFactorValue(mlDraw) : 0;
-
-	    if(gameOdds.length > 0){
-	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type));
-	      if(go){
-	        go.homeFactors.push(new Factor(homeFactor, bookName, bookId, bookLogo, mlHome));
-	        go.awayFactors.push(new Factor(awayFactor, bookName, bookId, bookLogo, mlAway));
-
-	        if(drawFactor > 0){
-	          go.drawFactors.push(new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw));
-	        }
-	      }else{
-	        gameOdds.push(new GameOdd(game,
-	        [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
-	        [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
-	        (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	        type, betType, null, [], []));
-	      }
-	    }else{
-	      gameOdds.push(new GameOdd(game,
-	      [new Factor(homeFactor, bookName, bookId, bookLogo, mlHome)],
-	      [new Factor(awayFactor, bookName, bookId, bookLogo, mlAway)],
-	      (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	      type, betType, null, [], []));
-	    }
+      this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
 	  }
 	}
 
@@ -113,128 +141,47 @@ export default class ActionNetworkBrain {
 
 	evaluateSpread(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
 		let betType = 'spread';
-		let line = Math.max(odds['spread_home'], odds['spread_away']);
 	  let spreadHomeLine= odds['spread_home_line'];
 	  let spreadAwayLine = odds['spread_away_line'];
 	  let mlDraw = odds['draw'];
+    let pickOptions = [];
+    game.line = Math.max(odds['spread_home'], odds['spread_away']);
+    pickOptions.push({ml: spreadHomeLine, label: 'Home'});
+    pickOptions.push({ml: spreadAwayLine, label: 'Away'});
+    pickOptions.push({ml: mlDraw, label: 'Draw'});
 
 	  //evaluate spread
-	  if(line && spreadHomeLine && spreadAwayLine && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
-	    var homeFactor = this.getFactorValue(spreadHomeLine);
-			var awayFactor = this.getFactorValue(spreadAwayLine);
-			var drawFactor = mlDraw ? this.getFactorValue(mlDraw) : 0;
-
-			if(gameOdds.length > 0){
-	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
-	      if(go){
-	        go.homeFactors.push(new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine));
-	        go.awayFactors.push(new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine));
-
-	        if(drawFactor > 0){
-	          go.drawFactors.push(new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw));
-	        }
-	      }else{
-	        gameOdds.push(new GameOdd(game,
-	        [new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine)],
-	        [new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine)],
-	        (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	        type, betType, line));
-	      }
-	    }else{
-	      gameOdds.push(new GameOdd(game,
-	      [new Factor(homeFactor, bookName, bookId, bookLogo, spreadHomeLine)],
-	      [new Factor(awayFactor, bookName, bookId, bookLogo, spreadAwayLine)],
-	      (drawFactor > 0 ? [new Factor(drawFactor, bookName, bookId, bookLogo, mlDraw)] : []),
-	      type, betType, line));
-	    }
+	  if(game.line && spreadHomeLine && spreadAwayLine && bookName != 'Open' && bookName != 'Consensus' && status != 'complete'){
+      this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
 	  }
 	}
 
 	evaluateTotalOverUnder(bookId, status, book, bookName, bookLogo, type, odds, game, gameOdds){
-		let line = odds['total'];
 		let overML = odds['over'];
 		let underML = odds['under'];
 		let betType = 'over-under-total';
+    let pickOptions = [];
+    game.line = odds['total'];
+    pickOptions.push({ml: overML, label: 'Over'});
+    pickOptions.push({ml: underML, label: 'Under'});
 
 		if(overML && underML && bookName !== 'Open' && bookName !== 'Consensus' && status !== 'complete'){
-			let overFactor = this.getFactorValue(overML);
-			let underFactor = this.getFactorValue(underML);
-
-			if(gameOdds.length > 0){
-	      var go = gameOdds.find(e => (e.gameId === game['id']) && (e.type === type) && (e.line === line) && (e.betType === betType));
-	      if(go){
-	        go.overFactors.push(new Factor(overFactor, bookName, bookId, bookLogo, overML));
-	        go.underFactors.push(new Factor(underFactor, bookName, bookId, bookLogo, underML));
-	      }else{
-	        gameOdds.push(new GameOdd(game,
-		        [],
-		        [],
-		        [],
-		        type,
-						betType,
-						line,
-						[new Factor(overFactor, bookName, bookId, bookLogo, overML)],
-						[new Factor(underFactor, bookName, bookId, bookLogo, underML)]
-					));
-	      }
-	    }else{
-				gameOdds.push(new GameOdd(game,
-					[],
-					[],
-					[],
-					type,
-					betType,
-					line,
-					[new Factor(overFactor, bookName, bookId, bookLogo, overML)],
-					[new Factor(underFactor, bookName, bookId, bookLogo, underML)]
-				));
-	    }
-		}
-
+			this.evaluatePickFactors(book, type, odds, game, gameOdds, pickOptions, betType);
+    }
 	}
 
-	sortGameOdds(gameOdds){
-	  for(var i =0; i<gameOdds.length; i++){
-	    var game = gameOdds[i];
-
-			if(game.homeFactors.length > 0){
-				game.homeFactors.sort((a,b)=>{return b.factor-a.factor});
-				game.bestHomeFactor = game.homeFactors[0];
-				game.homeFactors[0].best = true;
-			}
-
-			if(game.awayFactors.length > 0){
-				game.awayFactors.sort((a,b)=>{return b.factor-a.factor});
-				game.bestAwayFactor = game.awayFactors[0];
-				game.awayFactors[0].best = true;
-			}
-
-			if(game.overFactors && game.overFactors.length > 0){
-				game.overFactors.sort((a,b)=>{return b.factor-a.factor});
-				game.bestOverFactor = game.overFactors[0];
-				game.overFactors[0].best = true;
-			}
-
-			if(game.underFactors && game.underFactors.length > 0){
-				game.underFactors.sort((a,b)=>{return b.factor-a.factor});
-				game.bestUnderFactor = game.underFactors[0];
-				game.underFactors[0].best = true;
-			}
-
-	    if(game.drawFactors.length > 0 ){
-	      game.drawFactors.sort((a,b)=>{return b.factor-a.factor});
-	      game.bestDrawFactor = game.drawFactors[0];
-				game.drawFactors[0].best = true;
-	      game.houseLine = (1/game.bestHomeFactor.factor) + (1/game.bestAwayFactor.factor) + (1/game.bestDrawFactor.factor)
-	      //Logger.log(game.houseLine+ ': '+game.bestHomeFactor.factor+' : '+game.bestAwayFactor.factor +' : '+ game.bestDrawFactor.factor);
-	    }else if(game.bestHomeFactor && game.bestAwayFactor){
-	      game.houseLine = (1/game.bestHomeFactor.factor) + (1/game.bestAwayFactor.factor);
-	    }else if(game.bestOverFactor && game.bestUnderFactor){
-	      game.houseLine = (1/game.bestOverFactor.factor) + (1/game.bestUnderFactor.factor);
-	    }
-
-
-	  }
-	  gameOdds.sort((a,b)=>{ return a.houseLine - b.houseLine; })
+  sortGameOdds(gameOdds){
+    gameOdds.forEach(game => {
+      let houseLine = 0;
+      Object.keys(game.pickFactors).forEach(pf => {
+        if(game.pickFactors[pf].length > 0){
+  				game.pickFactors[pf].sort((a,b)=>{return b.factor-a.factor});
+  				game.pickFactors[pf][0].best = true;
+          houseLine += 1/game.pickFactors[pf][0].factor;
+  			}
+      });
+      game.houseLine = houseLine;
+    });
+    gameOdds.sort((a,b)=>{ return a.houseLine - b.houseLine; });
 	}
 }

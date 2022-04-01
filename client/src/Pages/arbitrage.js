@@ -72,6 +72,7 @@ class ArbitragePage extends Component{
 					return o.houseLine < this.state.houseLineThreshold;
 				})
 			});
+			//console.log(this.state.allOdds);
 		});
 	}
 

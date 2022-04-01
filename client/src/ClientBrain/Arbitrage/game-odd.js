@@ -1,12 +1,7 @@
 export default class GameOdd {
-  constructor(game, homeFactors, awayFactors, drawFactors, type, betType, line, overFactors, underFactors, sport) {
-    this.homeFactors = homeFactors;
-    this.awayFactors = awayFactors;
-    this.drawFactors = drawFactors;
-    this.overFactors = overFactors;
-    this.underFactors = underFactors;
+  constructor(game, type, betType, line, pickFactors) {
     this.type = type;
-    this.sport = sport;
+    this.sport = game.leagueName.toUpperCase();
     this.betType = betType;
     this.line = line
 
@@ -16,5 +11,7 @@ export default class GameOdd {
 
     this.homeName = game['teams'].find(e => e.id === this.homeId)['full_name'];
     this.awayName = game['teams'].find(e => e.id === this.awayId)['full_name'];
+
+    this.pickFactors = pickFactors;
   }
 }

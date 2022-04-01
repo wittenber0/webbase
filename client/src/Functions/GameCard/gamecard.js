@@ -19,6 +19,9 @@ const useStyles = makeStyles(theme =>({
   },
   divderColor: {
     background: '#202020'
+  },
+  accentTextColor: {
+    color: theme.palette.secondary
   }
 }));
 
@@ -58,7 +61,7 @@ function getFactorLabelByBook(factorList, bookId, isUS){
 }
 
 function getNetEV(houseLine){
-  return Math.round((1-houseLine)*1000)/10;
+  return Math.round((1-houseLine)*10000)/100;
 }
 
 export default function GameCard(props){
@@ -66,7 +69,17 @@ export default function GameCard(props){
   return(
     <div>
       <CardContent className={classes.cardPaper}>
-        <Typography gutterBottom variant="h5" component="div">{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={8}>
+            <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block'}}>{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
+            <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block', paddingLeft: '8px'}}>({props.gameOdd.sport} {props.gameOdd.betType})</Typography>
+          </Grid>
+          <Grid item xs={4}>
+
+          </Grid>
+        </Grid>
+
+
         <Grid container spacing={.5}>
 
           <Grid item xs={12}>
@@ -87,51 +100,24 @@ export default function GameCard(props){
               })}
             </Grid>
           </Grid>
-
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Item>{props.gameOdd.homeName}</Item>
-              </Grid>
-              {props.myBooks.map((b) => {
-                return(
-                  <Grid item xs={2} key={b.id}>
-                    {getFactorLabelByBook(props.gameOdd.homeFactors, b.id, true)}
+          {Object.keys(props.gameOdd.pickFactors).map(pfLabel =>{
+            return(
+              <Grid item xs={12} key={pfLabel}>
+                <Grid container spacing={2}>
+                  <Grid item xs={3}>
+                    <Item>{pfLabel}</Item>
                   </Grid>
-                );
-              })}
-            </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Item>{props.gameOdd.awayName}</Item>
+                  {props.myBooks.map((b) => {
+                    return(
+                      <Grid item xs={2} key={b.id}>
+                        {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.id, true)}
+                      </Grid>
+                    );
+                  })}
+                </Grid>
               </Grid>
-              {props.myBooks.map((b) => {
-                return(
-                  <Grid item xs={2} key={b.id}>
-                    {getFactorLabelByBook(props.gameOdd.awayFactors, b.id, true)}
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Grid>
-          {props.gameOdd.drawFactors.length > 0 &&
-          <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={3}>
-                <Item>Draw</Item>
-              </Grid>
-              {props.myBooks.map((b) => {
-                return(
-                  <Grid item xs={2}>
-                    {getFactorLabelByBook(props.gameOdd.drawFactors, b.id, true)}
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Grid>
-          }
+            )
+          })}
         </Grid>
       </CardContent>
       <Divider classes={{root: classes.divderColor}}/>
