@@ -23,8 +23,7 @@ const routing = (
     <Auth0Provider
       domain={config.domain}
       clientId={config.clientId}
-      redirectUri={window.location.origin}
-      onRedirectCallback={onRedirectCallback}
+      redirectUri={window.location.origin+'/callback'}
     >
       <ThemeProvider theme={theme}>
         <App history={history}/>
