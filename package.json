@@ -5,7 +5,8 @@
   "main": "serverexpress.js",
   "scripts": {
     "test": "start",
-    "start": "node serverexpress.js"
+    "start": "node serverexpress.js",
+    "build": "cd client/ && npm install && npm run build"
   },
   "author": "",
   "license": "ISC",
