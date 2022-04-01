@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@auth0/auth0-react": "^1.0.0",
+    "@auth0/auth0-react": "^1.9.0",
     "@auth0/auth0-spa-js": "^1.6.4",
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",

@@ -7,7 +7,7 @@ import { Router } from 'react-router-dom';
 import App from './App';
 
 //Auth
-import { Auth0Provider } from "./Auth/react-auth0-spa";
+import { Auth0Provider } from "@auth0/auth0-react";
 import config from "./Auth/auth0-keys.json";
 
 //Shared
@@ -15,20 +15,15 @@ import history from './Shared/browser-history';
 import theme from './Shared/theme';
 
 const onRedirectCallback = appState => {
-  console.log(appState);
-  history.push(
-    appState && appState.targetUrl
-      ? appState.targetUrl
-      : window.location.origin+'/callback'
-  );
+  history.push('/callback');
 };
 
 const routing = (
   <Router history={history}>
     <Auth0Provider
       domain={config.domain}
-      client_id={config.clientId}
-      redirect_uri={window.location.origin}
+      clientId={config.clientId}
+      redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
     >
       <ThemeProvider theme={theme}>

@@ -12,7 +12,9 @@ class HomePage extends Component{
 		return(
 			<div className="home-body">
 				<PageBlock fill="light">
-					<h2>welcome to the brain dump of wittenber0</h2>
+					<div style={{textAlign: 'center'}}>
+						<h2>welcome to the brain dump of wittenber0</h2>
+					</div>
 				</PageBlock>
 				<PageBlock fill="dark">
 					<h2>more coming soon...</h2>

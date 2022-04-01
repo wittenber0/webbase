@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { useAuth0 } from "../Auth/react-auth0-spa";
+import { useAuth0 } from "@auth0/auth0-react";
 import Loading from './loading'
 import history from '../Shared/browser-history';
 import AuthService from '../Shared/auth-service';
 
 export default function Callback(props) {
-  const { loading, user } = useAuth0();
-  if(!loading){
+  const { isLoading, user, isAuthenticated } = useAuth0();
+  if(!isLoading){
     return <LoginCallbackPage user={user} app={props.app}/>
   }
   return <Loading />

@@ -13,7 +13,7 @@ import Divider from '@material-ui/core/Divider';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
 
 import Profile from './profile';
-import { useAuth0 } from "../../Auth/react-auth0-spa";
+import { useAuth0 } from "@auth0/auth0-react";
 import App from '../../App';
 
 const useStyles = makeStyles(theme =>({
@@ -40,7 +40,6 @@ function Logout(l, app){
 function Login(props){
   const classes = useStyles();
   const { loginWithRedirect, logout } = useAuth0();
-  console.log(App.user());
   if(App.user()){
     return(
       <ListItem button onClick={()=> Logout(logout, props.app)}>
@@ -51,7 +50,7 @@ function Login(props){
   }
 
   return(
-    <ListItem button onClick={()=> loginWithRedirect({ appState: { targetUrl: window.location.origin+'/callback' }})}>
+    <ListItem button onClick={()=> loginWithRedirect({ returnTo: window.location.origin+'/app' })}>
       <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
       <ListItemText>Login</ListItemText>
     </ListItem>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 class LoadingPage extends Component{
 
@@ -13,7 +14,9 @@ class LoadingPage extends Component{
 			<div className="loading-page">
 				<div className="loading-page-body">
 					<PageBlock fill="light">
-						<div><h2>{this.state.title}</h2></div>
+						<div style={{textAlign:'center'}}>
+							<CircularProgress size={100}/>
+						</div>
 					</PageBlock>
 
 				</div>
