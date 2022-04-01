@@ -56,8 +56,6 @@ function getFactorLabelByBook(factorList, bookId, isUS){
   }else{
     return (<Item>{display}</Item>)
   }
-
-
 }
 
 function getNetEV(houseLine){
@@ -75,13 +73,9 @@ export default function GameCard(props){
             <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block', paddingLeft: '8px'}}>({props.gameOdd.sport} {props.gameOdd.betType})</Typography>
           </Grid>
           <Grid item xs={4}>
-
           </Grid>
         </Grid>
-
-
         <Grid container spacing={.5}>
-
           <Grid item xs={12}>
             <Grid container spacing={2}>
               <Grid item xs={3}>

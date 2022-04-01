@@ -1,8 +1,11 @@
 const express = require('express')
 const bodyParser = require('body-parser');
-const port = 4000
 const path = require('path');
 const auth = require('./serverAuth.js');
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 4000;
+}
 
 
 const app = express()
