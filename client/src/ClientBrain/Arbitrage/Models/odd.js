@@ -1,5 +1,7 @@
 export default class Odd {
-  constructor(mlHome, mlAway, mlDraw, spreadHome, spreadAway, totalOver, totalUnder, teamOver, teamUnder, line){
+  constructor(book, type, mlHome, mlAway, mlDraw, spreadHome, spreadAway, totalOver, totalUnder, lineSpread, lineOverUnder, homeOver, homeUnder, homeLine, awayOver, awayUnder, awayLine){
+    this.book = book;
+    this.type = type; //game, first half, second half etc.
     this.mlHome = mlHome;
 	  this.mlAway = mlAway;
 	  this.mlDraw = mlDraw;
@@ -7,8 +9,13 @@ export default class Odd {
 	  this.spreadAway = spreadAway;
     this.totalOver = totalOver;
 		this.totalUnder = totalUnder;
-    this.teamOver = teamOver;
-    this.teamUnder = teamUnder;
-    this.line = line;
+    this.lineSpread = lineSpread;
+    this.lineOverUnder = lineOverUnder;
+    this.homeOver = homeOver;
+    this.homeUnder = homeUnder;
+    this.homeLine = homeLine;
+    this.awayOver = awayOver;
+    this.awayUnder = awayUnder
+    this.awayLine = awayLine;
   }
 }

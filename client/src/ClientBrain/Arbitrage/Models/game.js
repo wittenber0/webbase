@@ -1,9 +1,9 @@
 export default class Game {
-  constructor(odds, leagueName, bookId, homeHame, awayName){
+  constructor(odds, leagueName, homeName, awayName, gameId){
     this.odds = odds;
-    this.leagueName = league_name;
-    this.bookId = bookId;
+    this.leagueName = leagueName;
     this.homeName = homeName;
     this.awayName = awayName;
+    this.gameId = gameId;
   }
 }

@@ -11,6 +11,7 @@ import { withStyles } from "@material-ui/core/styles";
 import BetOnlineBrain from '../ClientBrain/Arbitrage/BookBrains/bet-online-brain';
 import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain';
 import BookManager from '../ClientBrain/Arbitrage/book-manager';
+import GameOddManager from '../ClientBrain/Arbitrage/game-odd-manager';
 
 const styles = theme => ({
   root: {
@@ -28,30 +29,26 @@ class ArbitragePage extends Component{
 		this.state = {
 			title: 'Arbitrage',
 			allOdds: [],
-			books: [],
 			houseLineThreshold: 1.02,
 			thresholdInput: 1.02,
-			myBooks: [],
 			displayOdds: [],
-			betTypeFilter: 'all'
+			betTypeFilter: 'all',
+			myBooks: []
 		};
 
 		this.ActionNetworkBrain = new ActionNetworkBrain(this.state.houseLineThreshold, this.state.betTypeFilter, this.state.books);
-
+		this.bookManager = BookManager.getInstance();
+		this.gameOddManager = GameOddManager.getInstance();
 		this.refreshHouseLineThreshold = this.refreshHouseLineThreshold.bind(this);
 		this.updateHouseLineThreshold = this.updateHouseLineThreshold.bind(this);
 		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
 	}
 
 	componentDidMount(){
-		ArbitrageService.getAllBooks().then((r)=>{
-			let allBooks = r["books"];
-			let myBooks = allBooks.filter((b)=> {return BookManager.getSelectedBooks().includes(b.id)});
-			this.setState({books:allBooks, myBooks: myBooks});
+		this.bookManager.loadBooks().then(()=>{
+			this.setState({myBooks: this.bookManager.getSelectedBooks()})
 			this.populateGameOdds();
-		})
-
-
+		});
 	}
 
 	setBetTypeFilter(e){
@@ -62,21 +59,22 @@ class ArbitragePage extends Component{
 	}
 
 	populateGameOdds(){
-		this.ActionNetworkBrain.getGameOdds(this.state.houseLineThreshold, this.state.betTypeFilter, this.state.books).then(r =>{
+		this.gameOddManager.loadActionNetworkGameOdds(this.state.houseLineThreshold, this.state.betTypeFilter, this.bookManager).then(r => {
 			this.setState({
-				allOdds: r,
-				displayOdds: r.filter(o => {
-					if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType){
-						return false;
-					}
-					return o.houseLine < this.state.houseLineThreshold;
-				})
+				allOdds: this.gameOddManager.gameOdds,
+				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
 			});
-			//console.log(this.state.allOdds);
 		});
 	}
 
-
+	getDisplayOdds(gameOdds){
+    return gameOdds.filter(o => {
+      if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType){
+        return false;
+      }
+      return o.houseLine < this.state.houseLineThreshold;
+    });
+  }
 
 	updateHouseLineThreshold(e){
 		this.setState({thresholdInput: e.target.value});

@@ -1,9 +1,7 @@
 export default class Factor {
-  constructor(factor, bookName, bookId, bookLogo, factorLabel){
+  constructor(factor, book, factorLabel){
     this.factor = factor;
-    this.bookName = bookName;
-    this.bookId = bookId;
-    this.bookLogo = bookLogo;
+    this.book = book;
     this.factorLabel = factorLabel;
   }
 }

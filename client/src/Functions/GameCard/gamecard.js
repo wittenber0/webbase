@@ -42,7 +42,7 @@ const BestItem = styled(Paper)(({ theme }) => ({
 }));
 
 function getFactorLabelByBook(factorList, bookId, isUS){
-  let factor = factorList.find((e)=> {return e.bookId === bookId});
+  let factor = factorList.find((e)=> {return e.book.bookId === bookId});
   let display = '';
   if(factor && isUS){
     display = factor.factorLabel;
@@ -80,10 +80,10 @@ export default function GameCard(props){
             </Grid>
             {props.myBooks.map((b) => {
               return(
-                <Grid item xs={2} key={b.id}>
+                <Grid item xs={2} key={b.bookId}>
                   <Item>
-                  {b['meta']['logos']['primary'] ? <img src={b['meta']['logos']['primary']}/> :
-                    <Typography>{b['display_name']}</Typography>
+                  {b.logo ? <img src={b.logo}/> :
+                    <Typography>{b.bookName}</Typography>
                   }
                   </Item>
                 </Grid>
@@ -100,8 +100,8 @@ export default function GameCard(props){
                 </Grid>
                 {props.myBooks.map((b) => {
                   return(
-                    <Grid item xs={2} key={b.id}>
-                      {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.id, true)}
+                    <Grid item xs={2} key={b.bookId}>
+                      {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.bookId, true)}
                     </Grid>
                   );
                 })}
