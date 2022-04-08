@@ -8,7 +8,9 @@ const actionLabsBookOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/';
 const actionLabsPlayers = 'https://d3ttxfuywgi7br.cloudfront.net/players/projections/all/actionnetwork/default.json'
 const actionLabsPropEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=66baf522-6536-496c-bcd1-3405d15b434c'
 const actionLabsMarketEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=d7ffcc85-db0a-4d62-b94a-8fedb88a2c39'
-
+const pinnacleMatchUps = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
+const pinnacleSports = 'https://guest.api.arcadia.pinnacle.com/0.1/sports'
+const pinnacleMarkets = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
 const betOnlineOdds = 'https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games'
 
 class ArbitrageService{
@@ -42,6 +44,57 @@ class ArbitrageService{
 
   static getActionLabsMarketEvents = async function(){
     return UtilityService.get(actionLabsMarketEvents);
+  }
+
+  static getPinnacleMatchUps = async function(sportId){
+    let options = {
+      "headers": {
+        "accept": "application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json",
+        "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-api-key": "CmX2KcMrXuFmNg6YFbmTxE0y9CIrOi0R",
+        "x-device-uuid": "ad3e5664-f67a62d5-3de6d5cd-15c70fa6"
+      },
+      "referrer": "https://www.pinnacle.com/",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "body": null,
+      "method": "GET",
+      "mode": "cors",
+      "credentials": "omit"
+    }
+
+    return UtilityService.get(pinnacleMatchUps + sportId + '/matchups?withSpecials=false', options);
+  }
+
+  static getPinnacleMarkets = async function(sportId){
+    let options = {
+      "headers": {
+        "accept": "application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json",
+        "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"99\", \"Google Chrome\";v=\"99\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-api-key": "CmX2KcMrXuFmNg6YFbmTxE0y9CIrOi0R",
+        "x-device-uuid": "ad3e5664-f67a62d5-3de6d5cd-15c70fa6"
+      },
+      "referrer": "https://www.pinnacle.com/",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "body": null,
+      "method": "GET",
+      "mode": "cors",
+      "credentials": "omit"
+    }
+    return UtilityService.get(pinnacleMarkets + sportId + '/markets/straight?primaryOnly=false&withSpecials=false', options);
   }
 
   static getBetOnlineOdds = async function(sport){

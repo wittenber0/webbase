@@ -39,7 +39,7 @@ export default class ActionNetworkBrain {
                     odd['spread_away_line'],
                     odd['over'],
                     odd['under'],
-                    Math.max(odd['spread_home'], odd['spread_away']),
+                    odd['spread_home'], //spread based on home team
                     odd['total'],
                     odd['home_over'],
                     odd['home_under'],

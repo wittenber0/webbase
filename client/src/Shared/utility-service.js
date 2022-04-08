@@ -2,8 +2,8 @@ import App from '../App';
 const fetch = require('node-fetch');
 
 class UtilityService{
-  static get = async function(route){
-    return await fetch(route)
+  static get = async function(route, options){
+    return await fetch(route, options)
     .then(res=>{
       return(res.json());
     }).then((json)=> {

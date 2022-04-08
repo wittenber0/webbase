@@ -5,6 +5,7 @@ import Factor from './Models/factor';
 import BookManager from './book-manager';
 import ActionNetworkBrain from './action-network-brain';
 import BetOnlineBrain from './BookBrains/bet-online-brain';
+import PinnacleBrain from './BookBrains/pinnacle-brain';
 
 class GameOddManager {
   gameOdds;
@@ -16,9 +17,12 @@ class GameOddManager {
   }
 
   async loadGameOdds(houseLineThreshold, betTypeFilter, bm){
+    this.games = [];
+    this.gameOdds = [];
     let bookGameTrees = [
       this.loadActionNetworkGameTree(houseLineThreshold, betTypeFilter, bm),
-      this.loadBetOnlineGameTree()
+      this.loadBetOnlineGameTree(),
+      this.loadPinnacleGameTree()
     ]
     return await Promise.all(bookGameTrees).then( trees => {
       trees.forEach( tree => {
@@ -26,7 +30,7 @@ class GameOddManager {
           if(this.games.length > 0){
             let existingGame = this.games.find(g => g.gameId === game.gameId);
             if(existingGame){
-              console.log('matching:'+existingGame.gameId);
+              //console.log('matching:'+existingGame.gameId);
               game.odds.forEach(odd => {
                 existingGame.odds.push(odd);
               })
@@ -52,6 +56,13 @@ class GameOddManager {
   async loadBetOnlineGameTree(){
     this.betOnlineBrain = new BetOnlineBrain();
     return await this.betOnlineBrain.getGameTree().then( gameTree => {
+      return gameTree;
+    });
+  }
+
+  async loadPinnacleGameTree(){
+    this.pinnacleBrain = new PinnacleBrain();
+    return await this.pinnacleBrain.getGameTree().then( gameTree => {
       return gameTree;
     });
   }

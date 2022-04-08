@@ -1,7 +1,7 @@
 import ArbitrageService from '../../Shared/arbitrage-service';
 import Book from './Models/book';
 
-const defaultSelectedBookIds = [8, 21, 1001];
+const defaultSelectedBookIds = [1003, 8, 21, 1001];
 
 class BookManager {
   isLoaded;
@@ -22,14 +22,14 @@ class BookManager {
 
   async loadBooks(){
     return await ArbitrageService.getAllBooks().then((r)=>{
+      this.getMyLiveBooks().forEach( book => {
+        this.allBooks.push(book);
+      })
 			r["books"].forEach( book => {
         let bookName = book['display_name'];
     		let bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
         this.allBooks.push(new Book(book['id'], bookName, bookLogo));
       });
-      this.getMyLiveBooks().forEach( book => {
-        this.allBooks.push(book);
-      })
 			this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
       this.isLoaded = true;
 		});
@@ -45,6 +45,7 @@ class BookManager {
 
   getMyLiveBooks(){
     let liveBooks = [
+      new Book(1003, 'Pinnacle (Live)', null),
       new Book(1001, 'BetOnline (Live)', null)
     ]
     return liveBooks;

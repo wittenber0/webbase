@@ -60,7 +60,7 @@ export default class BetOnlineBrain{
       game.AwayLine.SpreadLine.Line,
       game.TotalLine.TotalLine.Over.Line,
       game.TotalLine.TotalLine.Under.Line,
-      Math.max(game.HomeLine.SpreadLine.Point, game.AwayLine.SpreadLine.Point),
+      game.HomeLine.SpreadLine.Point, //spread based on home
       game.TotalLine.TotalLine.Point,
       game.HomeLine.TeamTotalLine.Over.Line,
       game.HomeLine.TeamTotalLine.Under.Line,

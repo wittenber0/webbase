@@ -69,7 +69,10 @@ export default function GameCard(props){
       <Grid container spacing={2} style={{paddingBottom: '10px', paddingTop: '10px'}}>
         <Grid item xs={12}>
           <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block'}}>{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
-          <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block', paddingLeft: '8px'}}>({props.gameOdd.sport} {props.gameOdd.betType})</Typography>
+          <Button sx={{ml:2}} variant="outlined" size="small" color="secondary">{props.gameOdd.betType}</Button>
+          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">{props.gameOdd.sport}</Button>
+          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">{props.gameOdd.type}</Button>
+          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">Line: {props.gameOdd.line}</Button>
         </Grid>
       </Grid>
       <Grid container spacing={.5}>

@@ -9,7 +9,7 @@ export default class Odd {
 	  this.spreadAway = spreadAway;
     this.totalOver = totalOver;
 		this.totalUnder = totalUnder;
-    this.lineSpread = lineSpread;
+    this.lineSpread = lineSpread; //based on home
     this.lineOverUnder = lineOverUnder;
     this.homeOver = homeOver;
     this.homeUnder = homeUnder;
