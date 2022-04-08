@@ -2,6 +2,8 @@ import ArbitrageService from '../../Shared/arbitrage-service';
 import Book from './Models/book';
 
 const defaultSelectedBookIds = [1003, 8, 21, 1001];
+const bovadaLogo = 'https://www.aplussportsandmore-fanshop-baseballfield.com/images/bovada-logo_0.png'
+const myBookieLogo = 'https://images.squarespace-cdn.com/content/v1/5ab4527b3c3a536a7a352c05/1631109644782-2TR7KXFGKPA84ZHFCI94/TRANSPARENT-MB.png'
 
 class BookManager {
   isLoaded;
@@ -28,6 +30,12 @@ class BookManager {
 			r["books"].forEach( book => {
         let bookName = book['display_name'];
     		let bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
+        if(book['id'] === 21){
+          bookLogo = bovadaLogo;
+        }
+        if(book['id'] === 8){
+          bookLogo = myBookieLogo;
+        }
         this.allBooks.push(new Book(book['id'], bookName, bookLogo));
       });
 			this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
@@ -45,8 +53,8 @@ class BookManager {
 
   getMyLiveBooks(){
     let liveBooks = [
-      new Book(1003, 'Pinnacle (Live)', null),
-      new Book(1001, 'BetOnline (Live)', null)
+      new Book(1003, 'Pinnacle (Live)', 'https://www.pinnacle.com/static/media/logo-on-dark.94bbcdf8.svg'),
+      new Book(1001, 'BetOnline (Live)', 'https://www.predictem.com/wp-content/uploads/2018/05/BetOnline-logo.png')
     ]
     return liveBooks;
   }

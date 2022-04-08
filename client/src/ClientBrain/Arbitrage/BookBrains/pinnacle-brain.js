@@ -31,7 +31,7 @@ export default class PinnacleBrain {
       matchups.forEach( matchup => {
         let homeName = matchup.participants.find(p => p.alignment === 'home').name;
         let awayName = matchup.participants.find(p => p.alignment === 'away').name;
-        if(marketArray[matchup.id]){
+        if(marketArray[matchup.id] && !matchup.isLive){
           games.push(new Game(
             this.createOdds(marketArray[matchup.id]), matchup.league.name.toLowerCase(), homeName, awayName, this.getGameId(matchup.league.name.toLowerCase(), homeName, awayName, matchup.startTime)
           ));

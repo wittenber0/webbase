@@ -83,7 +83,7 @@ class GameOddManager {
 	}
 
   evaluateMoneyLine(odd, game){
-		let betType = 'money-line';
+		let betType = 'ml';
     let pickOptions = [];
     pickOptions.push({ml: odd.mlHome, label: 'Home'});
     pickOptions.push({ml: odd.mlAway, label: 'Away'});
@@ -98,7 +98,7 @@ class GameOddManager {
 	}
 
   evaluateSpread(odd, game){
-		let betType = 'spread';
+		let betType = 's';
     let pickOptions = [];
     odd.line = odd.lineSpread;
     pickOptions.push({ml: odd.spreadHome, label: 'Home'});
@@ -111,7 +111,7 @@ class GameOddManager {
 	}
 
 	evaluateTotalOverUnder(odd, game){
-		let betType = 'over-under-total';
+		let betType = 'ou';
     let pickOptions = [];
     odd.line = odd.lineOverUnder;
     pickOptions.push({ml: odd.totalOver, label: 'Over'});

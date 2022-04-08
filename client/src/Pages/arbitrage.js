@@ -5,8 +5,9 @@ import ArbitrageService from '../Shared/arbitrage-service';
 import GameCard from '../Functions/GameCard/gamecard';
 
 import TextField from '@mui/material/TextField';
-import { Grid, Button, ButtonGroup } from '@mui/material';
+import { Grid, Button, ButtonGroup, Typography, Paper } from '@mui/material';
 import { withStyles } from "@material-ui/core/styles";
+import { styled } from '@mui/material/styles';
 
 import BetOnlineBrain from '../ClientBrain/Arbitrage/BookBrains/bet-online-brain';
 import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain';
@@ -21,6 +22,15 @@ const styles = theme => ({
     color: "white !important"
   }
 });
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: '#202020',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: '#bbbbbb',
+  height: '25px'
+}));
 
 class ArbitragePage extends Component{
 
@@ -109,26 +119,26 @@ class ArbitragePage extends Component{
 								<ButtonGroup variant="outlined" aria-label="outlined primary button group">
 									<Button
 										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "money-line" ? 'secondary': 'primary' }
-										value="money-line">
+										color={this.state.betTypeFilter === "ml" ? 'secondary': 'primary' }
+										value="ml">
 										Money Line
 									</Button>
 									<Button
 										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "spread" ? 'secondary': 'primary' }
-										value="spread">
+										color={this.state.betTypeFilter === "s" ? 'secondary': 'primary' }
+										value="s">
 										Spread
 									</Button>
 									<Button
 										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "over-under-total" ? 'secondary': 'primary' }
-										value="over-under-total">
+										color={this.state.betTypeFilter === "ou" ? 'secondary': 'primary' }
+										value="ou">
 										Over Under (Total)
 									</Button>
 									<Button
 										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "over-under-team" ? 'secondary': 'primary' }
-										value="over-under-team">
+										color={this.state.betTypeFilter === "tt" ? 'secondary': 'primary' }
+										value="tt">
 										Over Under (Team)
 									</Button>
 									<Button
@@ -142,6 +152,31 @@ class ArbitragePage extends Component{
 							<Grid item>
 								<Button variant="contained" onClick={this.refreshHouseLineThreshold}>Refresh</Button>
 							</Grid>
+						</Grid>
+						<Grid container spacing={1} sx={{mt:2}}>
+							<Grid item xs={2}>
+
+							</Grid>
+							<Grid item xs={1}>
+								<Item>Line</Item>
+							</Grid>
+							<Grid item xs={1}>
+								<Item>Arb</Item>
+							</Grid>
+							<Grid item xs={1}>
+								<Item>EV</Item>
+							</Grid>
+							{this.state.myBooks.map((b) => {
+	              return(
+	                <Grid item xs={1.5} key={b.bookId}>
+	                  <Item>
+	                  {b.bookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.bookLogo}/> :
+	                    <Typography>{b.bookName}</Typography>
+	                  }
+	                  </Item>
+	                </Grid>
+	              );
+	            })}
 						</Grid>
 						{this.state.displayOdds.length > 0 &&
 							<div>

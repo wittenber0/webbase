@@ -22,7 +22,14 @@ const useStyles = makeStyles(theme =>({
   },
   accentTextColor: {
     color: theme.palette.secondary
+  },
+  whiteText: {
+    color: '#202020'
   }
+}));
+
+const BestTypography = styled(Typography)(({ theme }) => ({
+  color: '#99ffaa'
 }));
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -30,18 +37,24 @@ const Item = styled(Paper)(({ theme }) => ({
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
-  color: '#bbbbbb',
+  alignItems:'center',
+  justifyContent: 'center',
+  verticalAlign: 'middle',
+  color: '#aaaaaa',
+  height: '50px'
 }));
 
-const BestItem = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#AFE1AF',
+const TeamItem = styled(Paper)(({ theme }) => ({
+  backgroundColor: '#202020',
   ...theme.typography.body2,
   padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
+  paddingLeft: theme.spacing(2),
+  textAlign: 'left',
+  color: '#aaaaaa',
+  height: '50px'
 }));
 
-function getFactorLabelByBook(factorList, bookId, isUS){
+function getFactorLabelByBook(factorList, bookId, isUS, i){
   let factor = factorList.find((e)=> {return e.book.bookId === bookId});
   let display = '';
   if(factor && isUS){
@@ -52,9 +65,9 @@ function getFactorLabelByBook(factorList, bookId, isUS){
     display = 'N/A';
   }
   if(factor && factor.best){
-    return(<BestItem>{display}</BestItem>)
+    return(<BestTypography key={i}>{display}</BestTypography>)
   }else{
-    return (<Item>{display}</Item>)
+    return (<Typography key={i}>{display}</Typography>)
   }
 }
 
@@ -65,54 +78,41 @@ function getNetEV(houseLine){
 export default function GameCard(props){
   const classes = useStyles();
   return(
-    <div>
-      <Grid container spacing={2} style={{paddingBottom: '10px', paddingTop: '10px'}}>
-        <Grid item xs={12}>
-          <Typography gutterBottom variant="h5" component="div" style={{display: 'inline-block'}}>{props.gameOdd.awayName} @ {props.gameOdd.homeName}</Typography>
-          <Button sx={{ml:2}} variant="outlined" size="small" color="secondary">{props.gameOdd.betType}</Button>
-          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">{props.gameOdd.sport}</Button>
-          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">{props.gameOdd.type}</Button>
-          <Button sx={{ml:1}} variant="outlined" size="small" color="secondary">Line: {props.gameOdd.line}</Button>
-        </Grid>
+    <Grid container spacing={1} sx={{mt:0.1}}>
+      <Grid item xs={2}>
+        <TeamItem>
+          <Typography>{props.gameOdd.homeName}</Typography>
+          <Typography>{props.gameOdd.awayName}</Typography>
+        </TeamItem>
       </Grid>
-      <Grid container spacing={.5}>
-        <Grid item xs={12}>
-          <Grid container spacing={2}>
-            <Grid item xs={3}>
-              <Item>Net EV: {getNetEV(props.gameOdd.houseLine)}%</Item>
-            </Grid>
-            {props.myBooks.map((b) => {
-              return(
-                <Grid item xs={2} key={b.bookId}>
-                  <Item>
-                  {b.logo ? <img src={b.logo}/> :
-                    <Typography>{b.bookName}</Typography>
-                  }
-                  </Item>
-                </Grid>
-              );
+      <Grid item xs={1}>
+        <Item>
+          <Typography variant='subtitle2'>{props.gameOdd.betType}: {props.gameOdd.line}</Typography>
+          <Typography variant='subtitle2'>v: {props.gameOdd.type}</Typography>
+        </Item>
+      </Grid>
+      <Grid item xs={1}>
+        <Item>
+          <Typography>{getNetEV(props.gameOdd.houseLine)}%</Typography>
+        </Item>
+      </Grid>
+      <Grid item xs={1}>
+        <Item>
+          <Typography>EV:</Typography>
+          <Typography>EV:</Typography>
+        </Item>
+      </Grid>
+      {props.myBooks.map((b) => {
+        return(
+          <Grid item xs={1.5} key={b.bookId}>
+            <Item>
+            {Object.keys(props.gameOdd.pickFactors).map((pfLabel, i) => {
+              return getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.bookId, true, i)
             })}
+            </Item>
           </Grid>
-        </Grid>
-        {Object.keys(props.gameOdd.pickFactors).map(pfLabel =>{
-          return(
-            <Grid item xs={12} key={pfLabel}>
-              <Grid container spacing={2}>
-                <Grid item xs={3}>
-                  <Item>{pfLabel}</Item>
-                </Grid>
-                {props.myBooks.map((b) => {
-                  return(
-                    <Grid item xs={2} key={b.bookId}>
-                      {getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.bookId, true)}
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </Grid>
-          )
-        })}
-      </Grid>
-    </div>
+        );
+      })}
+    </Grid>
   )
 }
