@@ -59,7 +59,7 @@ class ArbitragePage extends Component{
 	}
 
 	populateGameOdds(){
-		this.gameOddManager.loadActionNetworkGameOdds(this.state.houseLineThreshold, this.state.betTypeFilter, this.bookManager).then(r => {
+		this.gameOddManager.loadGameOdds(this.state.houseLineThreshold, this.state.betTypeFilter, this.bookManager).then(r => {
 			this.setState({
 				allOdds: this.gameOddManager.gameOdds,
 				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)

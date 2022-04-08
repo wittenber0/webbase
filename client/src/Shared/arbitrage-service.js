@@ -45,7 +45,6 @@ class ArbitrageService{
   }
 
   static getBetOnlineOdds = async function(sport){
-    let payload = {};
     let options = {
       "headers": {
         "accept": "application/json, text/plain, */*",
@@ -70,13 +69,11 @@ class ArbitrageService{
       },
       "referrer": "https://www.betonline.ag/",
       "referrerPolicy": "strict-origin-when-cross-origin",
-      "body": "{\"Sport\":\"baseball\",\"Period\":0}",
+      "body": "{\"Sport\":\""+sport+"\",\"Period\":0}",
       "method": "POST",
       "mode": "cors",
       "credentials": "omit"
     }
-
-    payload = {Sport: sport, Period: 0}
 
     return await fetch("https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games", options)
     .then(res=>{

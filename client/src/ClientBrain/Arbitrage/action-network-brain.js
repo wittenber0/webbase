@@ -18,8 +18,9 @@ export default class ActionNetworkBrain {
   async getGameTree(houseLineThreshold, betTypeFilter, bm){
     this.houseLineThreshold = houseLineThreshold;
     this.betTypeFilter = betTypeFilter;
+    let d = new Date();
 
-		return await ArbitrageService.getAllOddsForDate(new Date(), bm.getSelectedBookIds()).then((r)=>{
+		return await ArbitrageService.getAllOddsForDate(d, bm.getSelectedBookIds()).then((r)=>{
 		    r["all_games"].forEach( league => {
           league['games'].forEach( game => {
             let cleanOdds = [];
@@ -52,12 +53,21 @@ export default class ActionNetworkBrain {
               });
               let homeName = game['teams'].find(e => e.id === game['home_team_id'])['full_name'];
               let awayName = game['teams'].find(e => e.id === game['away_team_id'])['full_name'];
-              let g = new Game(cleanOdds, league['league_name'], homeName, awayName, game['id']);
+              let g = new Game(cleanOdds, league['league_name'], homeName, awayName, this.getGameId(homeName, awayName, league['league_name'], d));
               this.gameTree.push(g);
             }
           });
         });
         return(this.gameTree);
 		});
+  }
+
+  //for type 'game' games id will be of format 'game|leagueName|homeName|awayName|YYYYMMDD'
+  getGameId(homeName, awayName, leagueName, dateString){
+    return 'game|'+leagueName+'|'+homeName+'|'+awayName+'|'+this.getDateString(dateString)
+  }
+
+  getDateString(d){
+    return d.getFullYear().toString()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
   }
 }

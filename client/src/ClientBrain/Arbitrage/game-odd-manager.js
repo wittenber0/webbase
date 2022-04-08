@@ -4,6 +4,7 @@ import Game from './Models/game';
 import Factor from './Models/factor';
 import BookManager from './book-manager';
 import ActionNetworkBrain from './action-network-brain';
+import BetOnlineBrain from './BookBrains/bet-online-brain';
 
 class GameOddManager {
   gameOdds;
@@ -14,11 +15,45 @@ class GameOddManager {
     this.games = [];
   }
 
-  async loadActionNetworkGameOdds(houseLineThreshold, betTypeFilter, bm){
+  async loadGameOdds(houseLineThreshold, betTypeFilter, bm){
+    let bookGameTrees = [
+      this.loadActionNetworkGameTree(houseLineThreshold, betTypeFilter, bm),
+      this.loadBetOnlineGameTree()
+    ]
+    return await Promise.all(bookGameTrees).then( trees => {
+      trees.forEach( tree => {
+        tree.forEach( game => {
+          if(this.games.length > 0){
+            let existingGame = this.games.find(g => g.gameId === game.gameId);
+            if(existingGame){
+              console.log('matching:'+existingGame.gameId);
+              game.odds.forEach(odd => {
+                existingGame.odds.push(odd);
+              })
+            }else{
+              this.games.push(game);
+            }
+          }else{
+            this.games.push(game);
+          }
+        });
+      });
+      this.buildGameOdds(this.games);
+    });
+  }
+
+  async loadActionNetworkGameTree(houseLineThreshold, betTypeFilter, bm){
     this.actionNetworkBrain = new ActionNetworkBrain(houseLineThreshold, betTypeFilter);
     return await this.actionNetworkBrain.getGameTree(houseLineThreshold, betTypeFilter, bm).then( gameTree => {
-      this.buildGameOdds(gameTree)
-    })
+      return gameTree;
+    });
+  }
+
+  async loadBetOnlineGameTree(){
+    this.betOnlineBrain = new BetOnlineBrain();
+    return await this.betOnlineBrain.getGameTree().then( gameTree => {
+      return gameTree;
+    });
   }
 
   buildGameOdds(gameTree){

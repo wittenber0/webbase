@@ -45,7 +45,6 @@ class AdminPage extends Component{
 	}
 
 	render(){
-		console.log(this.state.appUsers);
 		return(
 			<div className="admin">
 				<div className="admin-body">
