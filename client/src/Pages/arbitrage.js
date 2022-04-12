@@ -5,32 +5,46 @@ import ArbitrageService from '../Shared/arbitrage-service';
 import GameCard from '../Functions/GameCard/gamecard';
 
 import TextField from '@mui/material/TextField';
-import { Grid, Button, ButtonGroup, Typography, Paper } from '@mui/material';
-import { withStyles } from "@material-ui/core/styles";
+import { Grid, Typography, Paper, Button, FormControl, Switch } from '@mui/material';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import { styled } from '@mui/material/styles';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 
 import BetOnlineBrain from '../ClientBrain/Arbitrage/BookBrains/bet-online-brain';
 import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain';
 import BookManager from '../ClientBrain/Arbitrage/book-manager';
 import GameOddManager from '../ClientBrain/Arbitrage/game-odd-manager';
 
+
 const styles = theme => ({
-  root: {
-    background: "black"
-  },
-  input: {
-    color: "white !important"
-  }
+    textField: {
+        width: '90%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        paddingBottom: 0,
+        marginTop: 0,
+        fontWeight: 500
+    },
+    input: {
+        color: 'white'
+    }
 });
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: '#202020',
+const Item = styled(Paper)(({ theme }) => {
+	return({
+  backgroundColor: theme.palette.dark.three,
   ...theme.typography.body2,
   padding: theme.spacing(1),
   textAlign: 'center',
-  color: '#bbbbbb',
-  height: '25px'
-}));
+  color: 'white',
+  height: '25px',
+	fontWeight: 'bold',
+	alignItems: "center",
+	justifyContent: "center",
+	display:"flex"
+});});
 
 class ArbitragePage extends Component{
 
@@ -39,19 +53,18 @@ class ArbitragePage extends Component{
 		this.state = {
 			title: 'Arbitrage',
 			allOdds: [],
-			houseLineThreshold: 1.02,
-			thresholdInput: 1.02,
 			displayOdds: [],
 			betTypeFilter: 'all',
+			leagueFilter: 'all',
+			sortBy: 'ev',
 			myBooks: []
 		};
 
-		this.ActionNetworkBrain = new ActionNetworkBrain(this.state.houseLineThreshold, this.state.betTypeFilter, this.state.books);
+		this.ActionNetworkBrain = new ActionNetworkBrain(this.state.betTypeFilter, this.state.books);
 		this.bookManager = BookManager.getInstance();
 		this.gameOddManager = GameOddManager.getInstance();
-		this.refreshHouseLineThreshold = this.refreshHouseLineThreshold.bind(this);
-		this.updateHouseLineThreshold = this.updateHouseLineThreshold.bind(this);
 		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
+		this.updateSortBy = this.updateSortBy.bind(this);
 	}
 
 	componentDidMount(){
@@ -62,100 +75,108 @@ class ArbitragePage extends Component{
 	}
 
 	setBetTypeFilter(e){
-		let btf = e.currentTarget.value;
+		let btf = e.target.value;
 		if(e && btf){
 			this.setState({betTypeFilter: btf});
 		}
 	}
 
+	setLeagueFilter(e){
+		let btf = e.target.value;
+		if(e && btf){
+			this.setState({leagueFilter: btf});
+		}
+	}
+
+	updateSortBy(e){
+		let sb = e.target.value;
+		if(e && sb){
+			let allOdds = this.gameOddManager.getGameOddsSortedBy(sb);
+			this.setState({sortBy: sb, allOdds: allOdds, displayOdds: this.getDisplayOdds(allOdds)});
+		}
+	}
+
 	populateGameOdds(){
-		this.gameOddManager.loadGameOdds(this.state.houseLineThreshold, this.state.betTypeFilter, this.bookManager).then(r => {
+		this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy).then(r => {
 			this.setState({
 				allOdds: this.gameOddManager.gameOdds,
 				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
 			});
+			//console.log(this.state.displayOdds);
 		});
 	}
 
 	getDisplayOdds(gameOdds){
-    return gameOdds.filter(o => {
-      if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType){
+    return gameOdds.filter( (o, i) => {
+      if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType.slice(0,2)){
         return false;
       }
-      return o.houseLine < this.state.houseLineThreshold;
+      return i < 20;
     });
   }
 
-	updateHouseLineThreshold(e){
-		this.setState({thresholdInput: e.target.value});
-	}
-
-	refreshHouseLineThreshold(){
-		this.setState({houseLineThreshold: this.state.thresholdInput});
-		this.populateGameOdds();
-	}
-
 	render(){
-		const {classes} = this.props;
+		//const {classes} = this.props;
 		return(
 			<div className="arbitrage">
 				<div className="arbitrage-body">
-					<PageBlock fill="light">
+					<PageBlock fill="dark">
 						<div><h2>{this.state.title}</h2></div>
 						<Grid container spacing={2} justifyContent="left" alignItems="center">
 							<Grid item>
-								<TextField
-									id="outlined-basic"
-									label="House Line Threshold"
-									variant="outlined"
-									InputProps= {{className: classes.input}}
-									focused
-									defaultValue={this.state.houseLineThreshold}
-									onChange={this.updateHouseLineThreshold}
-									size='small'
-								/>
+								<FormControl fullWidth>
+									<InputLabel id="sort-by-label">Sort By</InputLabel>
+									<Select
+										size="small"
+										labelId="sort-by-label"
+										id="sort"
+										value={this.state.sortBy}
+										label=" Sort By "
+										onChange={this.updateSortBy}
+									>
+										<MenuItem value={'ev'}>+EV</MenuItem>
+										<MenuItem value={'arb'}>ARB</MenuItem>
+									</Select>
+								</FormControl>
 							</Grid>
-							<Grid item>
-								<ButtonGroup variant="outlined" aria-label="outlined primary button group">
-									<Button
-										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "ml" ? 'secondary': 'primary' }
-										value="ml">
-										Money Line
-									</Button>
-									<Button
-										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "s" ? 'secondary': 'primary' }
-										value="s">
-										Spread
-									</Button>
-									<Button
-										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "ou" ? 'secondary': 'primary' }
-										value="ou">
-										Over Under (Total)
-									</Button>
-									<Button
-										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "tt" ? 'secondary': 'primary' }
-										value="tt">
-										Over Under (Team)
-									</Button>
-									<Button
-										onClick={this.setBetTypeFilter}
-										color={this.state.betTypeFilter === "all" ? 'secondary': 'primary' }
-										value="all">
-										All
-									</Button>
-								</ButtonGroup>
+							<Grid item xs={2}>
+								<FormControl fullWidth>
+									<InputLabel id="bt-label">Bet Type</InputLabel>
+					        <Select
+										size="small"
+					          labelId="bt-label"
+					          id="betTypeFilter"
+					          value={this.state.betTypeFilter}
+					          label=" Bet Type "
+					          onChange={this.setBetTypeFilter}
+					        >
+					          <MenuItem value={'all'}>All</MenuItem>
+					          <MenuItem value={'ml'}>Money Line</MenuItem>
+					          <MenuItem value={'s'}>Spread</MenuItem>
+										<MenuItem value={'ou'}>Over Under</MenuItem>
+					          <MenuItem value={'tt'}>Team Over Under</MenuItem>
+					        </Select>
+								</FormControl>
 							</Grid>
-							<Grid item>
-								<Button variant="contained" onClick={this.refreshHouseLineThreshold}>Refresh</Button>
+							<Grid item xs={2}>
+								<FormControl fullWidth>
+									<InputLabel id="league-label">League</InputLabel>
+					        <Select
+										size="small"
+					          labelId="league-label"
+					          id="leagueFilter"
+					          value={this.state.leagueFilter}
+					          label=" League "
+					          onChange={this.setLeagueFilter}
+					        >
+										<MenuItem value={'all'}>all</MenuItem>
+					          <MenuItem value={'www'}>Not done yet loser</MenuItem>
+					        </Select>
+								</FormControl>
 							</Grid>
 						</Grid>
 						<Grid container spacing={1} sx={{mt:2}}>
-							<Grid item xs={2}>
-
+							<Grid item xs={2.5}>
 							</Grid>
 							<Grid item xs={1}>
 								<Item>Line</Item>
@@ -166,9 +187,12 @@ class ArbitragePage extends Component{
 							<Grid item xs={1}>
 								<Item>EV</Item>
 							</Grid>
+							<Grid item xs={1}>
+								<Item>Pick</Item>
+							</Grid>
 							{this.state.myBooks.map((b) => {
 	              return(
-	                <Grid item xs={1.5} key={b.bookId}>
+	                <Grid item xs={1} key={'header-'+b.bookId}>
 	                  <Item>
 	                  {b.bookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.bookLogo}/> :
 	                    <Typography>{b.bookName}</Typography>
@@ -179,7 +203,7 @@ class ArbitragePage extends Component{
 	            })}
 						</Grid>
 						{this.state.displayOdds.length > 0 &&
-							<div>
+							<div style={{width:'100%'}}>
 							{this.state.displayOdds.map((odd,i)=>{
 								if(i<100 && odd.houseLine){
 									return(<GameCard gameOdd={odd} key={i} myBooks={this.state.myBooks}/>)
@@ -188,7 +212,7 @@ class ArbitragePage extends Component{
 							</div>
 						}
 					</PageBlock>
-					<PageBlock fill="dark">
+					<PageBlock fill="light">
 						<h2>... more arbitrage stuff</h2>
 					</PageBlock>
 
@@ -199,4 +223,4 @@ class ArbitragePage extends Component{
 	}
 }
 
-export default withStyles(styles)(ArbitragePage);
+export default ArbitragePage;

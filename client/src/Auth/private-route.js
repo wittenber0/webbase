@@ -19,7 +19,6 @@ class PrivateRoute extends Component {
         this.setState({page: NotFound})
       }
     }).catch( (e) => {
-      console.log(e);
       this.setState({page: NotFound})
     });
   }

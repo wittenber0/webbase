@@ -1,36 +1,41 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-import Divider from '@material-ui/core/Divider';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import { Drawer, IconButton, List, ListItem, ListItemIcon, ListItemText, Divider} from '@mui/material';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 
 import Profile from './profile';
 import { useAuth0 } from "@auth0/auth0-react";
 import App from '../../App';
+import { styled } from '@mui/material/styles';
 
-const useStyles = makeStyles(theme =>({
-  list: {
-    width: 250
-  },
-  fullList: {
-    width: 'auto',
-  },
-  drawerPaper: {
-    backgroundColor: theme.palette.dark.three,
-    color: theme.palette.common.white
-  },
-  icon:{
-    color: theme.palette.common.white
-  }
+const HeaderDiv = styled('div')(({theme}) => ({
+  width: 250
 }));
+
+const StyledIcon = styled(ListItemIcon)(({theme}) => ({
+  color: 'white'
+}));
+
+const StyledIconButton = styled(IconButton)(({theme}) => ({
+  color: 'white'
+}));
+
+const StyledDrawer = styled(Drawer)(({theme}) => ({
+  backgroundColor: theme.palette.dark.one,
+  color: 'white'
+}));
+const useStyles = makeStyles((theme) => ({
+    drawer: {
+      },
+      drawerPaper: {
+        backgroundColor: '#000000',
+        color: 'white'
+      },
+  }));
 
 function Logout(l, app){
   app.clearUserCache();
@@ -38,12 +43,11 @@ function Logout(l, app){
 }
 
 function Login(props){
-  const classes = useStyles();
   const { loginWithRedirect, logout } = useAuth0();
   if(App.user()){
     return(
       <ListItem button onClick={()=> Logout(logout, props.app)}>
-        <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
+        <ListItemIcon><AccountBoxIcon sx={{ color: "white" }}/></ListItemIcon>
         <ListItemText>Log out</ListItemText>
       </ListItem>
     )
@@ -51,7 +55,7 @@ function Login(props){
 
   return(
     <ListItem button onClick={()=> loginWithRedirect({ returnTo: window.location.origin+'/app' })}>
-      <ListItemIcon className={classes.icon}><AccountBoxIcon /></ListItemIcon>
+      <StyledIcon><AccountBoxIcon sx={{ color: "white" }}/></StyledIcon>
       <ListItemText>Login</ListItemText>
     </ListItem>
   )
@@ -59,6 +63,7 @@ function Login(props){
 
 export default function TemporaryDrawer(props) {
   const classes = useStyles();
+
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -85,8 +90,7 @@ export default function TemporaryDrawer(props) {
   };
 
   const sideList = side => (
-    <div
-      className={classes.list}
+    <HeaderDiv
       role="presentation"
     >
       <Profile app={props.app} goToProfile={()=>toggleDrawer(side, false, '/app/profile')}/>
@@ -95,20 +99,20 @@ export default function TemporaryDrawer(props) {
         <Divider />
           {props.menuList.map((item, index) => (
             <ListItem button key={item.route} onClick={toggleDrawer(side, false, item.route)} onKeyDown={toggleDrawer(side, false, item.route)}>
-              <ListItemIcon className={classes.icon}>{index % 2 === 0 ? <InboxIcon /> : <MailIcon/>}</ListItemIcon>
+              <StyledIcon>{index % 2 === 0 ? <InboxIcon sx={{ color: "white" }}/> : <MailIcon sx={{ color: "white" }}/>}</StyledIcon>
               <ListItemText primary={item.display} />
             </ListItem>
           ))}
       </List>
-    </div>
+    </HeaderDiv>
   );
 
   return (
     <div>
-  	  <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu" onClick={toggleDrawer(state.drawerLocation, true)}>
-        <MenuIcon />
-      </IconButton>
-      <Drawer classes={{paper: classes.drawerPaper}} anchor={state.drawerLocation} open={state[state.drawerLocation]} onClose={toggleDrawer(state.drawerLocation, false)}>
+  	  <StyledIconButton edge="start" color="inherit" aria-label="menu" onClick={toggleDrawer(state.drawerLocation, true)}>
+        <MenuIcon sx={{ color: "white" }}/>
+      </StyledIconButton>
+      <Drawer anchor={state.drawerLocation} open={state[state.drawerLocation]} onClose={toggleDrawer(state.drawerLocation, false)} classes={{ paper: classes.drawerPaper  }}>
         {sideList(state[state.drawerLocation])}
       </Drawer>
     </div>

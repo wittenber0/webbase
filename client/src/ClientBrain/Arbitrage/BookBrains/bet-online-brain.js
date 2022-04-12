@@ -61,7 +61,9 @@ export default class BetOnlineBrain{
       game.TotalLine.TotalLine.Over.Line,
       game.TotalLine.TotalLine.Under.Line,
       game.HomeLine.SpreadLine.Point, //spread based on home
-      game.TotalLine.TotalLine.Point,
+      game.TotalLine.TotalLine.Point
+    );
+    /* bet-online HomeLine.TeamTotalLine Odds are incorrect coming from this route
       game.HomeLine.TeamTotalLine.Over.Line,
       game.HomeLine.TeamTotalLine.Under.Line,
       game.HomeLine.TeamTotalLine.Point,
@@ -69,6 +71,11 @@ export default class BetOnlineBrain{
       game.AwayLine.TeamTotalLine.Under.Line,
       game.AwayLine.TeamTotalLine.Point
     );
+    if(game.HomeTeam == "Arizona Diamondbacks"){
+      console.log("here:")
+      console.log(odd)
+      console.log(game);
+    }*/
     return [odd];
   }
 

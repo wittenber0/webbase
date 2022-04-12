@@ -16,11 +16,11 @@ class GameOddManager {
     this.games = [];
   }
 
-  async loadGameOdds(houseLineThreshold, betTypeFilter, bm){
+  async loadGameOdds(betTypeFilter, bm, sortBy){
     this.games = [];
     this.gameOdds = [];
     let bookGameTrees = [
-      this.loadActionNetworkGameTree(houseLineThreshold, betTypeFilter, bm),
+      this.loadActionNetworkGameTree(betTypeFilter, bm),
       this.loadBetOnlineGameTree(),
       this.loadPinnacleGameTree()
     ]
@@ -43,12 +43,14 @@ class GameOddManager {
         });
       });
       this.buildGameOdds(this.games);
+      this.calculateGameOdds();
+      this.gameOdds = this.getGameOddsSortedBy(sortBy)
     });
   }
 
-  async loadActionNetworkGameTree(houseLineThreshold, betTypeFilter, bm){
-    this.actionNetworkBrain = new ActionNetworkBrain(houseLineThreshold, betTypeFilter);
-    return await this.actionNetworkBrain.getGameTree(houseLineThreshold, betTypeFilter, bm).then( gameTree => {
+  async loadActionNetworkGameTree(betTypeFilter, bm){
+    this.actionNetworkBrain = new ActionNetworkBrain(betTypeFilter);
+    return await this.actionNetworkBrain.getGameTree(betTypeFilter, bm).then( gameTree => {
       return gameTree;
     });
   }
@@ -73,13 +75,14 @@ class GameOddManager {
         this.evaluateOdd(odd, game);
       });
     });
-    this.sortGameOdds();
   }
 
   evaluateOdd(odd, game){
 		this.evaluateMoneyLine(odd, game);
 		this.evaluateSpread(odd, game);
 		this.evaluateTotalOverUnder(odd, game);
+    this.evaluateHomeOverUnder(odd, game);
+    this.evaluateAwayOverUnder(odd, game);
 	}
 
   evaluateMoneyLine(odd, game){
@@ -122,6 +125,30 @@ class GameOddManager {
     }
 	}
 
+  evaluateHomeOverUnder(odd, game){
+		let betType = 'tth';
+    let pickOptions = [];
+    odd.line = odd.homeLine;
+    pickOptions.push({ml: odd.homeOver, label: 'Over'});
+    pickOptions.push({ml: odd.homeUnder, label: 'Under'});
+
+		if(odd.line && odd.homeOver && odd.homeUnder){
+			this.evaluatePickFactors(odd, game, pickOptions, betType);
+    }
+	}
+
+  evaluateAwayOverUnder(odd, game){
+		let betType = 'tta';
+    let pickOptions = [];
+    odd.line = odd.awayLine;
+    pickOptions.push({ml: odd.awayOver, label: 'Over'});
+    pickOptions.push({ml: odd.awayUnder, label: 'Under'});
+
+		if(odd.line && odd.awayOver && odd.awayUnder){
+			this.evaluatePickFactors(odd, game, pickOptions, betType);
+    }
+	}
+
   evaluatePickFactors(odd, game, pickOptions, betType){
 
     let pickFactorArray = [];
@@ -135,7 +162,7 @@ class GameOddManager {
     });
 
     if(this.gameOdds.length > 0){
-      var go = this.gameOdds.find(e => (e.gameId === game.gameId) && (e.type === odd.type) && (e.line === line) && (e.betType === betType));
+      var go = this.gameOdds.find(e => (e.gameId === game.gameId) && (e.type === odd.type) && (e.line === line) && (e.betType === betType) && (!e.betType === 'tt' || odd.ttSide === e.ttSide));
       if(go){
         pickFactorArray.forEach((pf, i)=>{
           let nf = new Factor(pf.factor, odd.book, pf.ml);
@@ -147,10 +174,14 @@ class GameOddManager {
         });
 
       }else{
-        this.gameOdds.push(new GameOdd(game, odd.type, betType, line, this.createPickFactors(pickFactorArray, odd.book)));
+        let g = new GameOdd(game, odd.type, betType, line, this.createPickFactors(pickFactorArray, odd.book));
+        g.debugGame = game;
+        this.gameOdds.push(g);
       }
     }else{
-      this.gameOdds.push(new GameOdd(game, odd.type, betType, line, this.createPickFactors(pickFactorArray, odd.book)));
+      let g = new GameOdd(game, odd.type, betType, line, this.createPickFactors(pickFactorArray, odd.book));
+      g.debugGame = game;
+      this.gameOdds.push(g);
     }
 
   }
@@ -178,22 +209,85 @@ class GameOddManager {
     return pf;
   }
 
-  sortGameOdds(){
-    this.gameOdds.forEach(game => {
-      let houseLine = 0;
-      Object.keys(game.pickFactors).forEach(pf => {
-        if(game.pickFactors[pf].length > 0){
-  				game.pickFactors[pf].sort((a,b)=>{return b.factor-a.factor});
-  				game.pickFactors[pf][0].best = true;
-          houseLine += 1/game.pickFactors[pf][0].factor;
-  			}
-      });
-      game.houseLine = houseLine;
+  calculateRealOdds(gameOdd){
+    let pTotal = 0;
+    let realOdds = {};
+
+    Object.keys(gameOdd.pinnacleFactors).forEach(pf => {
+      let f = gameOdd.pinnacleFactors[pf];
+      if(f){
+        pTotal += 1/f.factor;
+      }
     });
-    this.gameOdds.sort((a,b)=>{ return a.houseLine - b.houseLine; });
+
+    if(pTotal){
+      Object.keys(gameOdd.pinnacleFactors).forEach(pf => {
+        let f = gameOdd.pinnacleFactors[pf];
+        realOdds[pf] = (1/f.factor) / pTotal
+      });
+    }
+    gameOdd.realOdds = realOdds;
+  }
+
+  calculateGameOddInfo(gameOdd){
+    let houseLine = 0;
+    gameOdd.pinnacleFactors = {};
+    Object.keys(gameOdd.pickFactors).forEach(pf => {
+      if(gameOdd.pickFactors[pf].length > 0){
+        gameOdd.pickFactors[pf].sort((a,b)=>{return b.factor-a.factor});
+        gameOdd.pickFactors[pf][0].best = true;
+        gameOdd.pinnacleFactors[pf] = gameOdd.pickFactors[pf].find(f => f.book.bookId === 1003);
+        houseLine += 1/gameOdd.pickFactors[pf][0].factor;
+      }
+    });
+    gameOdd.houseLine = houseLine;
+    this.calculateRealOdds(gameOdd);
+    this.calculateEVs(gameOdd);
+  }
+
+  calculateEVs(gameOdd){
+    let pfEV = {}
+    Object.keys(gameOdd.pickFactors).forEach(pfLabel => {
+      if(gameOdd.realOdds[pfLabel]){
+        let factors = gameOdd.pickFactors[pfLabel];
+        let bestPFEV;
+        factors.forEach(factor => {
+          factor.EV = Math.round((factor.factor * gameOdd.realOdds[pfLabel] - 1)*100 / 2 * 100) / 100;
+          if(!gameOdd.bestEV){
+            gameOdd.bestEV = factor.EV;
+          }else if (factor.EV > gameOdd.bestEV){
+            gameOdd.bestEV = factor.EV;
+          }
+          if(!bestPFEV){
+            bestPFEV = factor.EV;
+          }else if(factor.EV > bestPFEV){
+            bestPFEV = factor.EV;
+          }
+        });
+        pfEV[pfLabel] = bestPFEV;
+      }
+    });
+    gameOdd.evs = pfEV;
+  }
+
+  calculateGameOdds(){
+    this.gameOdds.forEach(gameOdd => {
+      this.calculateGameOddInfo(gameOdd);
+    });
 	}
 
+  getGameOddsSortedBy(sort){
+    if(sort === 'ev'){
+      return this.gameOdds.filter(g => g.bestEV).sort(this.mySort);
+    }
+    if(sort === 'arb'){
+      return this.gameOdds.sort((a,b) => {return a.houseLine - b.houseLine });
+    }
+  }
 
+  mySort(a,b){
+    return b.bestEV - a.bestEV
+  }
 }
 
 var GameOddManagerWrapper = (function () {

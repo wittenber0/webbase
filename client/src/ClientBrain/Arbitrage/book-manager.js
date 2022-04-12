@@ -23,6 +23,7 @@ class BookManager {
   }
 
   async loadBooks(){
+    this.allBooks = [];
     return await ArbitrageService.getAllBooks().then((r)=>{
       this.getMyLiveBooks().forEach( book => {
         this.allBooks.push(book);

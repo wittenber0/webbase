@@ -8,15 +8,13 @@ import GameOddManager from './game-odd-manager';
 
 export default class ActionNetworkBrain {
 
-  constructor(houseLineThreshold, betTypeFilter){
-    this.houseLineThreshold = houseLineThreshold;
+  constructor(betTypeFilter){
     this.betTypeFilter = betTypeFilter;
     this.gameOddManager = GameOddManager.getInstance();
     this.gameTree = [];
   }
 
-  async getGameTree(houseLineThreshold, betTypeFilter, bm){
-    this.houseLineThreshold = houseLineThreshold;
+  async getGameTree(betTypeFilter, bm){
     this.betTypeFilter = betTypeFilter;
     let d = new Date();
 
@@ -55,6 +53,10 @@ export default class ActionNetworkBrain {
               let awayName = game['teams'].find(e => e.id === game['away_team_id'])['full_name'];
               let g = new Game(cleanOdds, league['league_name'], homeName, awayName, this.getGameId(homeName, awayName, league['league_name'], d));
               this.gameTree.push(g);
+              /*if (homeName === "Arizona Diamondbacks"){
+                console.log(g);
+                console.log(game);
+              }*/
             }
           });
         });

@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { ThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider } from '@mui/material/styles'
 import { Router } from 'react-router-dom';
 import App from './App';
 
@@ -19,17 +19,19 @@ const onRedirectCallback = appState => {
 };
 
 const routing = (
-  <Router history={history}>
+
     <Auth0Provider
       domain={config.domain}
       clientId={config.clientId}
       redirectUri={window.location.origin+'/callback'}
     >
       <ThemeProvider theme={theme}>
-        <App history={history}/>
+        <Router history={history}>
+          <App history={history}/>
+        </Router>
       </ThemeProvider>
     </Auth0Provider>
-  </Router>
+
 )
 ReactDOM.render(routing, document.getElementById('root'));
 

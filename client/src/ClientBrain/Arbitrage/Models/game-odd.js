@@ -1,17 +1,20 @@
 export default class GameOdd {
-  constructor(game, type, betType, line, pickFactors) {
+  constructor(game, type, betType, line, pickFactors, ttSide) {
     this.type = type;
     this.sport = game.leagueName.toUpperCase();
     this.betType = betType;
-    this.line = line
-
+    this.line = line;
     this.gameId = game.gameId;
-    //this.homeId = game['home_team_id'];
-    //this.awayId = game['away_team_id'];
-
     this.homeName = game.homeName;
     this.awayName = game.awayName;
-
     this.pickFactors = pickFactors;
+    this.ttSide = ttSide;
+
+    //calculated
+    //this.bestEV;
+    //this.pinnacleFactors;
+    this.betSizes = {};
+    this.realOds = {};
+    this.evs = {};
   }
 }

@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
+//import AppBar from '@material-ui/core/AppBar';
+import { AppBar, Toolbar, Typography } from '@mui/material';
 import TemporaryDrawer from './temporary-drawer'
 import Search from '../Search/search';
 import App from '../../App';
+import { styled } from '@mui/material/styles';
 
-const styles = theme => ({
+const styles = theme => {
+  return({
   root: {
     flexGrow: 1,
   },
@@ -16,11 +17,23 @@ const styles = theme => ({
     textAlign: 'left',
     marginLeft: '30px'
   },
-});
+  appBar: {
+    backgroundColor: theme.palette.primary.main
+  }
+})};
 
 let sideBarItems = [
 	{display: 'Home', route: '/app'},
 ];
+
+const StyledAppBar = styled(AppBar)(({theme}) => ({
+  backgroundColor: theme.palette.primary
+}));
+
+const StyledTyp = styled(Typography)(({theme}) => ({
+  color: theme.palette.primary,
+  paddingLeft: '20px'
+}));
 
 class MyAppBar extends Component{
 
@@ -63,17 +76,15 @@ class MyAppBar extends Component{
   }
 
 	render(){
-    const {classes} = this.props
     return (
       <div className="app-bar">
-        <AppBar position="fixed">
+        <AppBar position="fixed" color='primary'>
           <Toolbar>
             <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
             </TemporaryDrawer>
-            <Typography variant="h6" className={classes.title}>
+            <StyledTyp variant="h6" >
               wittenber0 archives
-            </Typography>
-            <Search />
+            </StyledTyp>
           </Toolbar>
         </AppBar>
       </div>
@@ -81,4 +92,4 @@ class MyAppBar extends Component{
 	}
 }
 
-export default withStyles(styles)(MyAppBar);
+export default MyAppBar;

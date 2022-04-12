@@ -1,53 +1,58 @@
 import React, { Component } from 'react';
 import classNames from 'classnames'
-import { withStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 
-const styles = theme => ({
-	lightFillBlock : {
-	  backgroundColor: theme.palette.dark.two,
-	  minHeight: '100vh',
-	  display: 'flex',
-	  flexDirection: 'column',
-	  alignItems: 'center',
-	  justifyContent: 'center',
-	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white',
-	},
-	darkFillBlock : {
-	  backgroundColor: theme.palette.dark.one,
-	  minHeight: '100vh',
-	  display: 'flex',
-	  flexDirection: 'column',
-	  alignItems: 'center',
-	  justifyContent: 'center',
-	  fontSize: 'calc(10px + 2vmin)',
-	  color: 'white',
-	},
-	blockBody : {
-		width: '80%'
-	}
-});
+const LightFillBlock = styled('div')(({theme}) => ({
+	backgroundColor: theme.palette.dark.two,
+	minHeight: '100vh',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'center',
+	justifyContent: 'center',
+	fontSize: 'calc(10px + 2vmin)',
+	color: 'white',
+}));
 
+const DarkFillBlock = styled('div')(({theme}) => ({
+	backgroundColor: theme.palette.dark.one,
+	minHeight: '100vh',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'center',
+	justifyContent: 'center',
+	fontSize: 'calc(10px + 2vmin)',
+	color: 'white',
+}));
+
+const NotWideDiv = styled('div')(({theme}) => ({
+	width: '80%',
+	height: '100%'
+
+}));
 
 class PageBlock extends Component{
 
 	render(){
-		const {classes} = this.props;
 		var blockFill;
     if(this.props.fill === 'light'){
-      blockFill = classNames(classes.lightFillBlock);
+			return(
+				<LightFillBlock className='lightFillBlock'>
+					<NotWideDiv className='notWideDiv'>
+						{this.props.children}
+					</NotWideDiv>
+				</LightFillBlock>
+			)
     }else{
-      blockFill = classNames(classes.darkFillBlock);
+			return(
+				<DarkFillBlock className='darkFillBlock'>
+					<NotWideDiv className='notWideDiv'>
+						{this.props.children}
+					</NotWideDiv>
+				</DarkFillBlock>
+			)
     }
-		return(
-			<div className={blockFill}>
-				<div className={classes.blockBody}>
-					{this.props.children}
-				</div>
-			</div>
 
-		)
 	}
 }
 
-export default withStyles(styles)(PageBlock);
+export default PageBlock;

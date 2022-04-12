@@ -3,7 +3,7 @@ import PageBlock from '../components/page-block';
 import AuthService from '../Shared/auth-service';
 import UtilityService from '../Shared/utility-service';
 import App from '../App';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { CircularProgress } from '@mui/material';
 
 import Table from '../Functions/Table/table';
 
@@ -11,7 +11,6 @@ class AdminPage extends Component{
 
 	constructor(props){
 		super(props);
-		console.log(App.user());
 		this.state = {title: 'administration', appUsers: null, appRoles: null};
 	}
 
@@ -21,7 +20,6 @@ class AdminPage extends Component{
 		dictionaries.push(UtilityService.post('/appusers'));
 
 		Promise.all(dictionaries).then( values => {
-			console.log(values);
 			this.setState({appUsers : values[1], appRoles: values[0]});
 		});
 
