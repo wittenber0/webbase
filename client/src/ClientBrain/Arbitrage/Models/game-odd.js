@@ -13,5 +13,6 @@ export default class GameOdd {
     this.awayName = game.awayName;
 
     this.pickFactors = pickFactors;
+    this.betSizes = {}
   }
 }
