@@ -178,6 +178,26 @@ class GameOddManager {
     return pf;
   }
 
+  populateBetSizeForGameOdd(gameOdd){
+    let bestFactors = {};
+    Object.keys(gameOdd.pickFactors).forEach(pf => {
+      let bestFactor = gameOdd.pickFactors[pf].find(e => e.best);
+      bestFactors[pf] = bestFactor;
+    })
+    gameOdd.betSizes = this.determineBetSize(bestFactors)
+  }
+
+  determineBetSize(bestFactors){
+    let betSizes = {};
+    Object.keys(bestFactors).forEach(pf => {
+      let bestFactor = bestFactors[pf];
+      let betPct = Math.max((bestFactor.factor*(bestFactor.realP-(1-bestFactor.realP)))/bestFactor.realP, 0);
+      betSizes[pf] = betPct;
+    })
+    return betSizes;
+  }
+
+
   sortGameOdds(){
     this.gameOdds.forEach(game => {
       let houseLine = 0;
@@ -189,11 +209,10 @@ class GameOddManager {
   			}
       });
       game.houseLine = houseLine;
+      this.populateBetSizeForGameOdd(game)
     });
     this.gameOdds.sort((a,b)=>{ return a.houseLine - b.houseLine; });
 	}
-
-
 }
 
 var GameOddManagerWrapper = (function () {
