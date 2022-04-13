@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import { CircularProgress } from '@mui/material';
 
 class LoadingPage extends Component{
 
