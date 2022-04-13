@@ -1,6 +1,5 @@
 //import { createTheme } from '@material-ui/core/styles';
 import { createTheme } from '@mui/material/styles'
-import blue from '@material-ui/core/colors/blue';
 import { darken } from '@material-ui/core/styles';
 const main = '#4466ff'
 
@@ -34,7 +33,7 @@ const theme = createTheme({
   },
   components: {
     // Name of the component
-    
+
   },
 });
 

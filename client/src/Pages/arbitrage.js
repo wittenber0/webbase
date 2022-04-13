@@ -46,6 +46,10 @@ const Item = styled(Paper)(({ theme }) => {
 	display:"flex"
 });});
 
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
+
 class ArbitragePage extends Component{
 
 	constructor(props){
@@ -57,7 +61,8 @@ class ArbitragePage extends Component{
 			betTypeFilter: 'all',
 			leagueFilter: 'all',
 			sortBy: 'ev',
-			myBooks: []
+			myBooks: [],
+			leagueOptions: []
 		};
 
 		this.ActionNetworkBrain = new ActionNetworkBrain(this.state.betTypeFilter, this.state.books);
@@ -65,26 +70,38 @@ class ArbitragePage extends Component{
 		this.gameOddManager = GameOddManager.getInstance();
 		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
 		this.updateSortBy = this.updateSortBy.bind(this);
+		this.populateGameOdds = this.populateGameOdds.bind(this);
+		this.setLeagueFilter = this.setLeagueFilter.bind(this);
 	}
 
 	componentDidMount(){
 		this.bookManager.loadBooks().then(()=>{
 			this.setState({myBooks: this.bookManager.getSelectedBooks()})
-			this.populateGameOdds();
+			this.populateGameOdds().then(() => {
+				this.populateLeagueOptions();
+			});
 		});
+	}
+
+	populateLeagueOptions(){
+		console.log(this.state.allOdds[0]);
+		let lo = this.state.allOdds.map( o => o.leagueName ).filter(onlyUnique);
+		this.setState({leagueOptions: lo});
 	}
 
 	setBetTypeFilter(e){
 		let btf = e.target.value;
 		if(e && btf){
 			this.setState({betTypeFilter: btf});
+			this.populateGameOdds();
 		}
 	}
 
 	setLeagueFilter(e){
-		let btf = e.target.value;
-		if(e && btf){
-			this.setState({leagueFilter: btf});
+		let lf = e.target.value;
+		if(e && lf){
+			this.setState({leagueFilter: lf});
+			this.populateGameOdds();
 		}
 	}
 
@@ -96,8 +113,8 @@ class ArbitragePage extends Component{
 		}
 	}
 
-	populateGameOdds(){
-		this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy).then(r => {
+	async populateGameOdds(){
+		return await this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy).then(r => {
 			this.setState({
 				allOdds: this.gameOddManager.gameOdds,
 				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
@@ -108,9 +125,14 @@ class ArbitragePage extends Component{
 
 	getDisplayOdds(gameOdds){
     return gameOdds.filter( (o, i) => {
+			//betType Filter
       if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType.slice(0,2)){
         return false;
       }
+			//setLeagueFilter
+			if(this.state.leagueFilter !== 'all' && this.state.leagueFilter !== o.leagueName){
+				return false;
+			}
       return i < 20;
     });
   }
@@ -170,9 +192,14 @@ class ArbitragePage extends Component{
 					          onChange={this.setLeagueFilter}
 					        >
 										<MenuItem value={'all'}>all</MenuItem>
-					          <MenuItem value={'www'}>Not done yet loser</MenuItem>
+										{this.state.leagueOptions.map( (lo, i) => {
+											return <MenuItem value={lo} key={i}>{lo}</MenuItem>
+										})}
 					        </Select>
 								</FormControl>
+							</Grid>
+							<Grid item xs={2}>
+								<Button variant="contained" onClick={this.populateGameOdds}>Refresh</Button>
 							</Grid>
 						</Grid>
 						<Grid container spacing={1} sx={{mt:2}}>

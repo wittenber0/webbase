@@ -1,7 +1,7 @@
 export default class GameOdd {
   constructor(game, type, betType, line, pickFactors, ttSide) {
     this.type = type;
-    this.sport = game.leagueName.toUpperCase();
+    this.leagueName = game.leagueName.toUpperCase();
     this.betType = betType;
     this.line = line;
     this.gameId = game.gameId;
