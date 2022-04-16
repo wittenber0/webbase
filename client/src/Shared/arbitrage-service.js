@@ -2,16 +2,23 @@ import App from '../App';
 import UtilityService from './utility-service';
 const fetch = require('node-fetch');
 
+//arbitrage
 const bookListUrl = 'https://api.actionnetwork.com/web/v1/books';
 const oddsUrl = 'https://api.actionnetwork.com/web/v1/scoreboard/all?bookIds=';
 const actionLabsBookOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/';
 const actionLabsPlayers = 'https://d3ttxfuywgi7br.cloudfront.net/players/projections/all/actionnetwork/default.json'
 const actionLabsPropEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=66baf522-6536-496c-bcd1-3405d15b434c'
 const actionLabsMarketEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=d7ffcc85-db0a-4d62-b94a-8fedb88a2c39'
+
+//betOnline
+const betOnlineOdds = 'https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games'
+
+//pinnacle
 const pinnacleMatchUps = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
 const pinnacleSports = 'https://guest.api.arcadia.pinnacle.com/0.1/sports'
 const pinnacleMarkets = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
-const betOnlineOdds = 'https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games'
+const pinnacleGameDetails = 'https://guest.api.arcadia.pinnacle.com/0.1/matchups/1551220294/related'
+const pinnacleGameLines = 'https://guest.api.arcadia.pinnacle.com/0.1/matchups/1551220294/markets/related/straight'
 
 class ArbitrageService{
 

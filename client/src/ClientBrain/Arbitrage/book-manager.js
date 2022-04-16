@@ -59,6 +59,15 @@ class BookManager {
     ]
     return liveBooks;
   }
+
+  updateBookById(bookId){
+    if(this.selectedBooks.includes(bookId)){
+      this.selectedBooksIds = this.selectedBookIds.filter(b => b !== bookId);
+    }else {
+      this.selectedBookIds.push(bookId);
+    }
+    this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
+  }
 }
 
 var BookManagerWrapper = (function () {

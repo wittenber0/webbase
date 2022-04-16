@@ -3,6 +3,7 @@ import logo from '../logo.svg';
 import PageBlock from '../components/page-block';
 import ArbitrageService from '../Shared/arbitrage-service';
 import GameCard from '../Functions/GameCard/gamecard';
+import BasicPopover from '../Functions/PopOver/popover';
 
 import TextField from '@mui/material/TextField';
 import { Grid, Typography, Paper, Button, FormControl, Switch } from '@mui/material';
@@ -172,7 +173,7 @@ class ArbitragePage extends Component{
 					          label=" Bet Type "
 					          onChange={this.setBetTypeFilter}
 					        >
-					          <MenuItem value={'all'}>All</MenuItem>
+					          <MenuItem value={'all'}>ALL</MenuItem>
 					          <MenuItem value={'ml'}>Money Line</MenuItem>
 					          <MenuItem value={'s'}>Spread</MenuItem>
 										<MenuItem value={'ou'}>Over Under</MenuItem>
@@ -191,14 +192,17 @@ class ArbitragePage extends Component{
 					          label=" League "
 					          onChange={this.setLeagueFilter}
 					        >
-										<MenuItem value={'all'}>all</MenuItem>
+										<MenuItem value={'all'}>ALL</MenuItem>
 										{this.state.leagueOptions.map( (lo, i) => {
 											return <MenuItem value={lo} key={i}>{lo}</MenuItem>
 										})}
 					        </Select>
 								</FormControl>
 							</Grid>
-							<Grid item xs={2}>
+							<Grid item>
+								<BasicPopover></BasicPopover>
+							</Grid>
+							<Grid item>
 								<Button variant="contained" onClick={this.populateGameOdds}>Refresh</Button>
 							</Grid>
 						</Grid>
