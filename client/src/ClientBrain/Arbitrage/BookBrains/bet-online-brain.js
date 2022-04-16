@@ -15,6 +15,8 @@ export default class BetOnlineBrain{
     });
   }
 
+  //scraping data from the api
+  //sends to our brain to combine with other books
   async getGameTree(){
     let gameTree = []
     let sportsToLoad = [
@@ -49,6 +51,7 @@ export default class BetOnlineBrain{
     });
   }
 
+  //get odds from their game
   getOddsFromGame(game){
     let odd = new Odd(
       BookManager.getInstance().getBookById(1001),
