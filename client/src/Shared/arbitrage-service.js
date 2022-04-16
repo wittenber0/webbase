@@ -149,6 +149,11 @@ class ArbitrageService{
     return UtilityService.get("https://www.bovada.lv/services/sports/event/coupon/events/A/description/"+sport+"?marketFilterId=def&preMatchOnly=true&lang=en");
   }
 
+  static updateMyBooks = async function(myBooks){
+    let userId = App.user().user_id;
+    return UtilityService.post('/users/'+userId+'/arbitrage/myBooks', {user: userId, myBooks: myBooks});
+  }
+
 }
 
 

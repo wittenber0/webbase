@@ -96,7 +96,7 @@ export default function GameCard(props){
       </Grid>
       {props.myBooks.map((b) => {
         return(
-          <Grid item xs={1} key={b.bookId}>
+          <Grid item xs key={b.bookId}>
             <Item>
             {Object.keys(props.gameOdd.pickFactors).map((pfLabel, i) => {
               return getFactorLabelByBook(props.gameOdd.pickFactors[pfLabel], b.bookId, true, i)

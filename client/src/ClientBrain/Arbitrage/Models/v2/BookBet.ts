@@ -13,85 +13,83 @@ export default class BookBet {
     public PlayerPropType: PlayerPropTypeEnum;
     public BetDuration: BetDuration;
     public Line: number;
-    public betFactors: BetFactor[];
+    public BetFactors: BetFactor[];
     public BetParticipants: Participant[];
     public JoinLabel: string;
     public Book: Book;
+
+    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], joinLabel:string, book:Book){
+        this.GameId = gameId;
+        this.BetType = betType
+        this.PlayerPropType = playerPropType;
+        this.BetDuration = betDuration;
+        this.Line = line;
+        this.BetFactors = betFactors;
+        this.BetParticipants = betParticipants;
+        this.JoinLabel = joinLabel;
+        this.Book = book;
+    }
 
     public GenerateExampleModels(){
         let book = new Book(1001, 'BetOnline', 'BetOnlineLogo');
         let participant1 = new Participant(1, 'D\'Angelo Russell');
         let participant2 = new Participant(2, 'Tim Anderson');
         let participant3 = new Participant(3, 'Brandon Lowe');
-        let bookBetOverUnderAssistsDangeloRussell = new BookBet()
-        {
-            //basketball
-            this.GameId = '123',
-            this.BetType = BetTypeEnum.PlayerProp,
-            this.PlayerPropType = PlayerPropTypeEnum.Assists,
-            this.BetDuration = BetDuration.Game,
-            this.Line = 7.5
-            this.Book = book;
-        };
-        bookBetOverUnderAssistsDangeloRussell.betFactors = [];
-        bookBetOverUnderAssistsDangeloRussell.betFactors.push
+        let betFactors1 = [];
+        let betFactors2 = [];
+        let betFactors3 = [];
+        betFactors1.push
         (
             new BetFactor(BetFactorTypeEnum.Over, new Factor(1.9, -114, book)),
             new BetFactor(BetFactorTypeEnum.Under, new Factor(1.9, -114, book))
         );
-         
-        bookBetOverUnderAssistsDangeloRussell.BetParticipants = [];
-        bookBetOverUnderAssistsDangeloRussell.BetParticipants.push(participant1);
-        //this should come from the game(the date)
-        bookBetOverUnderAssistsDangeloRussell.JoinLabel = this.GenerateJoinLabel('20220416');
-        
-        
-        let bookBetHeadToHeadTimWinsBrandon = new BookBet()
-        {
-            //baseball
-            this.GameId = '234',
-            this.BetType = BetTypeEnum.PlayerProp,
-            this.BetDuration = BetDuration.Game,
-            this.PlayerPropType = PlayerPropTypeEnum.MostTotalBases,
-            this.Line = 0,
-            this.Book = book
-        };
-
-        bookBetHeadToHeadTimWinsBrandon.betFactors = [];
-        bookBetHeadToHeadTimWinsBrandon.betFactors.push(
+        betFactors2.push(
             new BetFactor(BetFactorTypeEnum.HeadToHead, new Factor(1.95, -105, book))
         );
-        bookBetHeadToHeadTimWinsBrandon.BetParticipants = [];
-        bookBetHeadToHeadTimWinsBrandon.BetParticipants.push(participant2, participant3);
-        bookBetHeadToHeadTimWinsBrandon.JoinLabel = this.GenerateJoinLabel('20220416');
-
-
-        let bookBetHeadToHeadBrandonWinsTim = new BookBet()
-        {
-            //baseball
-            this.GameId = '234',
-            this.BetType = BetTypeEnum.PlayerProp,
-            this.BetDuration = BetDuration.Game,
-            this.PlayerPropType = PlayerPropTypeEnum.MostTotalBases,
-            this.Line = 0,
-            this.Book = book
-        };
-        bookBetHeadToHeadBrandonWinsTim.betFactors = [];
-        bookBetHeadToHeadBrandonWinsTim.betFactors.push(
+        betFactors3.push(
             new BetFactor(BetFactorTypeEnum.HeadToHead, new Factor(1.69, -145, book))
         );
         
-        bookBetHeadToHeadBrandonWinsTim.BetParticipants = [];
-        bookBetHeadToHeadBrandonWinsTim.BetParticipants.push(participant3, participant2);
+        let bookBetOverUnderAssistsDangeloRussell = new BookBet(
+            '123', 
+            BetTypeEnum.PlayerProp, 
+            PlayerPropTypeEnum.Assists, 
+            BetDuration.Game, 
+            7.5, 
+            betFactors1, 
+            [participant1], 
+            this.GenerateJoinLabel('20220416'), 
+            book
+        )
 
-        //PlayerProp|Game||Brandon|Tim|20220416
-        bookBetHeadToHeadBrandonWinsTim.JoinLabel = this.GenerateJoinLabel('20220416');
-
+        let bookBetHeadToHeadTimWinsBrandon = new BookBet(
+            '234', 
+            BetTypeEnum.PlayerProp, 
+            PlayerPropTypeEnum.MostTotalBases, 
+            BetDuration.Game, 
+            0, 
+            betFactors2, 
+            [participant2, participant3], 
+            this.GenerateJoinLabel('20220416'), 
+            book
+        )
+        
+        let bookBetHeadToHeadBrandonWinsTim = new BookBet(
+            '234', 
+            BetTypeEnum.PlayerProp, 
+            PlayerPropTypeEnum.MostTotalBases, 
+            BetDuration.Game, 
+            0, 
+            betFactors3, 
+            [participant3, participant2], 
+            this.GenerateJoinLabel('20220416'), 
+            book
+        )
     }
 
     public GenerateJoinLabel(gameDateString: string):string{
         let playerPropLabel = this.PlayerPropType != PlayerPropTypeEnum.NonApplicable ? `${this.PlayerPropType.toString()}|` : '';  
-        let participantsLabel = Array.join(this.BetParticipants.map(p => p.Name), '|');
+        let participantsLabel = this.BetParticipants.map(p => p.Name).join('|');
         let joinLabel = `${this.BetType.toString()}|${playerPropLabel}${this.BetDuration.toString()}|${participantsLabel}|${gameDateString}`;
          
         return joinLabel;

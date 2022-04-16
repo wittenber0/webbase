@@ -1,5 +1,6 @@
 import ArbitrageService from '../../Shared/arbitrage-service';
 import Book from './Models/book';
+import App from '../../App';
 
 const defaultSelectedBookIds = [1003, 8, 21, 1001];
 const bovadaLogo = 'https://www.aplussportsandmore-fanshop-baseballfield.com/images/bovada-logo_0.png'
@@ -15,7 +16,11 @@ class BookManager {
     this.allBooks = [];
     this.selectedBooks = [];
     this.isLoaded = false;
-    this.selectedBookIds = defaultSelectedBookIds;
+    if(App.user().user_metadata.arbitrage && App.user().user_metadata.arbitrage.myBooks){
+      this.selectedBookIds = App.user().user_metadata.arbitrage.myBooks;
+    } else {
+      this.selectedBookIds = defaultSelectedBookIds;
+    }
   }
 
   getSelectedBookIds(){
@@ -61,12 +66,13 @@ class BookManager {
   }
 
   updateBookById(bookId){
-    if(this.selectedBooks.includes(bookId)){
-      this.selectedBooksIds = this.selectedBookIds.filter(b => b !== bookId);
+    if(this.selectedBookIds.includes(bookId)){
+      this.selectedBookIds = this.selectedBookIds.filter(b => b !== bookId);
     }else {
       this.selectedBookIds.push(bookId);
     }
     this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
+    App.cacheMyBooks(this.selectedBookIds);
   }
 }
 

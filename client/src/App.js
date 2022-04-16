@@ -23,6 +23,15 @@ class App extends Component{
     return window.sessionStorage.user_context ? JSON.parse(window.sessionStorage.user_context) : null;
   }
 
+  static cacheMyBooks(myBooks){
+    let u = JSON.parse(window.sessionStorage.user_context);
+    if(!u.user_metadata.arbitrage){
+      u.user_metadata.arbitrage = {};
+    }
+    u.user_metadata.arbitrage.myBooks = myBooks;
+    window.sessionStorage.setItem('user_context', JSON.stringify(u));
+  }
+
   static userHasRoleFromCache(role){
     if(App.user() && App.user().roles){
       return App.user().roles.filter( r => r.name === role).length > 0;

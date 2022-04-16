@@ -12,4 +12,3 @@ export default class Factor {
     }
    
 }
-47367295

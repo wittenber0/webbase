@@ -1,3 +1,5 @@
+const { patch } = require("request");
+
 sysToken = '';
 
 exports.checkRoleForUser = async function(user, role){
@@ -97,6 +99,21 @@ exports.updateUserRoles = async function(user_id, role_list, viewer_user_id, to_
   });
 }
 
+exports.updateUserMetaData = async function(user_id, user_metadata, viewer_user_id){
+  return exports.checkRoleForUser(viewer_user_id, 'profile').then( r => {
+    if(r){
+      return updateUserMetaDataFromServer(user_id, user_metadata).then( r =>{
+        return r;
+      }).catch(()=>{
+        return [];
+      })
+    }
+  }).catch(() => {
+    console.log('failure');
+    return [];
+  });
+}
+
 getUserFromServer = function(user_id){
   let url = '/users/'+user_id;
   return getFromAuth0V2(url);
@@ -132,6 +149,12 @@ updateUserRolesFromServer = function(user_id, role_list, to_remove){
   }
 }
 
+updateUserMetaDataFromServer = function(user_id, user_metadata){
+  let url = '/users/'+user_id;
+  let body = {user_metadata: user_metadata};
+  return patchToAuth0V2(url, body);
+}
+
 getFromAuth0V2 = function(route){
   return getSysToken().then(()=>{
     let request = require("request-promise");
@@ -158,6 +181,36 @@ postToAuth0V2 = function(route, body){
     let request = require("request-promise");
     let options = {
         method: 'POST',
+        url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
+        body: JSON.stringify(body),
+        headers:
+            {
+                'content-type': 'application/json',
+                authorization: `Bearer ${sysToken}`
+            },
+        resolveWithFullResponse: true
+    };
+    return (request(options)
+        .then(response => {
+          if(response.body){
+            return JSON.parse(response.body);
+          }else if(Math.floor(response.statusCode / 100) === 2){
+            return true;
+          }else{
+            return false;
+          }
+        }).catch( e => {
+          console.log(e);
+          return false;
+        }));
+  });
+}
+
+patchToAuth0V2 = function(route, body){
+  return getSysToken().then(()=>{
+    let request = require("request-promise");
+    let options = {
+        method: 'PATCH',
         url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
         body: JSON.stringify(body),
         headers:

@@ -1,10 +1,11 @@
-import Factor from "./factor";
+import { BetFactorTypeEnum } from "./enum/BetFactorTypeEnum";
+import Factor from "./Factor";
 
 export default class BetFactor {
-    public Label: string;
+    public Label: BetFactorTypeEnum;
     public Factor: Factor;
 
-    public constructor(label, factor){
+    public constructor(label:BetFactorTypeEnum, factor:Factor){
         this.Label = label,
         this.Factor = factor
     }

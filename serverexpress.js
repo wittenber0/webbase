@@ -76,6 +76,26 @@ app.post('/users/:user/roles', (req, res) => {
   })
 })
 
+app.post('/users/:user/arbitrage/myBooks', (req, res) => {
+  auth.getUserData(req.body.user).then(u => {
+    if(!u.user_metadata.arbitrage){
+      u.user_metadata.arbitrage = {};
+    }
+    u.user_metadata.arbitrage.myBooks = req.body.myBooks;
+    console.log("Updating arbitrage books for "+ req.params.user);
+    auth.updateUserMetaData(req.params.user, u.user_metadata, req.body.user).then( v => {
+      res.send(v);
+    }).catch(()=>{
+      res.send(false);
+    })
+
+  }).catch(()=>{
+    console.log('failed to get context')
+    res.send({});
+  });
+  
+})
+
 if (process.env.NODE_ENV === 'production') {
   // Exprees will serve up production assets
   app.use(express.static('client/build'));

@@ -73,6 +73,7 @@ class ArbitragePage extends Component{
 		this.updateSortBy = this.updateSortBy.bind(this);
 		this.populateGameOdds = this.populateGameOdds.bind(this);
 		this.setLeagueFilter = this.setLeagueFilter.bind(this);
+		this.updateBooks = this.updateBooks.bind(this);
 	}
 
 	componentDidMount(){
@@ -112,6 +113,14 @@ class ArbitragePage extends Component{
 			let allOdds = this.gameOddManager.getGameOddsSortedBy(sb);
 			this.setState({sortBy: sb, allOdds: allOdds, displayOdds: this.getDisplayOdds(allOdds)});
 		}
+	}
+
+	updateBooks(e){
+		let bookId = parseInt(e.target.value,10);
+		this.bookManager.updateBookById(bookId);
+		this.setState({myBooks: this.bookManager.selectedBooks});
+		this.populateGameOdds();
+		ArbitrageService.updateMyBooks(this.bookManager.getSelectedBookIds());
 	}
 
 	async populateGameOdds(){
@@ -192,15 +201,15 @@ class ArbitragePage extends Component{
 					          label=" League "
 					          onChange={this.setLeagueFilter}
 					        >
-										<MenuItem value={'all'}>ALL</MenuItem>
-										{this.state.leagueOptions.map( (lo, i) => {
-											return <MenuItem value={lo} key={i}>{lo}</MenuItem>
-										})}
+								<MenuItem value={'all'}>ALL</MenuItem>
+								{this.state.leagueOptions.map( (lo, i) => {
+									return <MenuItem value={lo} key={i}>{lo}</MenuItem>
+								})}
 					        </Select>
 								</FormControl>
 							</Grid>
 							<Grid item>
-								<BasicPopover></BasicPopover>
+								<BasicPopover updateBooks={this.updateBooks} myBooks={this.state.myBooks}></BasicPopover>
 							</Grid>
 							<Grid item>
 								<Button variant="contained" onClick={this.populateGameOdds}>Refresh</Button>
@@ -222,16 +231,16 @@ class ArbitragePage extends Component{
 								<Item>Pick</Item>
 							</Grid>
 							{this.state.myBooks.map((b) => {
-	              return(
-	                <Grid item xs={1} key={'header-'+b.bookId}>
-	                  <Item>
-	                  {b.bookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.bookLogo}/> :
-	                    <Typography>{b.bookName}</Typography>
-	                  }
-	                  </Item>
-	                </Grid>
-	              );
-	            })}
+								return(
+									<Grid item xs key={'header-'+b.bookId}>
+									<Item>
+									{b.bookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.bookLogo}/> :
+										<Typography>{b.bookName}</Typography>
+									}
+									</Item>
+									</Grid>
+								);
+							})}
 						</Grid>
 						{this.state.displayOdds.length > 0 &&
 							<div style={{width:'100%'}}>
