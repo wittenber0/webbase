@@ -30,27 +30,31 @@ const NotWideDiv = styled('div')(({theme}) => ({
 
 }));
 
-class PageBlock extends Component{
+type Props = {
+	fill: string,
+	children: any
+}
+
+class PageBlock extends Component<Props>{
 
 	render(){
-		var blockFill;
-    if(this.props.fill === 'light'){
-			return(
-				<LightFillBlock className='lightFillBlock'>
-					<NotWideDiv className='notWideDiv'>
-						{this.props.children}
-					</NotWideDiv>
-				</LightFillBlock>
-			)
-    }else{
-			return(
-				<DarkFillBlock className='darkFillBlock'>
-					<NotWideDiv className='notWideDiv'>
-						{this.props.children}
-					</NotWideDiv>
-				</DarkFillBlock>
-			)
-    }
+		if(this.props.fill === 'light'){
+				return(
+					<LightFillBlock className='lightFillBlock'>
+						<NotWideDiv className='notWideDiv'>
+							{this.props.children}
+						</NotWideDiv>
+					</LightFillBlock>
+				)
+		}else{
+				return(
+					<DarkFillBlock className='darkFillBlock'>
+						<NotWideDiv className='notWideDiv'>
+							{this.props.children}
+						</NotWideDiv>
+					</DarkFillBlock>
+				)
+		}
 
 	}
 }

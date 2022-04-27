@@ -24,10 +24,6 @@ const StyledIconButton = styled(IconButton)(({theme}) => ({
   color: 'white'
 }));
 
-const StyledDrawer = styled(Drawer)(({theme}) => ({
-  backgroundColor: theme.palette.dark.one,
-  color: 'white'
-}));
 const useStyles = makeStyles((theme) => ({
     drawer: {
       },
@@ -35,14 +31,18 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#000000',
         color: 'white'
       },
-  }));
+}));
 
-function Logout(l, app){
+function Logout(l: any, app: any){
   app.clearUserCache();
   l({returnTo: window.location.origin})
 }
 
-function Login(props){
+type LoginProps = {
+  app: any
+}
+
+function Login(props: LoginProps){
   const { loginWithRedirect, logout } = useAuth0();
   if(App.user()){
     return(
@@ -61,7 +61,16 @@ function Login(props){
   )
 }
 
-export default function TemporaryDrawer(props) {
+type Anchor = 'top' | 'left' | 'bottom' | 'right';
+
+type Props = {
+  drawerLocation: Anchor,
+  app: any,
+  menuList: any,
+  history: any
+}
+
+export default function TemporaryDrawer(props: Props) {
   const classes = useStyles();
 
   const [state, setState] = React.useState({
@@ -72,7 +81,7 @@ export default function TemporaryDrawer(props) {
     drawerLocation: props.drawerLocation
   });
 
-  const toggleDrawer = (side, open, route) => event => {
+  const toggleDrawer = (side: Anchor, open: Boolean, route?: string) => (event:any) => {
     if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
@@ -84,12 +93,12 @@ export default function TemporaryDrawer(props) {
     setState({ ...state, [side]: open });
   };
 
-  const changeRoute = (route, side) => {
+  const changeRoute = (route: string, side: Anchor) => {
     setState({ ...state, [side]: false });
     props.history.push(route);
   };
 
-  const sideList = side => (
+  const sideList = (side: Anchor) => (
     <HeaderDiv
       role="presentation"
     >
@@ -97,7 +106,7 @@ export default function TemporaryDrawer(props) {
       <List>
         <Login app={props.app}/>
         <Divider />
-          {props.menuList.map((item, index) => (
+          {props.menuList.map((item:any, index:number) => (
             <ListItem button key={item.route} onClick={toggleDrawer(side, false, item.route)} onKeyDown={toggleDrawer(side, false, item.route)}>
               <StyledIcon>{index % 2 === 0 ? <InboxIcon sx={{ color: "white" }}/> : <MailIcon sx={{ color: "white" }}/>}</StyledIcon>
               <ListItemText primary={item.display} />
@@ -113,7 +122,7 @@ export default function TemporaryDrawer(props) {
         <MenuIcon sx={{ color: "white" }}/>
       </StyledIconButton>
       <Drawer anchor={state.drawerLocation} open={state[state.drawerLocation]} onClose={toggleDrawer(state.drawerLocation, false)} classes={{ paper: classes.drawerPaper  }}>
-        {sideList(state[state.drawerLocation])}
+        {sideList(state.drawerLocation)}
       </Drawer>
     </div>
   );

@@ -14,10 +14,6 @@ import config from "./Auth/auth0-keys.json";
 import history from './Shared/browser-history';
 import theme from './Shared/theme';
 
-const onRedirectCallback = appState => {
-  history.push('/callback');
-};
-
 const routing = (
 
     <Auth0Provider

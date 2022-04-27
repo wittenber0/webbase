@@ -3,6 +3,22 @@ import { createTheme } from '@mui/material/styles'
 import { darken } from '@material-ui/core/styles';
 const main = '#4466ff'
 
+declare module '@mui/material/styles' {
+  interface PaletteOptions {    
+      dark?: any,
+      light?: any,
+      typography?: any
+  }
+}
+
+declare module '@mui/material/styles' {
+  interface Palette {    
+      dark?: any,
+      light?: any,
+      typography?: any
+  }
+}
+
 const theme = createTheme({
   palette: {
     mode: 'dark',
@@ -13,7 +29,6 @@ const theme = createTheme({
       light: '#FF7060',
       main: '#cc9944'
     },
-    black: '#000000',
     dark: {
       one: '#101010',
       two: '#151515',

@@ -1,5 +1,5 @@
 import ArbitrageService from '../../Shared/arbitrage-service';
-import Book from './Models/book';
+import Book from './Models/v2/Book';
 import App from '../../App';
 
 const defaultSelectedBookIds = [1003, 8, 21, 1001];
@@ -7,12 +7,13 @@ const bovadaLogo = 'https://www.aplussportsandmore-fanshop-baseballfield.com/ima
 const myBookieLogo = 'https://images.squarespace-cdn.com/content/v1/5ab4527b3c3a536a7a352c05/1631109644782-2TR7KXFGKPA84ZHFCI94/TRANSPARENT-MB.png'
 
 class BookManager {
-  isLoaded;
-  allBooks;
-  selectedBooks;
-  selectedBookIds;
+  private static instance?: BookManager
+  isLoaded: Boolean;
+  allBooks: Book[];
+  selectedBooks: Book[];
+  selectedBookIds: number[];
 
-  constructor(){
+  private constructor(){
     this.allBooks = [];
     this.selectedBooks = [];
     this.isLoaded = false;
@@ -22,6 +23,18 @@ class BookManager {
       this.selectedBookIds = defaultSelectedBookIds;
     }
   }
+
+  private static createInstance() {
+    let object = new BookManager();
+    return object;
+  }
+
+  public static getInstance() {
+    if (!this.instance) {
+        this.instance = this.createInstance();
+    }
+    return this.instance;
+}
 
   getSelectedBookIds(){
     return this.selectedBookIds;
@@ -33,7 +46,7 @@ class BookManager {
       this.getMyLiveBooks().forEach( book => {
         this.allBooks.push(book);
       })
-			r["books"].forEach( book => {
+			r["books"].forEach( (book:any) => {
         let bookName = book['display_name'];
     		let bookLogo = (book['meta']['logos'] ? book['meta']['logos']['primary'] : null);
         if(book['id'] === 21){
@@ -44,7 +57,7 @@ class BookManager {
         }
         this.allBooks.push(new Book(book['id'], bookName, bookLogo));
       });
-			this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
+			this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.BookId)});
       this.isLoaded = true;
 		});
   }
@@ -53,8 +66,13 @@ class BookManager {
     return this.selectedBooks;
   };
 
-  getBookById(id){
-    return this.allBooks.find( b => b.bookId === id);
+  getBookById(id: number){
+    let b = this.allBooks.find( b => b.BookId === id)
+    if(b){
+      return b;
+    }else{
+      return new Book(0, 'Unknown Book')
+    }
   }
 
   getMyLiveBooks(){
@@ -65,33 +83,15 @@ class BookManager {
     return liveBooks;
   }
 
-  updateBookById(bookId){
+  updateBookById(bookId: number){
     if(this.selectedBookIds.includes(bookId)){
       this.selectedBookIds = this.selectedBookIds.filter(b => b !== bookId);
     }else {
       this.selectedBookIds.push(bookId);
     }
-    this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
+    this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.BookId)});
     App.cacheMyBooks(this.selectedBookIds);
   }
 }
 
-var BookManagerWrapper = (function () {
-    var instance;
-
-    function createInstance() {
-        var object = new BookManager();
-        return object;
-    }
-
-    return {
-        getInstance: function () {
-            if (!instance) {
-                instance = createInstance();
-            }
-            return instance;
-        }
-    };
-})();
-
-export default BookManagerWrapper;
+export default BookManager;

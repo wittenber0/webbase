@@ -3,5 +3,8 @@ export enum BetTypeEnum {
     Spread,
     MoneyLine,
     PlayerProp,
-    TeamTotal
+    TeamTotal,
+    TeamTotalHome,
+    TeamTotalAway,
+    All
 }

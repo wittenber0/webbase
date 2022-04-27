@@ -7,37 +7,35 @@ import Search from '../Search/search';
 import App from '../../App';
 import { styled } from '@mui/material/styles';
 
-const styles = theme => {
-  return({
-  root: {
-    flexGrow: 1,
-  },
-  title: {
-    flexGrow: 1,
-    textAlign: 'left',
-    marginLeft: '30px'
-  },
-  appBar: {
-    backgroundColor: theme.palette.primary.main
-  }
-})};
-
 let sideBarItems = [
 	{display: 'Home', route: '/app'},
 ];
 
-const StyledAppBar = styled(AppBar)(({theme}) => ({
-  backgroundColor: theme.palette.primary
-}));
-
-const StyledTyp = styled(Typography)(({theme}) => ({
+const StyledTyp = styled(Typography)(({theme}:any) => ({
   color: theme.palette.primary,
   paddingLeft: '20px'
 }));
 
-class MyAppBar extends Component{
+type Props = {
+  user?: any,
+  app?: any,
+  history: any
+}
 
-	constructor(props){
+type State = {
+  items: any,
+  app: any,
+  user: any
+}
+
+class MyAppBar extends Component<Props, State>{
+  public state: State = {
+    items: sideBarItems,
+    app: this.props.app,
+    user: this.props.app.getUser()
+  };
+
+	constructor(props: Props){
 		super(props);
     if(props.app.userHasRole('AppAdmin')){
       sideBarItems.push({display: 'Administration', route: '/app/admin'});
@@ -54,16 +52,16 @@ class MyAppBar extends Component{
     };
 	}
 
-  static getDerivedStateFromProps(nextProps, prevState){
+  static getDerivedStateFromProps(nextProps: Props, prevState: State){
 
     if(prevState.user !== nextProps.user){
-      let o = {};
-      if(prevState.app.userHasRole('AppAdmin') && !(prevState.items.filter( i => i.display === 'Administration').length > 0)){
+      let o: any = {};
+      if(prevState.app.userHasRole('AppAdmin') && !(prevState.items.filter( (i:any) => i.display === 'Administration').length > 0)){
         let s = prevState.items
         s.push({display: 'Administration', route: '/app/admin'});
         o.items = s;
       }
-      if(prevState.app.userHasRole('ArbitrageUser') && !(prevState.items.filter( i => i.display === 'Arbitrage').length > 0)){
+      if(prevState.app.userHasRole('ArbitrageUser') && !(prevState.items.filter( (i:any) => i.display === 'Arbitrage').length > 0)){
         let s = prevState.items
         s.push({display: 'Arbitrage', route: '/app/arbitrage'});
         o.items = s;
@@ -80,8 +78,7 @@ class MyAppBar extends Component{
       <div className="app-bar">
         <AppBar position="fixed" color='primary'>
           <Toolbar>
-            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app}>
-            </TemporaryDrawer>
+            <TemporaryDrawer drawerLocation='left' menuList={this.state.items} history={this.props.history} app={this.state.app} />
             <StyledTyp variant="h6" >
               wittenber0 archives
             </StyledTyp>

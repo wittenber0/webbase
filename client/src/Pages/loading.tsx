@@ -2,9 +2,17 @@ import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 import { CircularProgress } from '@mui/material';
 
-class LoadingPage extends Component{
+type Props = {
 
-	constructor(props){
+}
+
+type State = {
+	title: string
+}
+
+class LoadingPage extends Component<Props, State>{
+
+	constructor(props: Props){
 		super(props);
 		this.state = {title: 'Loading...'};
 	}

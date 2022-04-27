@@ -1,14 +1,17 @@
 import Book from "./Book";
 
 export default class Factor {
-    public DecimalOdds: number;
-    public AmericanOdds: number;
-    public Book: Book;
+    DecimalOdds: number;
+    AmericanOdds: number;
+    Book: Book;
+    Best: boolean;
+    EV?: number;
     
-    public constructor(decimalOdds:number, americanOdds:number, book:Book){
+    constructor(decimalOdds:number, americanOdds:number, book:Book){
         this.DecimalOdds = decimalOdds;
-        this.AmericanOdds = americanOdds,
+        this.AmericanOdds = americanOdds;
         this.Book = book;
+        this.Best = false;
     }
    
 }

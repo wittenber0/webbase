@@ -1,9 +1,6 @@
 import ArbitrageService from '../../Shared/arbitrage-service';
-import GameOdd from './Models/game-odd';
 import Odd from './Models/odd';
 import Game from './Models/game';
-import Factor from './Models/factor';
-import BookManager from './book-manager';
 import GameOddManager from './game-odd-manager';
 
 export default class ActionNetworkBrain {

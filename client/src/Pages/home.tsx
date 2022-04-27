@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 
-class HomePage extends Component{
+type Props = {
 
-	constructor(props){
+}
+
+type State = {
+	title: string
+}
+
+class HomePage extends Component<Props, State>{
+
+	constructor(props: Props){
 		super(props);
 		this.state = {title: 'Home'};
 	}

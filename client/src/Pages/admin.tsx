@@ -7,9 +7,19 @@ import { CircularProgress } from '@mui/material';
 
 import Table from '../Functions/Table/table';
 
-class AdminPage extends Component{
+type Props = {
+	app: any
+}
 
-	constructor(props){
+type State = {
+	title: string,
+	appUsers: any,
+	appRoles: any
+}
+
+class AdminPage extends Component<Props, State>{
+
+	constructor(props: Props){
 		super(props);
 		this.state = {title: 'administration', appUsers: null, appRoles: null};
 	}
@@ -25,13 +35,13 @@ class AdminPage extends Component{
 
 	}
 
-	updateUserRoles(user, toRemove){
+	updateUserRoles(user: any, toRemove: Boolean){
 		let roleList;
 
 		if(toRemove){
 			roleList = toRemove;
 		} else {
-			roleList = user.roles.map( r => r.id);
+			roleList = user.roles.map( (r: any) => r.id);
 		}
 
 		if(user.user_id === App.user().user_id){
@@ -47,7 +57,7 @@ class AdminPage extends Component{
 			<div className="admin">
 				<div className="admin-body">
 					{this.state.appUsers===null? <PageBlock fill="light"><CircularProgress size={100} /></PageBlock> :
-						<PageBlock fill="light" waitfor={this.state.appUsers}>
+						<PageBlock fill="light">
 							<h2>Manage Users</h2>
 							<Table users={this.state.appUsers} roles={this.state.appRoles} adminPage={this}/>
 						</PageBlock>

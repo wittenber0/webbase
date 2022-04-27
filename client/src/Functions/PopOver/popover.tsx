@@ -8,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
+import Book from '../../ClientBrain/Arbitrage/Models/v2/Book';
 
 /*
 const StyledButton = styled(Button)(({ theme }) => {
@@ -33,10 +34,14 @@ const StyledFCL = styled(FormControlLabel)`
   color: rgba(255, 255, 255, 0.7);
 `
 
-export default function BasicPopover(props) {
+type Props = {
+  myBooks: Book[],
+  updateBooks: any
+}
+export default function BasicPopover(props: Props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = (event) => {
+  const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -44,8 +49,8 @@ export default function BasicPopover(props) {
     setAnchorEl(null);
   };
 
-  const isChecked = (id) =>{
-    return props.myBooks.map(b => b.bookId).includes(id);
+  const isChecked = (id: number) =>{
+    return props.myBooks.map(b => b.BookId).includes(id);
   }
 
   const open = Boolean(anchorEl);

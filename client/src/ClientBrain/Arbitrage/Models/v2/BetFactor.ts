@@ -6,7 +6,7 @@ export default class BetFactor {
     public Factor: Factor;
 
     public constructor(label:BetFactorTypeEnum, factor:Factor){
-        this.Label = label,
-        this.Factor = factor
+        this.Label = label;
+        this.Factor = factor;
     }
 }

@@ -18,7 +18,7 @@ export default class BookBet {
     public JoinLabel: string;
     public Book: Book;
 
-    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], joinLabel:string, book:Book){
+    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], date:Date, book:Book){
         this.GameId = gameId;
         this.BetType = betType
         this.PlayerPropType = playerPropType;
@@ -26,7 +26,7 @@ export default class BookBet {
         this.Line = line;
         this.BetFactors = betFactors;
         this.BetParticipants = betParticipants;
-        this.JoinLabel = joinLabel;
+        this.JoinLabel = this.GenerateJoinLabel(this.getDateString(date));
         this.Book = book;
     }
 
@@ -58,7 +58,7 @@ export default class BookBet {
             7.5, 
             betFactors1, 
             [participant1], 
-            this.GenerateJoinLabel('20220416'), 
+            new Date(2022,4, 16), 
             book
         )
 
@@ -70,7 +70,7 @@ export default class BookBet {
             0, 
             betFactors2, 
             [participant2, participant3], 
-            this.GenerateJoinLabel('20220416'), 
+            new Date(2022,4, 16), 
             book
         )
         
@@ -82,7 +82,7 @@ export default class BookBet {
             0, 
             betFactors3, 
             [participant3, participant2], 
-            this.GenerateJoinLabel('20220416'), 
+            new Date(2022,4, 16), 
             book
         )
     }
@@ -90,9 +90,13 @@ export default class BookBet {
     public GenerateJoinLabel(gameDateString: string):string{
         let playerPropLabel = this.PlayerPropType != PlayerPropTypeEnum.NonApplicable ? `${this.PlayerPropType.toString()}|` : '';  
         let participantsLabel = this.BetParticipants.map(p => p.Name).join('|');
-        let joinLabel = `${this.BetType.toString()}|${playerPropLabel}${this.BetDuration.toString()}|${participantsLabel}|${gameDateString}`;
+        let joinLabel = `${BetTypeEnum[this.BetType]}|${playerPropLabel}${BetDuration[this.BetDuration]}|${participantsLabel}|${this.Line}|${gameDateString}`;
          
         return joinLabel;
+    }
+
+    getDateString(d:Date){
+        return d.getFullYear().toString()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
     }
 }
 

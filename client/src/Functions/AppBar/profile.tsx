@@ -2,7 +2,12 @@ import React, { Fragment } from "react";
 import { Avatar, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import App from '../../App';
 
-function Profile(props){
+type Props = {
+  goToProfile: any,
+  app: any
+}
+
+function Profile(props: Props){
   let user = App.user();
   if(user && props.app.userHasRole('AppUser')){
     return (
