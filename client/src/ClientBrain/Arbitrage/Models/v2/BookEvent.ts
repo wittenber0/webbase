@@ -8,14 +8,19 @@ export default class BookEvent {
     public Sport: SportEnum;
     public EventParticipants: Participant[];
     public GameId: string;
+    public SportsBookGameId: string;
+    public SportsBookThirdPartyGameId: string;
     public EventDate: Date;
 
-    constructor(BookBets: BookBet[], LeagueName: string, Sport: SportEnum, EventParticipants: Participant[], GameId: string, EventDate: Date){
-        this.BookBets = BookBets;
+    constructor(LeagueName: string, Sport: string, GameId: string, EventDate: Date){
+        this.BookBets = []
         this.LeagueName = LeagueName;
-        this.Sport = Sport;
-        this.EventParticipants = EventParticipants;
+        //todo enum converter
+        this.Sport = SportEnum.Baseball;
+        this.EventParticipants = [];
         this.GameId = GameId;
         this.EventDate = EventDate;
+        this.SportsBookGameId = '';
+        this.SportsBookThirdPartyGameId = '';
     }
 }

@@ -57,7 +57,7 @@ class GameOddManager {
 
   async loadBetOnlineGameTree(){
     this.betOnlineBrain = new BetOnlineBrain();
-    return await this.betOnlineBrain.getGameTree().then( gameTree => {
+    return await this.betOnlineBrain.getGameTreev2().then( gameTree => {
       return gameTree;
     });
   }

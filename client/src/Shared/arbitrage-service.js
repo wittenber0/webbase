@@ -28,7 +28,7 @@ class ArbitrageService{
 
   static getAllOddsForDate = async function(d, selectedBooks){
     let dateString;
-    if(d == undefined){
+    if(d === undefined){
       d = new Date();
     }
     dateString = d.getFullYear().toString();

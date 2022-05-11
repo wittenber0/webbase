@@ -9,6 +9,8 @@ import { PlayerPropTypeEnum } from "./enum/PlayerPropTypeEnum";
 
 export default class BookBet {
     public GameId: string;
+    public SportsBookGameId: string;
+    public SportsBookThirdPartyGameId: string;
     public BetType: BetTypeEnum;
     public PlayerPropType: PlayerPropTypeEnum;
     public BetDuration: BetDuration;
@@ -18,14 +20,16 @@ export default class BookBet {
     public JoinLabel: string;
     public Book: Book;
 
-    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], joinLabel:string, book:Book){
+    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], joinLabel:string, book:Book){
+        this.SportsBookGameId = '';
+        this.SportsBookThirdPartyGameId = '';
         this.GameId = gameId;
         this.BetType = betType
         this.PlayerPropType = playerPropType;
         this.BetDuration = betDuration;
         this.Line = line;
         this.BetFactors = betFactors;
-        this.BetParticipants = betParticipants;
+        this.BetParticipants = [];
         this.JoinLabel = joinLabel;
         this.Book = book;
     }
@@ -57,11 +61,10 @@ export default class BookBet {
             BetDuration.Game, 
             7.5, 
             betFactors1, 
-            [participant1], 
             this.GenerateJoinLabel('20220416'), 
             book
         )
-
+//[participant1], 
         let bookBetHeadToHeadTimWinsBrandon = new BookBet(
             '234', 
             BetTypeEnum.PlayerProp, 
@@ -69,24 +72,22 @@ export default class BookBet {
             BetDuration.Game, 
             0, 
             betFactors2, 
-            [participant2, participant3], 
             this.GenerateJoinLabel('20220416'), 
             book
         )
-        
-        let bookBetHeadToHeadBrandonWinsTim = new BookBet(
+        //        [participant2, participant3], 
+            let bookBetHeadToHeadBrandonWinsTim = new BookBet(
             '234', 
             BetTypeEnum.PlayerProp, 
             PlayerPropTypeEnum.MostTotalBases, 
             BetDuration.Game, 
             0, 
             betFactors3, 
-            [participant3, participant2], 
             this.GenerateJoinLabel('20220416'), 
             book
         )
     }
-
+//[participant3, participant2], 
     public GenerateJoinLabel(gameDateString: string):string{
         let playerPropLabel = this.PlayerPropType != PlayerPropTypeEnum.NonApplicable ? `${this.PlayerPropType.toString()}|` : '';  
         let participantsLabel = this.BetParticipants.map(p => p.Name).join('|');

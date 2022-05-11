@@ -16,7 +16,7 @@ class BookManager {
     this.allBooks = [];
     this.selectedBooks = [];
     this.isLoaded = false;
-    if(App.user().user_metadata.arbitrage && App.user().user_metadata.arbitrage.myBooks){
+    if(App.user() && App.user().user_metadata && App.user().user_metadata.arbitrage && App.user().user_metadata.arbitrage.myBooks){
       this.selectedBookIds = App.user().user_metadata.arbitrage.myBooks;
     } else {
       this.selectedBookIds = defaultSelectedBookIds;
