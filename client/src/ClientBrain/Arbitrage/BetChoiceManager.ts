@@ -41,15 +41,13 @@ class BetChoiceManager {
   async loadActionNetworkGameTree(){
     
     return await this.ActionNetworkBrain.getGameTree().then( gameTree => {
-     
       return gameTree;
     });
   }
 
   async loadBetOnlineGameTree(){
+    
     return await this.BetOnlineBrain.getGameTree().then( gameTree => {
-      console.log('betonline tree');
-      console.log(gameTree);
       return gameTree;
     });
   }
@@ -57,8 +55,6 @@ class BetChoiceManager {
   async loadPinnacleGameTree(){
     
     return await this.PinnacleBrain.getGameTree().then( gameTree => {
-      console.log('pinnacle tree');
-      console.log(gameTree);
       return gameTree;
     });
   }
@@ -81,9 +77,6 @@ class BetChoiceManager {
               if(bookBet.Book.BookId === 1003){
                 this.loadPinnacleOddsForBetChoice(bookBet, bookEvent);
               }
-              // if(bookBet.Book.BookId === 1001){
-              //   this.loadBetOnlineOddsForBetChoice(bookBet, bookEvent);
-              // }
             });
           }
         });
@@ -130,19 +123,6 @@ class BetChoiceManager {
       this.AllBets.push(newBetChoice);
     }else{
       existingBetChoice.PinnacleOdds = bookBet.BetFactors;
-    }
-  }
-
-  loadBetOnlineOddsForBetChoice(bookBet: BookBet, bookEvent: BookEvent){
-    let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel);
-    if(existingBetChoice === undefined){
-      let newBetChoice = new BetChoice(
-        bookEvent.BettingEvent, bookBet.JoinLabel, bookBet.BetParticipants, bookBet.BetType, bookBet.PlayerPropType, bookBet.BetDuration, bookBet.Line
-      );
-      newBetChoice.BetOnlineOdds = bookBet.BetFactors;
-      this.AllBets.push(newBetChoice);
-    }else{
-      existingBetChoice.BetOnlineOdds = bookBet.BetFactors;
     }
   }
 
