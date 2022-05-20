@@ -9,5 +9,6 @@ export enum SportEnum {
     Chess,
     Boxing,
     Football,
-    MartialArts
+    MartialArts,
+    Other
 }

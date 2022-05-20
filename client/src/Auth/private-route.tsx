@@ -4,11 +4,21 @@ import Loading from '../Pages/loading'
 import AuthService from '../Shared/auth-service';
 import App from '../App'
 
-class PrivateRoute extends Component {
+type Props = {
+  component: any,
+  userAccess: string,
+  app?: any
+}
 
-  constructor(props){
+type State = {
+  page: any
+}
+
+class PrivateRoute extends React.Component<Props, State> {
+  state: State = {page: Loading}
+
+  constructor(props: Props){
     super(props);
-    this.state = {page: Loading};
   }
 
   componentDidMount() {

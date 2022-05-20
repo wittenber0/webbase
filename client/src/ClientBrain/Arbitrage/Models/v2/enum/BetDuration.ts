@@ -1,8 +1,13 @@
+//order here matters
 export enum BetDuration {
     Game,
-    FirstHalf,
     FirstPeriod,
+    SecondPeriod,
     ThirdPeriod,
+    FourthPeriod,
     FifthPeriod,
-    SeventhPeriod    
+    SixthPeriod,
+    SeventhPeriod,
+    EightPeriod,
+    Other   
 }

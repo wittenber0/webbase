@@ -14,26 +14,14 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
 import BetOnlineBrain from '../ClientBrain/Arbitrage/BookBrains/bet-online-brain';
-import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain';
+import ActionNetworkBrain from '../ClientBrain/Arbitrage/action-network-brain-v2';
 import BookManager from '../ClientBrain/Arbitrage/book-manager';
-import GameOddManager from '../ClientBrain/Arbitrage/game-odd-manager';
+import BetChoice from '../ClientBrain/Arbitrage/Models/v2/BetChoice';
+import Book from '../ClientBrain/Arbitrage/Models/v2/Book';
+import BetChoiceManager from '../ClientBrain/Arbitrage/BetChoiceManager';
+import { BetTypeEnum } from '../ClientBrain/Arbitrage/Models/v2/enum/BetTypeEnum';
 
-
-const styles = theme => ({
-    textField: {
-        width: '90%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        paddingBottom: 0,
-        marginTop: 0,
-        fontWeight: 500
-    },
-    input: {
-        color: 'white'
-    }
-});
-
-const Item = styled(Paper)(({ theme }) => {
+const Item = styled(Paper)(({ theme }: any) => {
 	return({
   backgroundColor: theme.palette.dark.three,
   ...theme.typography.body2,
@@ -47,28 +35,44 @@ const Item = styled(Paper)(({ theme }) => {
 	display:"flex"
 });});
 
-function onlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
+type Props = {
+
 }
 
-class ArbitragePage extends Component{
+type State = {
+	title: string,
+	allBets: BetChoice[],
+	displayBets: BetChoice[],
+	betTypeFilter: BetTypeEnum,
+	leagueFilter: string,
+	sortBy: string,
+	myBooks: Book[],
+	leagueOptions: string[]
+}
 
-	constructor(props){
+class ArbitragePage extends Component<Props, State>{
+	state: State = {
+		title: 'Arbitrage',
+		allBets: [],
+		displayBets: [],
+		betTypeFilter: BetTypeEnum.All,
+		leagueFilter: 'all',
+		sortBy: 'ev',
+		myBooks: [],
+		leagueOptions: []
+	};
+
+	actionNetWorkBrain: ActionNetworkBrain;
+	bookManager: BookManager;
+	betChoiceManager: BetChoiceManager;
+
+
+	constructor(props: Props){
 		super(props);
-		this.state = {
-			title: 'Arbitrage',
-			allOdds: [],
-			displayOdds: [],
-			betTypeFilter: 'all',
-			leagueFilter: 'all',
-			sortBy: 'ev',
-			myBooks: [],
-			leagueOptions: []
-		};
 
-		this.ActionNetworkBrain = new ActionNetworkBrain(this.state.betTypeFilter, this.state.books);
+		this.actionNetWorkBrain = new ActionNetworkBrain();
 		this.bookManager = BookManager.getInstance();
-		this.gameOddManager = GameOddManager.getInstance();
+		this.betChoiceManager = BetChoiceManager.getInstance();
 		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
 		this.updateSortBy = this.updateSortBy.bind(this);
 		this.populateGameOdds = this.populateGameOdds.bind(this);
@@ -86,20 +90,21 @@ class ArbitragePage extends Component{
 	}
 
 	populateLeagueOptions(){
-		console.log(this.state.allOdds[0]);
-		let lo = this.state.allOdds.map( o => o.leagueName ).filter(onlyUnique);
+		let lo = this.state.allBets.map( o => o.BettingEvent.LeagueName ).filter((value, index, self) => {
+			return self.indexOf(value) === index;
+		});
 		this.setState({leagueOptions: lo});
 	}
 
-	setBetTypeFilter(e){
+	setBetTypeFilter(e: any){
 		let btf = e.target.value;
-		if(e && btf){
+		if(e && btf !== undefined){
 			this.setState({betTypeFilter: btf});
 			this.populateGameOdds();
 		}
 	}
 
-	setLeagueFilter(e){
+	setLeagueFilter(e: any){
 		let lf = e.target.value;
 		if(e && lf){
 			this.setState({leagueFilter: lf});
@@ -107,15 +112,17 @@ class ArbitragePage extends Component{
 		}
 	}
 
-	updateSortBy(e){
+	updateSortBy(e: any){
 		let sb = e.target.value;
 		if(e && sb){
-			let allOdds = this.gameOddManager.getGameOddsSortedBy(sb);
-			this.setState({sortBy: sb, allOdds: allOdds, displayOdds: this.getDisplayOdds(allOdds)});
+			let allBets = this.betChoiceManager.getGameOddsSortedBy(sb);
+			if(allBets !== undefined){
+				this.setState({sortBy: sb, allBets: allBets, displayBets: this.getDisplayBets(allBets)});
+			}
 		}
 	}
 
-	updateBooks(e){
+	updateBooks(e: any){
 		let bookId = parseInt(e.target.value,10);
 		this.bookManager.updateBookById(bookId);
 		this.setState({myBooks: this.bookManager.selectedBooks});
@@ -124,28 +131,32 @@ class ArbitragePage extends Component{
 	}
 
 	async populateGameOdds(){
-		return await this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy).then(r => {
-			this.setState({
-				allOdds: this.gameOddManager.gameOdds,
-				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
-			});
-			//console.log(this.state.displayOdds);
+		return await this.betChoiceManager.loadBetChoices().then(() => {
+			let allBets = this.betChoiceManager.getGameOddsSortedBy(this.state.sortBy);
+			if(allBets !== undefined){
+				
+				this.setState({
+					allBets: allBets,
+					displayBets: this.getDisplayBets(allBets)
+				});
+			}
+			console.log(this.state.displayBets);
 		});
 	}
 
-	getDisplayOdds(gameOdds){
-    return gameOdds.filter( (o, i) => {
+	getDisplayBets(allBets: BetChoice[]){
+		return allBets.filter( (o, i) => {
 			//betType Filter
-      if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType.slice(0,2)){
-        return false;
-      }
-			//setLeagueFilter
-			if(this.state.leagueFilter !== 'all' && this.state.leagueFilter !== o.leagueName){
+			if(this.state.betTypeFilter !== BetTypeEnum.All && this.state.betTypeFilter !== o.BetType){
 				return false;
 			}
-      return i < 20;
-    });
-  }
+			//setLeagueFilter
+			if(this.state.leagueFilter !== 'all' && this.state.leagueFilter !== o.BettingEvent.LeagueName){
+				return false;
+			}
+			return i < 20;
+		});
+	}
 
 	render(){
 		//const {classes} = this.props;
@@ -182,11 +193,11 @@ class ArbitragePage extends Component{
 					          label=" Bet Type "
 					          onChange={this.setBetTypeFilter}
 					        >
-					          <MenuItem value={'all'}>ALL</MenuItem>
-					          <MenuItem value={'ml'}>Money Line</MenuItem>
-					          <MenuItem value={'s'}>Spread</MenuItem>
-										<MenuItem value={'ou'}>Over Under</MenuItem>
-					          <MenuItem value={'tt'}>Team Over Under</MenuItem>
+					          	<MenuItem value={BetTypeEnum.All}>ALL</MenuItem>
+					        	<MenuItem value={BetTypeEnum.MoneyLine}>Money Line</MenuItem>
+					        	<MenuItem value={BetTypeEnum.Spread}>Spread</MenuItem>
+								<MenuItem value={BetTypeEnum.OverUnder}>Over Under</MenuItem>
+					        	<MenuItem value={BetTypeEnum.TeamTotal}>Team Over Under</MenuItem>
 					        </Select>
 								</FormControl>
 							</Grid>
@@ -218,7 +229,7 @@ class ArbitragePage extends Component{
 						<Grid container spacing={1} sx={{mt:2}}>
 							<Grid item xs={2.5}>
 							</Grid>
-							<Grid item xs={1}>
+							<Grid item xs={1.5}>
 								<Item>Line</Item>
 							</Grid>
 							<Grid item xs={1}>
@@ -232,21 +243,21 @@ class ArbitragePage extends Component{
 							</Grid>
 							{this.state.myBooks.map((b) => {
 								return(
-									<Grid item xs key={'header-'+b.bookId}>
+									<Grid item xs key={'header-'+b.BookId}>
 									<Item>
-									{b.bookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.bookLogo}/> :
-										<Typography>{b.bookName}</Typography>
+									{b.BookLogo ? <img style={{maxWidth:"100%", maxHeight:"100%"}}src={b.BookLogo}/> :
+										<Typography>{b.BookName}</Typography>
 									}
 									</Item>
 									</Grid>
 								);
 							})}
 						</Grid>
-						{this.state.displayOdds.length > 0 &&
+						{this.state.displayBets.length > 0 &&
 							<div style={{width:'100%'}}>
-							{this.state.displayOdds.map((odd,i)=>{
-								if(i<100 && odd.houseLine){
-									return(<GameCard gameOdd={odd} key={i} myBooks={this.state.myBooks}/>)
+							{this.state.displayBets.map((bet,i)=>{
+								if(i<100 && bet.HouseLine){
+									return(<GameCard betChoice={bet} key={i} myBooks={this.state.myBooks}/>)
 								}
 							})}
 							</div>

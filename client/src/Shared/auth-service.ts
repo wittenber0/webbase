@@ -4,44 +4,44 @@ const fetch = require('node-fetch');
 
 
 class AuthService{
-  static validate = async function(userId, role) {
+  static validate = async function(userId:string, role:any) {
     const body = {
       'user': userId,
       'role': role
     };
     return await fetch('/auth', { method: 'post', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }})
-    .then(res=>{
+    .then((res:any)=>{
       return(res.json());
-    }).then((json)=> {
+    }).then((json:any)=> {
       return(json)
     }).catch(()=>{
       return(false);
     });
   }
 
-  static userContextGet = async function(userId){
+  static userContextGet = async function(userId:string){
     return UtilityService.get('/usercontext?id='+userId);
   }
 
-  static getAllAppRoles = async function(userId) {
+  static getAllAppRoles = async function(userId:string) {
     const body = {
       'user': userId
     };
     return await fetch('/approles', { method: 'post', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }})
-    .then(res=>{
+    .then((res:any)=>{
       return(res.json());
-    }).then((json)=> {
+    }).then((json:any)=> {
       return(json)
     }).catch(()=>{
       return(false);
     });
   }
 
-  static getAppUsers = async function(userId) {
+  static getAppUsers = async function(userId:string) {
     return UtilityService.post('/appusers');
   }
 
-  static updateUserRoles = async function(userId, roleList, removeInd){
+  static updateUserRoles = async function(userId:string, roleList:any, removeInd: Boolean){
     return UtilityService.post('/users/'+userId+'/roles', {user: App.user().user_id, roles: roleList, removeInd: removeInd });
   }
 }

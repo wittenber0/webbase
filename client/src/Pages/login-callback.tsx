@@ -4,7 +4,12 @@ import Loading from './loading'
 import history from '../Shared/browser-history';
 import AuthService from '../Shared/auth-service';
 
-export default function Callback(props) {
+type Props = {
+  app?: any,
+  user?: any
+}
+
+export default function Callback(props: Props) {
   const { isLoading, user, isAuthenticated } = useAuth0();
   if(!isLoading){
     return <LoginCallbackPage user={user} app={props.app}/>
@@ -12,7 +17,7 @@ export default function Callback(props) {
   return <Loading />
 };
 
-class LoginCallbackPage extends Component{
+class LoginCallbackPage extends Component<Props>{
 
   componentDidMount(){
     if(this.props.user){

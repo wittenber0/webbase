@@ -11,7 +11,7 @@ import {
   TablePagination, TableRow, TableSortLabel, Toolbar, Typography, Checkbox, IconButton
 } from '@mui/material';
 
-function descendingComparator(a, b, orderBy) {
+function descendingComparator(a:any, b:any, orderBy:any) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -21,30 +21,30 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
+function getComparator(order:any, orderBy:any) {
   return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+    ? (a:any, b:any) => descendingComparator(a, b, orderBy)
+    : (a:any, b:any) => -descendingComparator(a, b, orderBy);
 }
 
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
+function stableSort(array:any, comparator:any) {
+  const stabilizedThis = array.map((el:any, index:number) => [el, index]);
+  stabilizedThis.sort((a:any, b:any) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-  return stabilizedThis.map((el) => el[0]);
+  return stabilizedThis.map((el:any) => el[0]);
 }
 
 
 
-function getHeadCells(roles){
+function getHeadCells(roles:any){
   let headCells = [
     { id: 'email', numeric: false, disablePadding: false, label: 'Email', checkbox: false, disabled: false, description: "The user's email", rowDetail: null }
   ];
 
-  roles.map( r => {
+  roles.map( (r:any) => {
     headCells.push({ id: r.id, numeric: false, disablePadding: false, label: r.name, checkbox: true, disabled: false, description: r.description, rowDetail: r });
   });
 
@@ -55,9 +55,9 @@ function getHeadCells(roles){
 
 
 
-function EnhancedTableHead(props) {
+function EnhancedTableHead(props:any) {
   const { classes, order, orderBy, onRequestSort } = props;
-  const createSortHandler = (property) => (event) => {
+  const createSortHandler = (property:any) => (event:any) => {
     onRequestSort(event, property);
   };
 
@@ -97,6 +97,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  roles: PropTypes.array.isRequired
 };
 
 const useToolbarStyles = makeStyles((theme) => ({
@@ -119,7 +120,7 @@ const useToolbarStyles = makeStyles((theme) => ({
   },
 }));
 
-const EnhancedTableToolbar = (props) => {
+const EnhancedTableToolbar = (props:any) => {
   const classes = useToolbarStyles();
   const { numSelected } = props;
 
@@ -184,7 +185,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable(props) {
+export default function EnhancedTable(props:any) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
@@ -194,18 +195,18 @@ export default function EnhancedTable(props) {
   const [users, setUsers] = React.useState(props.users);
 
   const buildData = () => {
-    let d = []
-    users.map( u => {
+    let d:any = []
+    users.map( (u:any) => {
       d.push(createRow(u))
     });
     return d;
   }
 
-  const createRow = (user) => {
-    let row = {user, name: user.name, email: user.email};
+  const createRow = (user:any) => {
+    let row:any = {user, name: user.name, email: user.email};
     let hasNone = true;
-    props.roles.map( role => {
-      row[role.id] = user.roles.filter( r => {return r.id === role.id}).length > 0;
+    props.roles.map( (role:any) => {
+      row[role.id] = user.roles.filter( (r:any) => {return r.id === role.id}).length > 0;
       if(row[role.id]){
         hasNone = false;
       }
@@ -218,18 +219,18 @@ export default function EnhancedTable(props) {
   let rows = buildData();
   //let [rows, setRows] = React.useState(buildData());
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (event:any, property:any) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
 
-  const updateUsers = (role, userId) => {
+  const updateUsers = (role:any, userId:any) => {
     let roleId = role.id;
-    users.map( u => {
+    users.map( (u:any) => {
       if (u.user_id === userId){
-        if(u.roles.filter( r => r.id === roleId).length > 0){
-          u.roles = u.roles.filter( r => r.id !== roleId);
+        if(u.roles.filter( (r:any) => r.id === roleId).length > 0){
+          u.roles = u.roles.filter( (r:any) => r.id !== roleId);
           props.adminPage.updateUserRoles(u, [roleId]);
         }else{
           u.roles.push(role);
@@ -242,11 +243,11 @@ export default function EnhancedTable(props) {
     setUsers(Object.assign([], users));
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event:any, newPage:any) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event:any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -276,7 +277,7 @@ export default function EnhancedTable(props) {
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
+                .map((row:any, index:number) => {
                   return (
                     <TableRow
                       hover

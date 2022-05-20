@@ -1,4 +1,5 @@
 import App from '../App';
+import Book from '../ClientBrain/Arbitrage/Models/v2/Book';
 import UtilityService from './utility-service';
 const fetch = require('node-fetch');
 
@@ -26,7 +27,7 @@ class ArbitrageService{
     return UtilityService.get(bookListUrl);
   }
 
-  static getAllOddsForDate = async function(d, selectedBooks){
+  static getAllOddsForDate = async function(d:Date, selectedBooks: number[]){
     let dateString;
     if(d === undefined){
       d = new Date();
@@ -37,7 +38,7 @@ class ArbitrageService{
     return UtilityService.get(oddsUrl + selectedBooks.join() + '&date='+dateString);
   }
 
-  static getAtionLabsBookOdds = async function(bookId){
+  static getAtionLabsBookOdds = async function(bookId: number){
     return UtilityService.get(actionLabsBookOdds + bookId +'/default.json');
   }
 
@@ -53,7 +54,7 @@ class ArbitrageService{
     return UtilityService.get(actionLabsMarketEvents);
   }
 
-  static getPinnacleMatchUps = async function(sportId){
+  static getPinnacleMatchUps = async function(sportId: number){
     let options = {
       "headers": {
         "accept": "application/json",
@@ -79,7 +80,7 @@ class ArbitrageService{
     return UtilityService.get(pinnacleMatchUps + sportId + '/matchups?withSpecials=false', options);
   }
 
-  static getPinnacleMarkets = async function(sportId){
+  static getPinnacleMarkets = async function(sportId:number){
     let options = {
       "headers": {
         "accept": "application/json",
@@ -104,7 +105,7 @@ class ArbitrageService{
     return UtilityService.get(pinnacleMarkets + sportId + '/markets/straight?primaryOnly=false&withSpecials=false', options);
   }
 
-  static getBetOnlineOdds = async function(sport){
+  static getBetOnlineOdds = async function(sport: string){
     let options = {
       "headers": {
         "accept": "application/json, text/plain, */*",
@@ -136,20 +137,20 @@ class ArbitrageService{
     }
 
     return await fetch("https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games", options)
-    .then(res=>{
+    .then((res:any)=>{
       return(res.json());
-    }).then((json)=> {
+    }).then((json:any)=> {
       return(json)
     }).catch(()=>{
       return(false);
-    });;
+    });
   }
 
-  static getBovadaOdds = async function(sport){
+  static getBovadaOdds = async function(sport: string){
     return UtilityService.get("https://www.bovada.lv/services/sports/event/coupon/events/A/description/"+sport+"?marketFilterId=def&preMatchOnly=true&lang=en");
   }
 
-  static updateMyBooks = async function(myBooks){
+  static updateMyBooks = async function(myBooks: any){
     let userId = App.user().user_id;
     return UtilityService.post('/users/'+userId+'/arbitrage/myBooks', {user: userId, myBooks: myBooks});
   }

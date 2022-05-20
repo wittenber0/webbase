@@ -108,7 +108,7 @@ export default class BetOnlineBrain{
       game.TotalLine.TotalLine.Point
 */
   getOddsFromGamev2(gameId, game) {
-    letbookBets = [];
+    let bookBets = [];
     let book = BookManager.getInstance().getBookById(1001);
     //#region home money line
     let bookBetHomeMoneyLineFactor = 
@@ -125,7 +125,7 @@ export default class BetOnlineBrain{
     let bookBetHomeMoneyLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.MoneyLine, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -149,7 +149,7 @@ export default class BetOnlineBrain{
     let bookBetAwayMoneyLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.MoneyLine, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -173,7 +173,7 @@ export default class BetOnlineBrain{
     let bookBetDrawMoneyLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.MoneyLine, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -197,7 +197,7 @@ export default class BetOnlineBrain{
     let bookBetHomeSpreadLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.Spread, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -221,7 +221,7 @@ export default class BetOnlineBrain{
     let bookBetAwaySpreadLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.Spread, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -245,7 +245,7 @@ export default class BetOnlineBrain{
     let bookBetTotalOverLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.TotalLine, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 
@@ -269,7 +269,7 @@ export default class BetOnlineBrain{
     let bookBetTotalUnderLine = 
       new BookBet
       (
-        gamedId, 
+        gameId, 
         BetTypeEnum.MoneyLine, 
         PlayerPropTypeEnum.NonApplicable,
         BetDuration.Game, 

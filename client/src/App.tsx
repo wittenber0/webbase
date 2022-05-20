@@ -12,18 +12,36 @@ import Admin from './Pages/admin';
 import Arbitrage from './Pages/arbitrage';
 import Callback from './Pages/login-callback'
 
-class App extends Component{
+//Models
+import Book from './ClientBrain/Arbitrage/Models/v2/Book'
+import { propsToClassKey } from '@mui/styles';
 
-  constructor(props){
+type Props = {
+  history: any
+}
+
+type State = {
+  usercontext: any
+}
+
+type Role = {
+  description: string,
+  id: string,
+  name:string
+}
+
+class App extends React.Component<Props, State>{
+  public state : State = {usercontext : App.user()}
+
+  constructor(props: Props){
     super(props);
-    this.state = {usercontext : App.user()}
   }
 
   static user(){
     return window.sessionStorage.user_context ? JSON.parse(window.sessionStorage.user_context) : null;
   }
 
-  static cacheMyBooks(myBooks){
+  static cacheMyBooks(myBooks: number[]){
     let u = JSON.parse(window.sessionStorage.user_context);
     if(!u.user_metadata.arbitrage){
       u.user_metadata.arbitrage = {};
@@ -32,9 +50,9 @@ class App extends Component{
     window.sessionStorage.setItem('user_context', JSON.stringify(u));
   }
 
-  static userHasRoleFromCache(role){
+  static userHasRoleFromCache(role: string){
     if(App.user() && App.user().roles){
-      return App.user().roles.filter( r => r.name === role).length > 0;
+      return App.user().roles.filter( (r:any) => r.name === role).length > 0;
     }else{
       return false;
     }
@@ -49,20 +67,20 @@ class App extends Component{
     this.setState({usercontext: null})
   }
 
-  cacheUser(u){
+  cacheUser(u: any){
     window.sessionStorage.setItem('user_context', JSON.stringify(u));
     this.setState({usercontext: App.user()})
   }
 
-  updateMyRoles(roles){
+  updateMyRoles(roles: Role[]){
     let u = this.state.usercontext;
     u.roles = roles;
     this.cacheUser(u);
   }
 
-  userHasRole(role){
+  userHasRole(role: string){
     if(this.state.usercontext && this.state.usercontext.roles){
-      return this.state.usercontext.roles.filter( r => r.name === role).length > 0;
+      return this.state.usercontext.roles.filter( (r:Role) => r.name === role).length > 0;
     }else{
       return false;
     }

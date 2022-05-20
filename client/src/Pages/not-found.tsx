@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 
-class NotFoundPage extends Component{
+type Props = {
 
-	constructor(props){
+}
+
+type State = {
+	title: string
+}
+
+class NotFoundPage extends Component<Props, State>{
+
+	constructor(props: Props){
 		super(props);
 		this.state = {title: 'Page Not Found'};
 	}

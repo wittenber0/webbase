@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import PageBlock from '../components/page-block';
 
-class MyProfilePage extends Component{
+type Props = {
 
-	constructor(props){
+}
+
+type State = {
+	title: string
+}
+
+class MyProfilePage extends Component<Props, State>{
+
+	constructor(props: Props){
 		super(props);
 		this.state = {title: 'Profile'};
 	}
