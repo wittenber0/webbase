@@ -13,7 +13,7 @@ export default class BettingEvent{
     public EventDate: Date;
 
     constructor(LeagueName: string, Sport: SportEnum, EventParticipants: Participant[], GameId: string, EventDate: Date){
-        this.LeagueName = LeagueName;
+        this.LeagueName = LeagueName.toLowerCase();
         this.Sport = Sport;
         this.EventParticipants = EventParticipants;
         this.GameId = GameId;

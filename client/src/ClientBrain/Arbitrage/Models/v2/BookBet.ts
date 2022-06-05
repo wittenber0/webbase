@@ -9,6 +9,8 @@ import { PlayerPropTypeEnum } from "./enum/PlayerPropTypeEnum";
 
 export default class BookBet {
     public GameId: string;
+    public SportsBookGameId: string;
+    public SportsBookThirdPartyGameId: string;
     public BetType: BetTypeEnum;
     public PlayerPropType: PlayerPropTypeEnum;
     public BetDuration: BetDuration;
@@ -18,7 +20,10 @@ export default class BookBet {
     public JoinLabel: string;
     public Book: Book;
 
+
     constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], date:Date, book:Book){
+        this.SportsBookGameId = '';
+        this.SportsBookThirdPartyGameId = '';
         this.GameId = gameId;
         this.BetType = betType
         this.PlayerPropType = playerPropType;
@@ -61,7 +66,7 @@ export default class BookBet {
             new Date(2022,4, 16), 
             book
         )
-
+//[participant1], 
         let bookBetHeadToHeadTimWinsBrandon = new BookBet(
             '234', 
             BetTypeEnum.PlayerProp, 
@@ -73,8 +78,8 @@ export default class BookBet {
             new Date(2022,4, 16), 
             book
         )
-        
-        let bookBetHeadToHeadBrandonWinsTim = new BookBet(
+        //        [participant2, participant3], 
+            let bookBetHeadToHeadBrandonWinsTim = new BookBet(
             '234', 
             BetTypeEnum.PlayerProp, 
             PlayerPropTypeEnum.MostTotalBases, 
@@ -86,7 +91,7 @@ export default class BookBet {
             book
         )
     }
-
+//[participant3, participant2], 
     public GenerateJoinLabel(gameDateString: string):string{
         let playerPropLabel = this.PlayerPropType != PlayerPropTypeEnum.NonApplicable ? `${this.PlayerPropType.toString()}|` : '';  
         let participantsLabel = this.BetParticipants.map(p => p.Name).join('|');

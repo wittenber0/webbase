@@ -11,4 +11,5 @@ export default class BookEvent {
         this.BookBets = BookBets;
         this.BettingEvent = bettingEvent;
     }
+    
 }

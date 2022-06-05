@@ -17,7 +17,7 @@ class BookManager {
     this.allBooks = [];
     this.selectedBooks = [];
     this.isLoaded = false;
-    if(App.user().user_metadata.arbitrage && App.user().user_metadata.arbitrage.myBooks){
+    if(App.user() && App.user().user_metadata && App.user().user_metadata.arbitrage && App.user().user_metadata.arbitrage.myBooks){
       this.selectedBookIds = App.user().user_metadata.arbitrage.myBooks;
     } else {
       this.selectedBookIds = defaultSelectedBookIds;
@@ -71,7 +71,7 @@ class BookManager {
     if(b){
       return b;
     }else{
-      return new Book(0, 'Unknown Book')
+      return new Book(0, 'Unknown Book', 'book logo')
     }
   }
 

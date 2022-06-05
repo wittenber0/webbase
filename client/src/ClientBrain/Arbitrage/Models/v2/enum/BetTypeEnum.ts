@@ -6,5 +6,6 @@ export enum BetTypeEnum {
     TeamTotal,
     TeamTotalHome,
     TeamTotalAway,
+    TotalLine,
     All
 }

@@ -22,6 +22,7 @@ export default class BetChoice{
 
     Choices: BetChoiceFactors[];
     PinnacleOdds?: BetFactor[];
+    BetOnlineOdds?: BetFactor[];
     RealOdds?: FactorTypeSummary[];
     Evs?: FactorTypeSummary[];
     HouseLine?: number;

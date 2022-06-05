@@ -64,7 +64,7 @@ class BetChoiceManager {
     this.AllBets = [];
     let bookGameTrees = [
       this.loadActionNetworkGameTree(),
-      //this.loadBetOnlineGameTree(),
+      this.loadBetOnlineGameTree(),
       this.loadPinnacleGameTree()
     ]
     return await Promise.all(bookGameTrees).then( trees => {
