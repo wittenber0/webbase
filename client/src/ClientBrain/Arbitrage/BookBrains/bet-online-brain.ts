@@ -40,7 +40,7 @@ export default class BetOnlineBrain {
                             let gameId = this.getGameId(game, dateGrouping.GameDate, leagueGroup.League.toLowerCase());
                             let gameDateString = dateGrouping.GameDate + " " + timeGrouping.GameTime;
                            
-                            debugger;
+                            //debugger;
                             //dategrouping.gamedate
                             //timegrouping.gametime
                             //order here matters

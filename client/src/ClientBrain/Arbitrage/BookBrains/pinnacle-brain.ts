@@ -1,3 +1,4 @@
+
 import ArbitrageService from '../../../Shared/arbitrage-service';
 import BookManager from '../book-manager';
 import BetFactor from '../Models/v2/BetFactor';
@@ -16,22 +17,27 @@ import Participant from '../Models/v2/Participant';
 export default class PinnacleBrain {
   matchups:any;
   markets:any;
+  bookEvents:BookEvent[];
 
   constructor(){
     this.matchups = [];
     this.markets = [];
-
+    this.bookEvents = [];
   }
   async loadSport(sportId:number){
     let reqs = [
       ArbitrageService.getPinnacleMarkets(sportId),
       ArbitrageService.getPinnacleMatchUps(sportId)
     ]
-    return await Promise.all(reqs).then((values)=>{
+    return await Promise.all(reqs).then( async (values)=>{
       let matchups = values[1];
       let markets = values[0];
       let bookEvents: BookEvent[] = [];
       let marketArray:any = {};
+
+      //matchups = [matchups.find((m:any)=>m.id === 1552304201)];
+
+      let specialBookBets = await this.getSpecialBookBets(matchups, sportId);
 
       markets.forEach( (market:any) => {
         if(market.matchupId.toString() && Object.keys(marketArray).includes(market.matchupId.toString())){
@@ -41,7 +47,7 @@ export default class PinnacleBrain {
         }
       })
 
-      matchups.forEach( (matchup:any) => {
+      bookEvents = await Promise.all(matchups.map(async (matchup:any) => {
         let homeName = matchup.participants.find((p:any) => p.alignment === 'home').name;
         let awayName = matchup.participants.find((p:any) => p.alignment === 'away').name;
         let participants:Participant[] = [];
@@ -51,7 +57,7 @@ export default class PinnacleBrain {
         participants.push(new Participant('home', homeName));
         participants.push(new Participant('away', awayName));
         
-        if(marketArray[matchup.id] && !matchup.isLive){
+        if(marketArray[matchup.id] && !matchup.isLive && matchup.status !== 'started'){
 
           let bettingEvent = new BettingEvent(
             matchup.league.name.toLowerCase(),
@@ -60,22 +66,165 @@ export default class PinnacleBrain {
             gameId,
             new Date(matchup.startTime)
           );
-
-          bookEvents.push(new BookEvent(
-            this.createOdds(marketArray[matchup.id], gameId, matchup.startTime, participants),
+          
+          
+          let mySpecialBookBets:any = specialBookBets.find((sbb:any) => sbb[0] && sbb[0].GameId === gameId);
+          return (new BookEvent(
+            mySpecialBookBets,
             bettingEvent
           ));
+          
+        }
+      }));
+      return bookEvents.filter((bev:BookEvent) => bev);
+    });
+  }
+
+  async getSpecialBookBets(matchups:any, sportId:number){
+
+    return await Promise.all(matchups.map((matchup:any)=>{
+      let homeName = matchup.participants.find((p:any) => p.alignment === 'home').name;
+      let awayName = matchup.participants.find((p:any) => p.alignment === 'away').name;
+      let participants:Participant[] = [];
+      let gameId = this.getGameId(matchup.league.name.toLowerCase(), homeName, awayName, matchup.startTime);
+
+      //order here matters
+      participants.push(new Participant('home', homeName));
+      participants.push(new Participant('away', awayName));
+
+      let bettingEvent = new BettingEvent(
+        matchup.league.name.toLowerCase(),
+        this.getSportEnumFromPinnacleSportId(sportId),
+        participants,
+        gameId,
+        new Date(matchup.startTime)
+      );
+      
+      return this.getMatchupDetails(matchup.id, bettingEvent);
+    }));
+  }
+
+  async getMatchupDetails(gameId:any, bettingEvent:BettingEvent){
+    let bookBets:BookBet[] = [];
+    let reqs = [ArbitrageService.getPinnacleLinesByGame(gameId),
+      ArbitrageService.getPinnacleRelatedByGame(gameId)];
+
+    return await Promise.all(reqs).then(values => {
+      let lines = values[0];
+      let related = values[1];
+      if(related && related.length > 0){
+        related = related.filter((r:any)=>r.status!=='started');
+
+        if(lines){
+          lines.forEach( (l:any) => {
+            
+            let rel = related.find((r:any) => r.id === l.matchupId);
+  
+            if(rel){
+              let participants:Participant[] = this.getBookBetParticipants(rel, l);
+              let betFactors:BetFactor[] = this.getBookBetFactors(rel,l);
+  
+              let startTime = new Date(rel.startTime)
+              let betLine = 0;
+              let book = BookManager.getInstance().getBookById(1003);
+  
+              if(l.prices && l.prices[0] && l.prices[0].points){
+                betLine = l.prices[0].points;
+              }else{
+                this.getFromKey(l.key, 'Line');
+              }
+
+              if(betFactors){
+                let bb = new BookBet(
+                  bettingEvent.GameId,
+                  this.getFromKey(l.key, 'BetType'),
+                  this.getPPType(rel.units),
+                  this.getFromKey(l.key, 'Period'),
+                  betLine,
+                  betFactors,
+                  participants,
+                  startTime,
+                  book,
+                  {line: l, related: rel}
+                );
+    
+                bookBets.push(bb);
+              }
+            }
+          });
+        }
+      }
+      return bookBets;
+    });
+  }
+
+  getBookBetParticipants(rel:any, line:any){
+    let participants:Participant[] = [];
+    if(rel.participants){
+      rel.participants.forEach((p:any) => {
+        if(rel.special){
+          if(!participants.find((pa:any)=>pa.Name === rel.special.description)){
+            participants.push(new Participant(p.name, rel.special.description));
+          }
+        }else if(p.id){
+          if(!participants.find((pa:any)=>pa.Name === p.name)){
+            participants.push(new Participant(p.id, p.name));
+          }
+        }else if(this.getFromKey(line.key, 'BetType') === BetTypeEnum.TeamTotalHome){
+          if(p.alignment === 'home'){
+            participants.push(new Participant('home', p.name))
+          }
+        }else if(this.getFromKey(line.key, 'BetType') === BetTypeEnum.TeamTotalAway){
+          if(p.alignment === 'away'){
+            participants.push(new Participant('away', p.name))
+          }
+        }else{
+          if(!participants.find((pa:any)=>pa.Name === p.name)){
+            participants.push(new Participant(p.alignment, p.name));
+          }
         }
       });
-      return bookEvents;
+      
+    }else{
+      console.log('no participants');
+      console.log(rel);
+    }
+    return participants;
+  }
+
+  getBookBetFactors(rel:any, l:any){
+    let book = BookManager.getInstance().getBookById(1003);
+    let betFactors:BetFactor[] = [];
+    l.prices.forEach((lineP:any) => {
+      let participant = rel.participants.find((relP:any) => {
+        if(lineP.participantId){
+          return relP.id === lineP.participantId;
+        }
+      });
+
+      let participantName:any;
+      let factor = new Factor(this.getDecimialFromAmerican(lineP.price), lineP.price, book)
+      if(participant){
+        participantName = participant.name;
+      }else{
+        participantName = lineP.designation
+      }
+
+      let bf = new BetFactor(this.getBetFactorType(participantName), factor)
+      if(bf.Label !== BetFactorTypeEnum.NonApplicable){
+        betFactors.push(bf);
+      }
+      
     });
+
+    return betFactors;
   }
 
   async getGameTree(){
     let allBookEvents:BookEvent[] = [];
     let sportCalls = [
       this.loadSport(3),
-      this.loadSport(4)
+      //this.loadSport(4)
     ];
     return await Promise.all(sportCalls).then( sportTrees => {
       sportTrees.forEach( st => {
@@ -233,4 +382,215 @@ export default class PinnacleBrain {
 		}
 		return f;
 	}
+
+  getFromKey(key:string, label: string){
+    let keys = key.split(';')
+
+    if(label === 'BetType'){
+      let k = keys[2];
+      if(k === 'ou'){
+        return BetTypeEnum.OverUnder
+      } else if(k === 's'){
+        return BetTypeEnum.Spread
+      } else if(k === 'tt'){
+        let k2 = keys[4];
+        if(k2 === 'away'){
+          return BetTypeEnum.TeamTotalAway
+        }else {
+          return BetTypeEnum.TeamTotalHome
+        }
+      } else if(k === 'm'){
+        return BetTypeEnum.MoneyLine
+      } else{
+        return BetTypeEnum.All
+      }
+    }
+
+    if(label === 'Line'){
+      if(keys.length >=4){
+        let k = keys[3];
+        return parseFloat(k);
+      }else {
+        return 0;
+      }
+      
+    }
+
+    if(label === 'Period'){
+      let k = keys[1];
+      return parseInt(k);
+    } else {
+      return 0
+    }
+    
+  }
+  
+  getPPType(t: string){
+    if(t == 'TotalBases'){
+      return PlayerPropTypeEnum.TotalBases;
+    }
+    if(t === 'HomeRuns'){
+      return PlayerPropTypeEnum.HomeRuns;
+    }
+    if(t === 'Hits + Runs + Errors'){
+      return PlayerPropTypeEnum.HitsRunsErrors
+    }
+    if(t === 'Strikeouts'){
+      return PlayerPropTypeEnum.Strikeouts
+    }
+    if(t === 'Hits'){
+      return PlayerPropTypeEnum.Hits
+    }
+    if(t === 'EarnedRuns'){
+      return PlayerPropTypeEnum.EarnedRuns
+    }
+
+    return PlayerPropTypeEnum.NonApplicable;
+  }
+
+  getBetFactorType(t: string){
+    if(t === 'home'){
+      return BetFactorTypeEnum.Home
+    }
+    if(t === 'away'){
+      return BetFactorTypeEnum.Away
+    }
+    if(t === 'over'){
+      return BetFactorTypeEnum.Over
+    }
+    if(t === 'under'){
+      return BetFactorTypeEnum.Under
+    }
+    if(t === 'Odd'){
+      return BetFactorTypeEnum.Odd
+    }
+    if(t === 'Even'){
+      return BetFactorTypeEnum.Even
+    }
+    if(t === '0'){
+      return BetFactorTypeEnum.Zero
+    }
+    if(t === '1'){
+      return BetFactorTypeEnum.One
+    }
+    if(t === '2'){
+      return BetFactorTypeEnum.Two
+    }
+    if(t === '3'){
+      return BetFactorTypeEnum.Three
+    }
+    if(t === '4'){
+      return BetFactorTypeEnum.Four
+    }
+    if(t === '5'){
+      return BetFactorTypeEnum.Five
+    }
+    if(t === '6'){
+      return BetFactorTypeEnum.Six
+    }
+    if(t === '7'){
+      return BetFactorTypeEnum.Seven
+    }
+    if(t === '8'){
+      return BetFactorTypeEnum.Eight
+    }
+    if(t === '9'){
+      return BetFactorTypeEnum.Nine
+    }
+    if(t === '10'){
+      return BetFactorTypeEnum.Ten
+    }
+    if(t === '11'){
+      return BetFactorTypeEnum.Eleven
+    }
+    if(t === '12'){
+      return BetFactorTypeEnum.Twelve
+    }
+    if(t === '13'){
+      return BetFactorTypeEnum.Thirteen
+    }
+    if(t === '14'){
+      return BetFactorTypeEnum.Fourteen
+    }
+    if(t === '15'){
+      return BetFactorTypeEnum.Fifteen
+    }
+    if(t === '16'){
+      return BetFactorTypeEnum.Sixteen
+    }
+    if(t === '17'){
+      return BetFactorTypeEnum.Seventeen
+    }
+    if(t === '18'){
+      return BetFactorTypeEnum.Eightteen
+    }
+    if(t === '19'){
+      return BetFactorTypeEnum.Nineteen
+    }
+    if(t === '20'){
+      return BetFactorTypeEnum.Twenty
+    }
+    if(t === '1+'){
+      return BetFactorTypeEnum.OnePlus
+    }
+    if(t === '2+'){
+      return BetFactorTypeEnum.TwoPlus
+    }
+    if(t === '3+'){
+      return BetFactorTypeEnum.ThreePlus
+    }
+    if(t === '4+'){
+      return BetFactorTypeEnum.FourPlus
+    }
+    if(t === '5+'){
+      return BetFactorTypeEnum.FivePlus
+    }
+    if(t === '6+'){
+      return BetFactorTypeEnum.SixPlus
+    }
+    if(t === '7+'){
+      return BetFactorTypeEnum.SevenPlus
+    }
+    if(t === '8+'){
+      return BetFactorTypeEnum.EightPlus
+    }
+    if(t === '9+'){
+      return BetFactorTypeEnum.NinePlus
+    }
+    if(t === '10+'){
+      return BetFactorTypeEnum.TenPlus
+    }
+    if(t === '11+'){
+      return BetFactorTypeEnum.ElevenPlus
+    }
+    if(t === '12+'){
+      return BetFactorTypeEnum.TwelvePlus
+    }
+    if(t === '13+'){
+      return BetFactorTypeEnum.ThirteenPlus
+    }
+    if(t === '14+'){
+      return BetFactorTypeEnum.FourteenPlus
+    }
+    if(t === '15+'){
+      return BetFactorTypeEnum.FifteenPlus
+    }
+    if(t === '16+'){
+      return BetFactorTypeEnum.SixteenPlus
+    }
+    if(t === '17+'){
+      return BetFactorTypeEnum.SeventeenPlus
+    }
+    if(t === '18+'){
+      return BetFactorTypeEnum.EightteenPlus
+    }
+    if(t === '19+'){
+      return BetFactorTypeEnum.NineteenPlus
+    }
+    if(t === '20+'){
+      return BetFactorTypeEnum.TwentyPlus
+    }
+
+    return BetFactorTypeEnum.NonApplicable
+  }
 }

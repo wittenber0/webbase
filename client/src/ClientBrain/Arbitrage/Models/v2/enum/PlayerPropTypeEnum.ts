@@ -4,5 +4,9 @@ export enum PlayerPropTypeEnum {
     MostStrikeouts,
     TotalBases,
     Strikeouts,
-    Assists
+    Assists,
+    HomeRuns,
+    HitsRunsErrors,
+    Hits,
+    EarnedRuns
 }

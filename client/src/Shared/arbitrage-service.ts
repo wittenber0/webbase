@@ -3,13 +3,14 @@ import Book from '../ClientBrain/Arbitrage/Models/v2/Book';
 import UtilityService from './utility-service';
 const fetch = require('node-fetch');
 
-//arbitrage
+//actionnetwork
 const bookListUrl = 'https://api.actionnetwork.com/web/v1/books';
 const oddsUrl = 'https://api.actionnetwork.com/web/v1/scoreboard/all?bookIds=';
 const actionLabsBookOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/';
 const actionLabsPlayers = 'https://d3ttxfuywgi7br.cloudfront.net/players/projections/all/actionnetwork/default.json'
 const actionLabsPropEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=66baf522-6536-496c-bcd1-3405d15b434c'
 const actionLabsMarketEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=d7ffcc85-db0a-4d62-b94a-8fedb88a2c39'
+const actionLabsPropOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/'
 
 //betOnline
 const betOnlineOdds = 'https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games'
@@ -19,7 +20,7 @@ const pinnacleMatchUps = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
 const pinnacleSports = 'https://guest.api.arcadia.pinnacle.com/0.1/sports'
 const pinnacleMarkets = 'https://guest.api.arcadia.pinnacle.com/0.1/sports/'
 const pinnacleGameDetails = 'https://guest.api.arcadia.pinnacle.com/0.1/matchups/1551220294/related'
-const pinnacleGameLines = 'https://guest.api.arcadia.pinnacle.com/0.1/matchups/1551220294/markets/related/straight'
+const pinnacleGameLines = 'https://guest.api.arcadia.pinnacle.com/0.1/matchups/'
 
 class ArbitrageService{
 
@@ -52,6 +53,10 @@ class ArbitrageService{
 
   static getActionLabsMarketEvents = async function(){
     return UtilityService.get(actionLabsMarketEvents);
+  }
+
+  static getActionLabsPropOdds = async function(bookId:number){
+    return UtilityService.get(actionLabsPropOdds + bookId + '/default.json');
   }
 
   static getPinnacleMatchUps = async function(sportId: number){
@@ -103,6 +108,53 @@ class ArbitrageService{
       "credentials": "omit"
     }
     return UtilityService.get(pinnacleMarkets + sportId + '/markets/straight?primaryOnly=false&withSpecials=false', options);
+  }
+
+  static getPinnacleLinesByGame(matchupId: string){
+    let options = {
+      "headers": {
+        "accept": "application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json",
+        "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Google Chrome\";v=\"100\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-api-key": "CmX2KcMrXuFmNg6YFbmTxE0y9CIrOi0R",
+        "x-device-uuid": "656702a7-a7b9090b-8f7ee794-dfbd59e9",
+        "Referer": "https://www.pinnacle.com/",
+      },
+      "body": null,
+      "method": "GET"
+    }
+    return UtilityService.get(pinnacleGameLines+matchupId+'/markets/related/straight', options);
+  }
+
+  static getPinnacleRelatedByGame(matchupId: string){
+    let options = {
+      "headers": {
+        "accept": "application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "content-type": "application/json",
+        "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"100\", \"Google Chrome\";v=\"100\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"macOS\"",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "x-api-key": "CmX2KcMrXuFmNg6YFbmTxE0y9CIrOi0R",
+        "x-device-uuid": "656702a7-a7b9090b-8f7ee794-dfbd59e9"
+      },
+      "referrer": "https://www.pinnacle.com/",
+      "referrerPolicy": "strict-origin-when-cross-origin",
+      "body": null,
+      "method": "GET",
+      "mode": "cors",
+      "credentials": "omit"
+    }
+    return UtilityService.get('https://guest.api.arcadia.pinnacle.com/0.1/matchups/'+matchupId+ '/related', options);
   }
 
   static getBetOnlineOdds = async function(sport: string){

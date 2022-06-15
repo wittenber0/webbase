@@ -23,7 +23,7 @@ export default class ActionNetworkBrain {
   async getGameTree(){
     let d = new Date();
     let bm = BookManager.getInstance();
-
+    this.getAllPlayerPropBookBets();
 		return await ArbitrageService.getAllOddsForDate(d, bm.getSelectedBookIds()).then((r)=>{
 		    r["all_games"].forEach( (league:any) => {
           league['games'].forEach( (game:any) => {
@@ -237,5 +237,104 @@ export default class ActionNetworkBrain {
       return BetDuration.FourthPeriod;
     }
     
+  }
+
+  getAllPlayerPropBookBets(){
+    let reqs = [ArbitrageService.getActionLabsPlayers(), ArbitrageService.getActionLabsPropEvents()]
+
+    BookManager.getInstance().getSelectedBookIds().filter(b=>b<1000).forEach(b => {
+      reqs.push(ArbitrageService.getActionLabsPropOdds(b));
+    });
+
+    return Promise.all(reqs).then((values:any)=> {
+      let events:any;
+      let players:any;
+      values.forEach((v:any, i:number) => {
+        console.log(v);
+        if(i === 0){
+          players = v;
+        }else if(i === 1){
+          events = v.events;
+        }else{
+          this.getPPBets(v, events, players)
+        }
+      })
+    });
+  }
+
+  getPPBets(bets:any, events:any, players:any){
+    console.log('getppbets');
+    console.log(players);
+    console.log(events);
+    console.log(bets);
+    if(bets){
+      bets.forEach((b:any) => {
+        //let gameEvent = events.find((e:any)=>e.event_id === b.eventId);
+        let betLine:number;
+        //let bettingEvent:BettingEvent = this.getPPBettingEvent(gameEvent);
+        if(b.eventId === 5303020){
+          Object.keys(events).forEach(e => {
+            if(e === '5303020'){
+              let ev = events[e];
+              let ps = Object.keys(players).filter(p=>p.includes(b.eventId));
+              //console.log('my event');
+              //console.log([ev,ps, b]);
+            }
+          })
+        }
+  
+        Object.keys(b.lines).forEach((lineKey:any) => {
+          let line = b.lines[lineKey];
+          let participantId:any;
+          let pickType:any;
+  
+          betLine = line.line;
+
+
+
+          
+  
+          if(b.eventId){
+            if(lineKey.indexOf(':') >= 0){
+              let lkArray = lineKey.split(':');
+              let playerKey = lkArray[0] + '|'+b.eventId;
+              b.player = players[playerKey];
+              if(b.player){
+                console.log(b);
+              }
+            }
+            
+          }
+  
+          if(lineKey.includes(':')){
+            let lkArray = lineKey.split(':');
+            participantId = lkArray[0];
+            pickType = lkArray[1];
+          }else{
+            pickType = lineKey;
+            //this is a pick for an event but not a player i believe... no player id
+          }
+        });
+  
+        /*let bb = new BookBet(
+          bettingEvent.GameId,
+          this.getFromKey(l.key, 'BetType'),
+          this.getPPType(rel.units),
+          this.getFromKey(l.key, 'Period'),
+          betLine,
+          betFactors,
+          participants,
+          startTime,
+          book,
+          {line: l, related: rel}
+        );*/
+      })
+    }
+  }
+
+  getPPBettingEvent(gameEvent:any){
+    let e:BettingEvent;
+
+    //return e;
   }
 }

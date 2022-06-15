@@ -37,8 +37,9 @@ app.get('/usercontext', (req, res) => {
       u.roles = roles;
       res.send(u);
     });
-  }).catch(()=>{
+  }).catch((e)=>{
     console.log('failed somewhere in here')
+    console.log(e);
     res.send({});
   });
 });

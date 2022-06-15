@@ -238,7 +238,7 @@ class ArbitragePage extends Component<Props, State>{
 							<Grid item xs={1}>
 								<Item>EV</Item>
 							</Grid>
-							<Grid item xs={1}>
+							<Grid item xs={2}>
 								<Item>Pick</Item>
 							</Grid>
 							{this.state.myBooks.map((b) => {

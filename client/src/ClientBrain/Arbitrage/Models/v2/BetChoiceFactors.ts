@@ -4,10 +4,10 @@ import Factor from "./Factor";
 
 
 export default class BetChoiceFactors{
-    public Label: BetFactorTypeEnum;
+    public Label: any;
     public Factors: Factor[];
 
-    constructor(label:BetFactorTypeEnum, factors:Factor[]){
+    constructor(label:any, factors:Factor[]){
         this.Label = label;
         this.Factors = factors;
     }

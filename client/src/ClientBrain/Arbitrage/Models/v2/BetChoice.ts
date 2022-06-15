@@ -27,6 +27,7 @@ export default class BetChoice{
     Evs?: FactorTypeSummary[];
     HouseLine?: number;
     BestEV?: number;
+    debug:BookBet[];
 
     constructor(bettingEvent: BettingEvent, betChoiceId:string, betParticipants: Participant[], betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number){
         this.BettingEvent = bettingEvent;
@@ -38,5 +39,6 @@ export default class BetChoice{
         this.Line = line;
         
         this.Choices = [];
+        this.debug = [];
     }
 }

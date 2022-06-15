@@ -25,7 +25,7 @@ const Item = styled(Paper)(({ theme }: any) => ({
   justifyContent: 'center',
   verticalAlign: 'middle',
   color: '#aaaaaa',
-  height: '50px'
+  flexGrow: 1
 }));
 
 const TeamItem = styled(Paper)(({ theme }: any) => ({
@@ -35,7 +35,7 @@ const TeamItem = styled(Paper)(({ theme }: any) => ({
   paddingLeft: theme.spacing(2),
   textAlign: 'left',
   color: 'white',
-  height: '50px'
+  flexGrow: 1
 }));
 
 function getEVLabel(betChoice: BetChoice, evSummary: FactorTypeSummary){
@@ -83,25 +83,30 @@ type Props = {
 export default function GameCard(props: Props){
   return(
     <Grid container spacing={1} sx={{mt:0.1}}>
-      <Grid item xs={2.5}>
+      <Grid sx={{display: 'flex'}} item xs={2.5}>
         <TeamItem>
-          <Typography>{props.betChoice.BetParticipants.find(p => p.Id === 'home')?.Name}</Typography>
-          <Typography>{props.betChoice.BetParticipants.find(p => p.Id === 'away')?.Name}</Typography>
+          <Typography>{props.betChoice.BettingEvent.LeagueName}</Typography>
+          {props.betChoice.BettingEvent.EventParticipants.map((p, i) => {
+            return <Typography key={i}>{p.Name}</Typography>
+          })}
+          {props.betChoice.BetParticipants.map((p, i) => {
+            return <Typography key={i}>{p.Name}</Typography>
+          })}
         </TeamItem>
       </Grid>
-      <Grid item xs={1.5}>
+      <Grid sx={{display: 'flex'}} item xs={1.5}>
         <Item>
           <Typography variant='subtitle2'>{BetTypeEnum[props.betChoice.BetType]}: {props.betChoice.Line}</Typography>
           <Typography variant='subtitle2'>v: {BetDuration[props.betChoice.BetDuration]}</Typography>
           
         </Item>
       </Grid>
-      <Grid item xs={1}>
+      <Grid sx={{display: 'flex'}} item xs={1}>
         <Item>
           <Typography>{getNetEV(props.betChoice.HouseLine)}%</Typography>
         </Item>
       </Grid>
-      <Grid item xs={1}>
+      <Grid sx={{display: 'flex'}} item xs={1}>
         {props.betChoice.Evs ? 
           <Item>
           {props.betChoice.Evs.map((evLabel) => {
@@ -115,7 +120,7 @@ export default function GameCard(props: Props){
         }
         
       </Grid>
-      <Grid item xs={1}>
+      <Grid sx={{display: 'flex'}} item xs={2}>
         <Item>
           {props.betChoice.Choices.map((c, i) => {
             return <Typography key={i}>{BetFactorTypeEnum[c.Label]}</Typography>
@@ -124,7 +129,7 @@ export default function GameCard(props: Props){
       </Grid>
       {props.myBooks.map((b: Book) => {
         return(
-          <Grid item xs key={b.BookId}>
+          <Grid sx={{display: 'flex'}} item xs key={b.BookId}>
             <Item>
               {props.betChoice.Choices.map((c, i) => {
                 return getFactorLabelByBook(c.Factors, b.BookId, true, i)

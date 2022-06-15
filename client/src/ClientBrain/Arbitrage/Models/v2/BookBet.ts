@@ -19,11 +19,9 @@ export default class BookBet {
     public BetParticipants: Participant[];
     public JoinLabel: string;
     public Book: Book;
+    public debug?:any;
 
-
-    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], date:Date, book:Book){
-        this.SportsBookGameId = '';
-        this.SportsBookThirdPartyGameId = '';
+    constructor(gameId:string, betType: BetTypeEnum, playerPropType: PlayerPropTypeEnum, betDuration: BetDuration, line: number, betFactors: BetFactor[], betParticipants: Participant[], date:Date, book:Book, debug?:any){
         this.GameId = gameId;
         this.BetType = betType
         this.PlayerPropType = playerPropType;
@@ -33,6 +31,9 @@ export default class BookBet {
         this.BetParticipants = betParticipants;
         this.JoinLabel = this.GenerateJoinLabel(this.getDateString(date));
         this.Book = book;
+        this.debug = debug;
+        this.SportsBookGameId = '';
+        this.SportsBookThirdPartyGameId = '';
     }
 
     public GenerateExampleModels(){
@@ -93,9 +94,8 @@ export default class BookBet {
     }
 //[participant3, participant2], 
     public GenerateJoinLabel(gameDateString: string):string{
-        let playerPropLabel = this.PlayerPropType != PlayerPropTypeEnum.NonApplicable ? `${this.PlayerPropType.toString()}|` : '';  
         let participantsLabel = this.BetParticipants.map(p => p.Name).join('|');
-        let joinLabel = `${BetTypeEnum[this.BetType]}|${playerPropLabel}${BetDuration[this.BetDuration]}|${participantsLabel}|${this.Line}|${gameDateString}`;
+        let joinLabel = `${BetTypeEnum[this.BetType]}|${PlayerPropTypeEnum[this.PlayerPropType]}|${BetDuration[this.BetDuration]}|${participantsLabel}|${this.Line}|${gameDateString}`;
          
         return joinLabel;
     }

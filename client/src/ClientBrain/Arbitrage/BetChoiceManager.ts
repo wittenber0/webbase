@@ -9,6 +9,7 @@ import BetFactor from './Models/v2/BetFactor';
 import BetChoiceFactors from './Models/v2/BetChoiceFactors';
 import Factor from './Models/v2/Factor';
 import FactorTypeSummary from './Models/v2/FactorTypeSummary';
+import { RadioButtonUncheckedTwoTone } from '@material-ui/icons';
 
 class BetChoiceManager {
   private static Instance?: BetChoiceManager;
@@ -63,8 +64,8 @@ class BetChoiceManager {
     this.AllEvents = [];
     this.AllBets = [];
     let bookGameTrees = [
-      this.loadActionNetworkGameTree(),
-      this.loadBetOnlineGameTree(),
+      //this.loadActionNetworkGameTree(),
+      //this.loadBetOnlineGameTree(),
       this.loadPinnacleGameTree()
     ]
     return await Promise.all(bookGameTrees).then( trees => {
@@ -86,7 +87,7 @@ class BetChoiceManager {
   }
 
   loadChoicesForBetChoice(bookBet: BookBet, bookEvent: BookEvent){
-    let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel);
+    let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel && b.BettingEvent.GameId === bookBet.GameId);
     if(existingBetChoice !== undefined){
       bookBet.BetFactors.forEach(bf => {
         let bcf = existingBetChoice?.Choices.find(c => c.Label === bf.Label);
@@ -98,7 +99,8 @@ class BetChoiceManager {
             [bf.Factor]
           ))
         }
-      })
+      });
+      existingBetChoice.debug.push(bookBet);
     } else {
       let newBetChoice = new BetChoice(
         bookEvent.BettingEvent, bookBet.JoinLabel, bookBet.BetParticipants, bookBet.BetType, bookBet.PlayerPropType, bookBet.BetDuration, bookBet.Line
@@ -109,12 +111,13 @@ class BetChoiceManager {
           [bf.Factor]
         ))
       })
+      newBetChoice.debug.push(bookBet);
       this.AllBets.push(newBetChoice);
     }
   }
 
   loadPinnacleOddsForBetChoice(bookBet: BookBet, bookEvent: BookEvent){
-    let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel);
+    let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel && b.BettingEvent.GameId === bookBet.GameId);
     if(existingBetChoice === undefined){
       let newBetChoice = new BetChoice(
         bookEvent.BettingEvent, bookBet.JoinLabel, bookBet.BetParticipants, bookBet.BetType, bookBet.PlayerPropType, bookBet.BetDuration, bookBet.Line
