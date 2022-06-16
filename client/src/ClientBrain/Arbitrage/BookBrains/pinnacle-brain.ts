@@ -211,6 +211,9 @@ export default class PinnacleBrain {
       }
 
       let bf = new BetFactor(this.getBetFactorType(participantName), factor)
+      if(bf.Label === BetFactorTypeEnum.NumberRange){
+        bf.LabelDetail = participantName;
+      }
       if(bf.Label !== BetFactorTypeEnum.NonApplicable){
         betFactors.push(bf);
       }
@@ -467,130 +470,15 @@ export default class PinnacleBrain {
     if(t === 'Even'){
       return BetFactorTypeEnum.Even
     }
-    if(t === '0'){
-      return BetFactorTypeEnum.Zero
+    if(this.hasNumber(t)){
+      return BetFactorTypeEnum.NumberRange
     }
-    if(t === '1'){
-      return BetFactorTypeEnum.One
-    }
-    if(t === '2'){
-      return BetFactorTypeEnum.Two
-    }
-    if(t === '3'){
-      return BetFactorTypeEnum.Three
-    }
-    if(t === '4'){
-      return BetFactorTypeEnum.Four
-    }
-    if(t === '5'){
-      return BetFactorTypeEnum.Five
-    }
-    if(t === '6'){
-      return BetFactorTypeEnum.Six
-    }
-    if(t === '7'){
-      return BetFactorTypeEnum.Seven
-    }
-    if(t === '8'){
-      return BetFactorTypeEnum.Eight
-    }
-    if(t === '9'){
-      return BetFactorTypeEnum.Nine
-    }
-    if(t === '10'){
-      return BetFactorTypeEnum.Ten
-    }
-    if(t === '11'){
-      return BetFactorTypeEnum.Eleven
-    }
-    if(t === '12'){
-      return BetFactorTypeEnum.Twelve
-    }
-    if(t === '13'){
-      return BetFactorTypeEnum.Thirteen
-    }
-    if(t === '14'){
-      return BetFactorTypeEnum.Fourteen
-    }
-    if(t === '15'){
-      return BetFactorTypeEnum.Fifteen
-    }
-    if(t === '16'){
-      return BetFactorTypeEnum.Sixteen
-    }
-    if(t === '17'){
-      return BetFactorTypeEnum.Seventeen
-    }
-    if(t === '18'){
-      return BetFactorTypeEnum.Eightteen
-    }
-    if(t === '19'){
-      return BetFactorTypeEnum.Nineteen
-    }
-    if(t === '20'){
-      return BetFactorTypeEnum.Twenty
-    }
-    if(t === '1+'){
-      return BetFactorTypeEnum.OnePlus
-    }
-    if(t === '2+'){
-      return BetFactorTypeEnum.TwoPlus
-    }
-    if(t === '3+'){
-      return BetFactorTypeEnum.ThreePlus
-    }
-    if(t === '4+'){
-      return BetFactorTypeEnum.FourPlus
-    }
-    if(t === '5+'){
-      return BetFactorTypeEnum.FivePlus
-    }
-    if(t === '6+'){
-      return BetFactorTypeEnum.SixPlus
-    }
-    if(t === '7+'){
-      return BetFactorTypeEnum.SevenPlus
-    }
-    if(t === '8+'){
-      return BetFactorTypeEnum.EightPlus
-    }
-    if(t === '9+'){
-      return BetFactorTypeEnum.NinePlus
-    }
-    if(t === '10+'){
-      return BetFactorTypeEnum.TenPlus
-    }
-    if(t === '11+'){
-      return BetFactorTypeEnum.ElevenPlus
-    }
-    if(t === '12+'){
-      return BetFactorTypeEnum.TwelvePlus
-    }
-    if(t === '13+'){
-      return BetFactorTypeEnum.ThirteenPlus
-    }
-    if(t === '14+'){
-      return BetFactorTypeEnum.FourteenPlus
-    }
-    if(t === '15+'){
-      return BetFactorTypeEnum.FifteenPlus
-    }
-    if(t === '16+'){
-      return BetFactorTypeEnum.SixteenPlus
-    }
-    if(t === '17+'){
-      return BetFactorTypeEnum.SeventeenPlus
-    }
-    if(t === '18+'){
-      return BetFactorTypeEnum.EightteenPlus
-    }
-    if(t === '19+'){
-      return BetFactorTypeEnum.NineteenPlus
-    }
-    if(t === '20+'){
-      return BetFactorTypeEnum.TwentyPlus
-    }
+    
 
     return BetFactorTypeEnum.NonApplicable
+  }
+
+  hasNumber(myString:string) {
+    return /\d/.test(myString);
   }
 }

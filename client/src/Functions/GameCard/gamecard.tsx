@@ -123,7 +123,7 @@ export default function GameCard(props: Props){
       <Grid sx={{display: 'flex'}} item xs={2}>
         <Item>
           {props.betChoice.Choices.map((c, i) => {
-            return <Typography key={i}>{BetFactorTypeEnum[c.Label]}</Typography>
+            return <Typography key={i}>{c.Label}</Typography>
           })}
         </Item>
       </Grid>

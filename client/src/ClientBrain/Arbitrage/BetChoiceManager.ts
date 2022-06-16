@@ -10,6 +10,7 @@ import BetChoiceFactors from './Models/v2/BetChoiceFactors';
 import Factor from './Models/v2/Factor';
 import FactorTypeSummary from './Models/v2/FactorTypeSummary';
 import { RadioButtonUncheckedTwoTone } from '@material-ui/icons';
+import { BetFactorTypeEnum } from './Models/v2/enum/BetFactorTypeEnum';
 
 class BetChoiceManager {
   private static Instance?: BetChoiceManager;
@@ -90,12 +91,12 @@ class BetChoiceManager {
     let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel && b.BettingEvent.GameId === bookBet.GameId);
     if(existingBetChoice !== undefined){
       bookBet.BetFactors.forEach(bf => {
-        let bcf = existingBetChoice?.Choices.find(c => c.Label === bf.Label);
+        let bcf = existingBetChoice?.Choices.find(c => c.Label === BetFactorTypeEnum[bf.Label] || (c.Label === BetFactorTypeEnum[BetFactorTypeEnum.NumberRange] && c.Label === bf.LabelDetail));
         if(bcf !== undefined){
           bcf.Factors.push(bf.Factor);
         }else{
           existingBetChoice?.Choices.push(new BetChoiceFactors(
-            bf.Label,
+            (bf.Label === BetFactorTypeEnum.NumberRange ? bf.LabelDetail : BetFactorTypeEnum[bf.Label]),
             [bf.Factor]
           ))
         }
@@ -107,7 +108,7 @@ class BetChoiceManager {
       );
       bookBet.BetFactors.forEach(bf => {
         newBetChoice.Choices.push(new BetChoiceFactors(
-          bf.Label,
+          (bf.Label === BetFactorTypeEnum.NumberRange ? bf.LabelDetail : BetFactorTypeEnum[bf.Label]),
           [bf.Factor]
         ))
       })
@@ -165,9 +166,9 @@ class BetChoiceManager {
         }
         betChoice.PinnacleOdds.forEach(bf => {
           if(betChoice.RealOdds){
-            betChoice.RealOdds.push(new FactorTypeSummary(bf.Label, (1/bf.Factor.DecimalOdds) / pTotal))
+            betChoice.RealOdds.push(new FactorTypeSummary((BetFactorTypeEnum.NumberRange === bf.Label && bf.LabelDetail ? bf.LabelDetail : BetFactorTypeEnum[bf.Label]), (1/bf.Factor.DecimalOdds) / pTotal))
           }else {
-            betChoice.RealOdds = [new FactorTypeSummary(bf.Label, (1/bf.Factor.DecimalOdds) / pTotal)]
+            betChoice.RealOdds = [new FactorTypeSummary((BetFactorTypeEnum.NumberRange === bf.Label && bf.LabelDetail ? bf.LabelDetail : BetFactorTypeEnum[bf.Label]), (1/bf.Factor.DecimalOdds) / pTotal)]
           }
           
         })
