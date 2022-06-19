@@ -86,14 +86,14 @@ class BetChoiceManager {
     });
   }
 
-  loadChoicesForBetChoice(bookBet: BookBet, bookEvent: BookEvent){
+  loadChoicesForBetChoice(bookBet: BookBet, bookEvent: BookEvent) {
     let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel && b.BettingEvent.GameId === bookBet.GameId);
-    if(existingBetChoice !== undefined){
+    if (existingBetChoice !== undefined) {
       bookBet.BetFactors.forEach(bf => {
         let bcf = existingBetChoice?.Choices.find(c => c.Label === bf.Label);
-        if(bcf !== undefined){
+        if (bcf !== undefined) {
           bcf.Factors.push(bf.Factor);
-        }else{
+        } else {
           existingBetChoice?.Choices.push(new BetChoiceFactors(
             bf.Label,
             [bf.Factor]
@@ -116,117 +116,117 @@ class BetChoiceManager {
     }
   }
 
-  loadPinnacleOddsForBetChoice(bookBet: BookBet, bookEvent: BookEvent){
+  loadPinnacleOddsForBetChoice(bookBet: BookBet, bookEvent: BookEvent) {
     let existingBetChoice = this.AllBets.find(b => b.BetChoiceId === bookBet.JoinLabel && b.BettingEvent.GameId === bookBet.GameId);
-    if(existingBetChoice === undefined){
+    if (existingBetChoice === undefined) {
       let newBetChoice = new BetChoice(
         bookEvent.BettingEvent, bookBet.JoinLabel, bookBet.BetParticipants, bookBet.BetType, bookBet.PlayerPropType, bookBet.BetDuration, bookBet.Line
       );
       newBetChoice.PinnacleOdds = bookBet.BetFactors;
       this.AllBets.push(newBetChoice);
-    }else{
+    } else {
       existingBetChoice.PinnacleOdds = bookBet.BetFactors;
     }
   }
 
-  calculateBetChoices(){
+  calculateBetChoices() {
     this.AllBets.forEach(betChoice => {
       this.calculateBetChoiceInfo(betChoice);
     });
-	}
+  }
 
-  calculateBetChoiceInfo(betChoice: BetChoice){
+  calculateBetChoiceInfo(betChoice: BetChoice) {
     betChoice.Choices.forEach((bcf: BetChoiceFactors) => {
-      bcf.Factors.sort((a,b)=>{return b.DecimalOdds-a.DecimalOdds});
+      bcf.Factors.sort((a, b) => { return b.DecimalOdds - a.DecimalOdds });
       bcf.Factors[0].Best = true;
-      if(betChoice.HouseLine){
-        betChoice.HouseLine += 1/bcf.Factors[0].DecimalOdds;
-      }else{
-        betChoice.HouseLine = 1/bcf.Factors[0].DecimalOdds;
+      if (betChoice.HouseLine) {
+        betChoice.HouseLine += 1 / bcf.Factors[0].DecimalOdds;
+      } else {
+        betChoice.HouseLine = 1 / bcf.Factors[0].DecimalOdds;
       }
-      
+
     })
 
     this.calculateRealOdds(betChoice);
     this.calculateEVs(betChoice);
   }
 
-  calculateRealOdds(betChoice: BetChoice){
+  calculateRealOdds(betChoice: BetChoice) {
     let pTotal = 0;
 
-    if(betChoice.PinnacleOdds){
+    if (betChoice.PinnacleOdds) {
       betChoice.PinnacleOdds.forEach(bf => {
-        pTotal += 1/bf.Factor.DecimalOdds;
+        pTotal += 1 / bf.Factor.DecimalOdds;
       })
-  
-      if(pTotal){
-        if(pTotal < 0.5){
+
+      if (pTotal) {
+        if (pTotal < 0.5) {
           console.log(betChoice);
         }
         betChoice.PinnacleOdds.forEach(bf => {
-          if(betChoice.RealOdds){
-            betChoice.RealOdds.push(new FactorTypeSummary(bf.Label, (1/bf.Factor.DecimalOdds) / pTotal))
-          }else {
-            betChoice.RealOdds = [new FactorTypeSummary(bf.Label, (1/bf.Factor.DecimalOdds) / pTotal)]
+          if (betChoice.RealOdds) {
+            betChoice.RealOdds.push(new FactorTypeSummary(bf.Label, (1 / bf.Factor.DecimalOdds) / pTotal))
+          } else {
+            betChoice.RealOdds = [new FactorTypeSummary(bf.Label, (1 / bf.Factor.DecimalOdds) / pTotal)]
           }
-          
+
         })
       }
     }
-    
+
   }
 
-  
 
-  calculateEVs(betChoice: BetChoice){
-    if(betChoice.RealOdds){
+
+  calculateEVs(betChoice: BetChoice) {
+    if (betChoice.RealOdds) {
       betChoice.Choices.forEach(c => {
         let bestCEV: number;
         c.Factors.forEach(f => {
           let realP = betChoice.RealOdds?.find(o => o.PickLabel === c.Label)?.Value;
-          if(realP){
-            f.EV = Math.round((f.DecimalOdds * realP - 1)*100 / 2 * 100) / 100;
-            if(betChoice.BestEV=== undefined){
+          if (realP) {
+            f.EV = Math.round((f.DecimalOdds * realP - 1) * 100 / 2 * 100) / 100;
+            if (betChoice.BestEV === undefined) {
               betChoice.BestEV = f.EV;
-            }else if (f.EV > betChoice.BestEV){
+            } else if (f.EV > betChoice.BestEV) {
               betChoice.BestEV = f.EV;
             }
-            if(bestCEV === undefined){
+            if (bestCEV === undefined) {
               bestCEV = f.EV;
-            }else if(f.EV > bestCEV){
+            } else if (f.EV > bestCEV) {
               bestCEV = f.EV;
             }
             let existingEV = betChoice.Evs?.find(fs => fs.PickLabel === c.Label)
-            if(betChoice.Evs && existingEV === undefined){
+            if (betChoice.Evs && existingEV === undefined) {
               betChoice.Evs.push(new FactorTypeSummary(c.Label, bestCEV));
-            }else if(betChoice.Evs === undefined){
+            } else if (betChoice.Evs === undefined) {
               betChoice.Evs = [new FactorTypeSummary(c.Label, bestCEV)];
             }
-            
+
           }
-  
+
         })
       })
     }
-    
+
   }
 
-  
 
-  getGameOddsSortedBy(sort: string){
-    if(sort === 'ev'){
+
+  getGameOddsSortedBy(sort: string) {
+    if (sort === 'ev') {
       return this.AllBets.filter(g => g.BestEV).sort(this.mySort);
     }
-    if(sort === 'arb'){
+    if (sort === 'arb') {
       return this.AllBets.sort(this.mySort2);
     }
   }
 
-  mySort(a:BetChoice,b:BetChoice){
-    return (b.BestEV ?  b.BestEV : -100 ) - (a.BestEV ? a.BestEV : -100)
+  mySort(a: BetChoice, b: BetChoice) {
+    return (b.BestEV ? b.BestEV : -100) - (a.BestEV ? a.BestEV : -100)
   }
 
-  mySort2(a:BetChoice,b:BetChoice){
+  mySort2(a: BetChoice, b: BetChoice) {
     return (a.HouseLine ? a.HouseLine : 100) - (b.HouseLine ? b.HouseLine : 100);
   }
 }
