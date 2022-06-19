@@ -1,10 +1,10 @@
 import { BetFactorTypeEnum } from './enum/BetFactorTypeEnum'
 
 export default class FactorTypeSummary{
-    PickLabel: BetFactorTypeEnum;
+    PickLabel: string;
     Value: number;
 
-    constructor(pickLabel: BetFactorTypeEnum, value:number){
+    constructor(pickLabel: string, value:number){
         this.PickLabel = pickLabel;
         this.Value = value;
     }
