@@ -104,14 +104,14 @@ class ArbitrageService{
     return UtilityService.get(pinnacleMarkets + sportId + '/markets/straight?primaryOnly=false&withSpecials=false', options);
   }
 
-  static getBetOnlineOdds = async function(sport){
+  static getBetOnlineOdds = async function(sport, league){
     let options = {
       "headers": {
         "accept": "application/json, text/plain, */*",
         "accept-language": "en-US,en;q=0.9",
         "access-control-allow-headers": "Content-Type",
         "access-control-allow-methods": "GET, POST",
-        "access-control-allow-origin": "https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games",
+        "access-control-allow-origin": "https://api.betonline.ag/offering/api/offering/sports/offering-by-league",
         "actual-time": "1648563709976",
         "content-type": "application/json",
         "contests": "na",
@@ -129,13 +129,13 @@ class ArbitrageService{
       },
       "referrer": "https://www.betonline.ag/",
       "referrerPolicy": "strict-origin-when-cross-origin",
-      "body": "{\"Sport\":\""+sport+"\",\"Period\":0}",
+      "body": "{\"Sport\":\""+sport+"\",\"Period\":0,\"League\":\""+league+"\"}",
       "method": "POST",
       "mode": "cors",
       "credentials": "omit"
     }
 
-    return await fetch("https://api.betonline.ag/offering/api/offering/sports/offering-by-today-games", options)
+    return await fetch("https://api.betonline.ag/offering/api/offering/sports/offering-by-league", options)
     .then(res=>{
       return(res.json());
     }).then((json)=> {

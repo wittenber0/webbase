@@ -9,8 +9,8 @@ export default class BetOnlineBrain{
     this.gameOdds = [];
   }
 
-  async loadSport(sport){
-    return await ArbitrageService.getBetOnlineOdds(sport).then((r)=>{
+  async loadSport(sport, league){
+    return await ArbitrageService.getBetOnlineOdds(sport, league).then((r)=>{
       return r
     });
   }
@@ -20,31 +20,24 @@ export default class BetOnlineBrain{
   async getGameTree(){
     let gameTree = []
     let sportsToLoad = [
-      this.loadSport('baseball'),
-      this.loadSport('basketball'),
-      this.loadSport('hockey'),
-      this.loadSport('soccer'),
-      this.loadSport('football')
+      this.loadSport('baseball', 'mlb'),
+      this.loadSport('basketball', 'nba'),
+      this.loadSport('hockey', 'nhl'),
+      this.loadSport('soccer','mls'),
+      this.loadSport('football', 'nfl')
     ]
     return await Promise.all(sportsToLoad).then((values) => {
       values.forEach(v => {
-        v.GameOffering.LeagueGroup.forEach( leagueGroup => {
-          leagueGroup.DateGrouping.forEach( dateGrouping => {
-            dateGrouping.ScheduleGroup.forEach( scheduleGroup => {
-              scheduleGroup.TimeGrouping.forEach( gameTime => {
-                gameTime.Games.forEach( game => {
-                  let g = new Game(
-                    this.getOddsFromGame(game),
-                    leagueGroup.League,
-                    game.HomeTeam,
-                    game.AwayTeam,
-                    this.getGameId(game, dateGrouping.GameDate, leagueGroup.League.toLowerCase())
-                  );
-                  gameTree.push(g);
-                });
-              });
-            });
-          });
+        v.GameOffering.GamesDescription.forEach( gd => {
+          let game = gd.Game;
+          let g = new Game(
+            this.getOddsFromGame(game),
+            v.GameOffering.League.toLowerCase(),
+            game.HomeTeam,
+            game.AwayTeam,
+            this.getGameId(game, gd.GameDate, v.GameOffering.League.toLowerCase())
+          );
+          gameTree.push(g);
         });
       });
       return gameTree;
