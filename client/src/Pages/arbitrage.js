@@ -59,9 +59,10 @@ class ArbitragePage extends Component{
 			title: 'Arbitrage',
 			allOdds: [],
 			displayOdds: [],
+      freeBetBook: 'all',
 			betTypeFilter: 'all',
 			leagueFilter: 'all',
-			sortBy: 'ev',
+			sortBy: 'arb',
 			myBooks: [],
 			leagueOptions: []
 		};
@@ -70,6 +71,7 @@ class ArbitragePage extends Component{
 		this.bookManager = BookManager.getInstance();
 		this.gameOddManager = GameOddManager.getInstance();
 		this.setBetTypeFilter = this.setBetTypeFilter.bind(this);
+    this.setFreeBetFilter = this.setFreeBetFilter.bind(this);
 		this.updateSortBy = this.updateSortBy.bind(this);
 		this.populateGameOdds = this.populateGameOdds.bind(this);
 		this.setLeagueFilter = this.setLeagueFilter.bind(this);
@@ -86,7 +88,6 @@ class ArbitragePage extends Component{
 	}
 
 	populateLeagueOptions(){
-		console.log(this.state.allOdds[0]);
 		let lo = this.state.allOdds.map( o => o.leagueName ).filter(onlyUnique);
 		this.setState({leagueOptions: lo});
 	}
@@ -96,6 +97,16 @@ class ArbitragePage extends Component{
 		if(e && btf){
 			this.setState({betTypeFilter: btf});
 			this.populateGameOdds();
+		}
+	}
+
+  setFreeBetFilter(e){
+		let fbf = e.target.value;
+		if(e && fbf){
+			this.setState({freeBetBook: fbf}, ()=> {
+  			this.populateGameOdds();
+      });
+
 		}
 	}
 
@@ -110,7 +121,7 @@ class ArbitragePage extends Component{
 	updateSortBy(e){
 		let sb = e.target.value;
 		if(e && sb){
-			let allOdds = this.gameOddManager.getGameOddsSortedBy(sb);
+			let allOdds = this.gameOddManager.getGameOddsSortedBy(sb, this.state.freeBetBook);
 			this.setState({sortBy: sb, allOdds: allOdds, displayOdds: this.getDisplayOdds(allOdds)});
 		}
 	}
@@ -123,28 +134,65 @@ class ArbitragePage extends Component{
 		ArbitrageService.updateMyBooks(this.bookManager.getSelectedBookIds());
 	}
 
-	async populateGameOdds(){
-		return await this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy).then(r => {
+	async populateGameOddsOld(){
+		return await this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy, this.state.freeBetBook).then(r => {
 			this.setState({
 				allOdds: this.gameOddManager.gameOdds,
 				displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
 			});
-			//console.log(this.state.displayOdds);
+      console.log(this.gameOddManager.gameOdds[0]);
 		});
 	}
 
+	async populateGameOdds(){
+		let lgo = await this.gameOddManager.loadGameOdds(this.state.betTypeFilter, this.bookManager, this.state.sortBy, this.state.freeBetBook);
+		this.setState({
+			allOdds: this.gameOddManager.gameOdds,
+			displayOdds: this.getDisplayOdds(this.gameOddManager.gameOdds)
+		});
+		console.log(this.gameOddManager.gameOdds[0]);
+		return lgo;
+	}
+
 	getDisplayOdds(gameOdds){
-    return gameOdds.filter( (o, i) => {
-			//betType Filter
-      if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType.slice(0,2)){
-        return false;
-      }
-			//setLeagueFilter
-			if(this.state.leagueFilter !== 'all' && this.state.leagueFilter !== o.leagueName){
-				return false;
-			}
-      return i < 20;
+    let filtered = gameOdds.filter( (o, i) => {
+		//betType Filter
+    	if(this.state.betTypeFilter !== 'all' && this.state.betTypeFilter !== o.betType.slice(0,2)){
+        	return false;
+      	}
+		//setLeagueFilter
+		if(this.state.leagueFilter !== 'all' && this.state.leagueFilter !== o.leagueName){
+			return false;
+		}
+    	return true;
     });
+
+	return filtered.slice(0,20);
+  }
+
+  getDisplayFreeBetBookSelector(){
+    if(this.state.sortBy === "fb"){
+      return (
+        <Grid item xs={2}>
+          <FormControl fullWidth>
+            <InputLabel id="fb-label">Free Bet Book</InputLabel>
+            <Select
+              size="small"
+              labelId="fb-label"
+              id="freeBetBookFilter"
+              value={this.state.freeBetBook}
+              label=" Free Bet Book "
+              onChange={this.setFreeBetFilter}
+            >
+              <MenuItem value={'all'}>Any</MenuItem>
+              {this.state.myBooks.map((b,i) => {
+                return <MenuItem value={b.bookId} key={i}>{b.bookName}</MenuItem>
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+      )
+    }
   }
 
 	render(){
@@ -168,25 +216,28 @@ class ArbitragePage extends Component{
 									>
 										<MenuItem value={'ev'}>+EV</MenuItem>
 										<MenuItem value={'arb'}>ARB</MenuItem>
+                    <MenuItem value={'fb'}>FB</MenuItem>
 									</Select>
 								</FormControl>
 							</Grid>
+              {this.getDisplayFreeBetBookSelector()}
 							<Grid item xs={2}>
 								<FormControl fullWidth>
-									<InputLabel id="bt-label">Bet Type</InputLabel>
-					        <Select
-										size="small"
-					          labelId="bt-label"
-					          id="betTypeFilter"
-					          value={this.state.betTypeFilter}
-					          label=" Bet Type "
-					          onChange={this.setBetTypeFilter}
-					        >
+									<InputLabel id="fb-label">Bet Type</InputLabel>
+                    <Select
+                      size="small"
+                      labelId="bt-label"
+                      id="betTypeFilter"
+                      value={this.state.betTypeFilter}
+                      label=" Bet Type "
+                      onChange={this.setBetTypeFilter}
+                    >
 					          <MenuItem value={'all'}>ALL</MenuItem>
 					          <MenuItem value={'ml'}>Money Line</MenuItem>
 					          <MenuItem value={'s'}>Spread</MenuItem>
 										<MenuItem value={'ou'}>Over Under</MenuItem>
 					          <MenuItem value={'tt'}>Team Over Under</MenuItem>
+							  <MenuItem value={'pp'}>Player Props</MenuItem>
 					        </Select>
 								</FormControl>
 							</Grid>
@@ -218,7 +269,7 @@ class ArbitragePage extends Component{
 						<Grid container spacing={1} sx={{mt:2}}>
 							<Grid item xs={2.5}>
 							</Grid>
-							<Grid item xs={1}>
+							<Grid item xs={2}>
 								<Item>Line</Item>
 							</Grid>
 							<Grid item xs={1}>
@@ -226,6 +277,9 @@ class ArbitragePage extends Component{
 							</Grid>
 							<Grid item xs={1}>
 								<Item>EV</Item>
+							</Grid>
+              <Grid item xs={1}>
+								<Item>FB</Item>
 							</Grid>
 							<Grid item xs={1}>
 								<Item>Pick</Item>
@@ -255,10 +309,8 @@ class ArbitragePage extends Component{
 					<PageBlock fill="light">
 						<h2>... more arbitrage stuff</h2>
 					</PageBlock>
-
 				</div>
 			</div>
-
 		)
 	}
 }

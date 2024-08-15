@@ -1,8 +1,11 @@
 const { patch } = require("request");
+let request = require("request-promise");
 
 sysToken = '';
+lastSysTime = null;
 
 exports.checkRoleForUser = async function(user, role){
+  console.log('checking role for user:' + user);
   return await exports.getUserRoles(user).then((roles) => {
     switch(role){
       case 'profile':
@@ -84,7 +87,25 @@ exports.getRoleUsers = async function(user_id){
   });
 }
 
-exports.updateUserRoles = async function(user_id, role_list, viewer_user_id, to_remove){
+exports.getRoleUsers = async function(user_id){
+  let isAdmin = await exports.checkRoleForUser(user_id, 'admin');
+  try{
+    if(isAdmin){
+      let appRoles = await getAllAppRolesFromServer();
+      let roleFetch = appRoles.map( async (r) => {
+        r.users = await getAllUserForRoleFromServerSync(r.id)
+      })
+
+      return await Promise.all(roleFetch)
+    }
+
+  }catch{
+    console.log('failure to get role users');
+    return [];
+  }
+}
+
+exports.updateUserRolesOld = async function(user_id, role_list, viewer_user_id, to_remove){
   return exports.checkRoleForUser(viewer_user_id, 'admin').then( r => {
     if(r){
       return updateUserRolesFromServer(user_id, role_list, to_remove).then( r =>{
@@ -157,7 +178,7 @@ updateUserMetaDataFromServer = function(user_id, user_metadata){
 
 getFromAuth0V2 = function(route){
   return getSysToken().then(()=>{
-    let request = require("request-promise");
+    
     let options = {
         method: 'GET',
         url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
@@ -178,7 +199,6 @@ getFromAuth0V2 = function(route){
 
 postToAuth0V2 = function(route, body){
   return getSysToken().then(()=>{
-    let request = require("request-promise");
     let options = {
         method: 'POST',
         url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
@@ -208,7 +228,6 @@ postToAuth0V2 = function(route, body){
 
 patchToAuth0V2 = function(route, body){
   return getSysToken().then(()=>{
-    let request = require("request-promise");
     let options = {
         method: 'PATCH',
         url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
@@ -238,7 +257,6 @@ patchToAuth0V2 = function(route, body){
 
 deleteFromAuth0V2 = function(route, body){
   return getSysToken().then(()=>{
-    let request = require("request-promise");
     let options = {
         method: 'DELETE',
         url: 'https://ryanwwittenberg.auth0.com/api/v2'+route,
@@ -265,21 +283,25 @@ deleteFromAuth0V2 = function(route, body){
   });
 }
 
-getSysToken = function(){
-    let request = require("request-promise");
+getSysToken = async function(){
+  let options = { method: 'POST',
+      url: 'https://ryanwwittenberg.auth0.com/oauth/token',
+      headers: { 'content-type': 'application/json' },
+      body:
+          { grant_type: 'client_credentials',
+              client_id: 'yqN4d3JWsdMT4weRe86RiZmCc0CbbiJ7',
+              client_secret: 'AjPwvWk6m5GTBBpip6gzr3d1M27SVALjtEgmg6q8g-ephczUE96Q-wqQr2llslD1',
+              audience: 'https://ryanwwittenberg.auth0.com/api/v2/'},
+      json: true 
+  };
 
-    let options = { method: 'POST',
-        url: 'https://ryanwwittenberg.auth0.com/oauth/token',
-        headers: { 'content-type': 'application/json' },
-        body:
-            { grant_type: 'client_credentials',
-                client_id: 'yqN4d3JWsdMT4weRe86RiZmCc0CbbiJ7',
-                client_secret: 'AjPwvWk6m5GTBBpip6gzr3d1M27SVALjtEgmg6q8g-ephczUE96Q-wqQr2llslD1',
-                audience: 'https://ryanwwittenberg.auth0.com/api/v2/'},
-        json: true };
+  let now = new Date();
 
-    return request(options)
-     .then(response => {
-            sysToken = response['access_token'];
-        });
+  if(lastSysTime == null || Math.abs(now - lastSysTime) > (24*60*60*1000)){
+    let response = await request(options);
+    sysToken = response['access_token'];
+    lastSysTime = now;
+  }
+
+  return sysToken
 };

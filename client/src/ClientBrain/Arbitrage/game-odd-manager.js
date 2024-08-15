@@ -16,13 +16,13 @@ class GameOddManager {
     this.games = [];
   }
 
-  async loadGameOdds(betTypeFilter, bm, sortBy){
+  async loadGameOdds(betTypeFilter, bm, sortBy, fbBook){
     this.games = [];
     this.gameOdds = [];
     let bookGameTrees = [
       this.loadActionNetworkGameTree(betTypeFilter, bm),
-      this.loadBetOnlineGameTree(),
-      this.loadPinnacleGameTree()
+      //this.loadBetOnlineGameTree(),
+      //this.loadPinnacleGameTree()
     ]
     return await Promise.all(bookGameTrees).then( trees => {
       trees.forEach( tree => {
@@ -44,7 +44,7 @@ class GameOddManager {
       });
       this.buildGameOdds(this.games);
       this.calculateGameOdds();
-      this.gameOdds = this.getGameOddsSortedBy(sortBy)
+      this.gameOdds = this.getGameOddsSortedBy(sortBy, fbBook)
     });
   }
 
@@ -74,7 +74,11 @@ class GameOddManager {
       game.odds.forEach( odd => {
         this.evaluateOdd(odd, game);
       });
+      if(game.playerPropGameOdds){
+        this.gameOdds = this.gameOdds.concat(game.playerPropGameOdds);
+      }
     });
+    console.log(this.gameOdds);
   }
 
   evaluateOdd(odd, game){
@@ -240,13 +244,28 @@ class GameOddManager {
         houseLine += 1/gameOdd.pickFactors[pf][0].factor;
       }
     });
+
+    if(Object.keys(gameOdd.pickFactors).length === 2 ){
+      let f1 = gameOdd.pickFactors[Object.keys(gameOdd.pickFactors)[0]][0]
+      let f2 = gameOdd.pickFactors[Object.keys(gameOdd.pickFactors)[1]][0]
+      if(f2.factorLabel > f1.factorLabel){
+        let fTemp = f1;
+        f1 = f2;
+        f2 = fTemp;
+      }
+      let stake = 100;
+      let hedge = stake * f1.factor / f2.factor;
+      gameOdd.houseFactor = hedge / 100;
+    }
+
     gameOdd.houseLine = houseLine;
     this.calculateRealOdds(gameOdd);
     this.calculateEVs(gameOdd);
+    this.calculateFreebets(gameOdd);
   }
 
   calculateEVs(gameOdd){
-    let pfEV = {}
+    let pfEV = {};
     Object.keys(gameOdd.pickFactors).forEach(pfLabel => {
       if(gameOdd.realOdds[pfLabel]){
         let factors = gameOdd.pickFactors[pfLabel];
@@ -270,18 +289,49 @@ class GameOddManager {
     gameOdd.evs = pfEV;
   }
 
+  calculateFreebets(gameOdd){
+    if(Object.keys(gameOdd.pickFactors).length === 2){
+      let keys = Object.keys(gameOdd.pickFactors);
+      let f1 = gameOdd.pickFactors[keys[0]][0];
+      let f2 = gameOdd.pickFactors[keys[1]][0];
+
+      if(f2.factorLabel > f1.factorLabel){
+        let fTemp = f1;
+        f1 = f2;
+        f2 = fTemp;
+      }
+
+      gameOdd.freeBetBook = f1.book;
+
+      let stake = 100;
+      let hedge = (stake * (f1.factor - 1)) / (f2.factor);
+      let payout = (stake * (f1.factor - 1));
+      let fbPercent = (payout - hedge) / stake;
+
+      gameOdd.freeBetPercent = fbPercent;
+      gameOdd.freeBetHedgeRatio = hedge / stake;
+    } else {
+      gameOdd.freeBetHedgeRatio = 0;
+      gameOdd.freeBetPercent = 0;
+    }
+  }
+
   calculateGameOdds(){
     this.gameOdds.forEach(gameOdd => {
       this.calculateGameOddInfo(gameOdd);
     });
 	}
 
-  getGameOddsSortedBy(sort){
+  getGameOddsSortedBy(sort, fbBook){
     if(sort === 'ev'){
       return this.gameOdds.filter(g => g.bestEV).sort(this.mySort);
     }
     if(sort === 'arb'){
       return this.gameOdds.sort((a,b) => {return a.houseLine - b.houseLine });
+    }
+    if(sort === 'fb'){
+      let fo = this.gameOdds.filter(g => g.freeBetBook && ((g.freeBetBook.bookId === fbBook) || fbBook === "all"));
+      return fo.sort((a,b) => {return b.freeBetPercent - a.freeBetPercent });
     }
   }
 

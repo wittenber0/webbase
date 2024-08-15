@@ -1,5 +1,5 @@
 export default class Odd {
-  constructor(book, type, mlHome, mlAway, mlDraw, spreadHome, spreadAway, totalOver, totalUnder, lineSpread, lineOverUnder, homeOver, homeUnder, homeLine, awayOver, awayUnder, awayLine){
+  constructor(book, type, mlHome, mlAway, mlDraw, spreadHome, spreadAway, totalOver, totalUnder, lineSpread, lineOverUnder, homeOver, homeUnder, homeLine, awayOver, awayUnder, awayLine, odd, game){
     this.book = book;
     this.type = type; //game, first half, second half etc.
     this.mlHome = mlHome;
@@ -17,5 +17,7 @@ export default class Odd {
     this.awayOver = awayOver;
     this.awayUnder = awayUnder
     this.awayLine = awayLine;
+    this.oddDebug = odd;
+    this.gameDebug = game;
   }
 }

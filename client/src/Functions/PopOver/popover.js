@@ -72,13 +72,27 @@ export default function BasicPopover(props) {
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={8} checked={isChecked(8)}/>} label="My Bookie"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={21} checked={isChecked(21)}/>} label="Bovada"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={1001} checked={isChecked(1001)}/>} label="Bet Online"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={1003} checked={isChecked(1003)}/>} label="Pinacle Live"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={3} checked={isChecked(3)}/>} label="Pinacle AN"/>
             <Divider sx={{my:1}}/>
+            <Typography variant='subtitle1'>Massachusetts Books</Typography>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2263} checked={isChecked(2263)}/>} label="WynnBet MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2261} checked={isChecked(2261)}/>} label="Caesers MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2229} checked={isChecked(2229)}/>} label="Fan Duel MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2228} checked={isChecked(2228)}/>} label="Bet MGM MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2260} checked={isChecked(2260)}/>} label="Draft Kings MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2262} checked={isChecked(2262)}/>} label="Barstool MA"/>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2398} checked={isChecked(2398)}/>} label="Fanatics MA"/>
             <Typography variant='subtitle1'>Michigan Books</Typography>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={351} checked={isChecked(351)}/>} label="PointsBet MI"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={355} checked={isChecked(355)}/>} label="Caesers MI"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={366} checked={isChecked(366)}/>} label="Fan Duel MI"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={283} checked={isChecked(283)}/>} label="Bet MGM MI"/>
             <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={68} checked={isChecked(68)}/>} label="Draft Kings"/>
+            <Typography variant='subtitle1'>VT Books</Typography>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={2855} checked={isChecked(2855)}/>} label="Fanatics VT"/>
+            <Typography variant='subtitle1'>NJ Books</Typography>
+            <StyledFCL  control={<Checkbox onChange={props.updateBooks} value={76} checked={isChecked(76)}/>} label="Pointsbet NJ"/>
           </FormGroup>
         </Paper>
       </Popover>

@@ -5,6 +5,7 @@ const fetch = require('node-fetch');
 //arbitrage
 const bookListUrl = 'https://api.actionnetwork.com/web/v1/books';
 const oddsUrl = 'https://api.actionnetwork.com/web/v1/scoreboard/all?bookIds=';
+const propsUrl = 'https://api.actionnetwork.com/web/v1/games/';
 const actionLabsBookOdds = 'https://d3ttxfuywgi7br.cloudfront.net/odds/';
 const actionLabsPlayers = 'https://d3ttxfuywgi7br.cloudfront.net/players/projections/all/actionnetwork/default.json'
 const actionLabsPropEvents = 'https://d3ttxfuywgi7br.cloudfront.net/events/default.json?leagueId=1,2,3&initialRequest=true&xid=66baf522-6536-496c-bcd1-3405d15b434c'
@@ -35,6 +36,10 @@ class ArbitrageService{
     dateString += (d.getMonth() +1).toString().padStart(2, '0') ;
     dateString += d.getDate().toString().padStart(2, '0');
     return UtilityService.get(oddsUrl + selectedBooks.join() + '&date='+dateString);
+  }
+
+  static getPlayerPropsForGame = async function(gameId){
+    return UtilityService.get(propsUrl + gameId + '/props')
   }
 
   static getAtionLabsBookOdds = async function(bookId){

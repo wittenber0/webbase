@@ -2,7 +2,7 @@ import ArbitrageService from '../../Shared/arbitrage-service';
 import Book from './Models/book';
 import App from '../../App';
 
-const defaultSelectedBookIds = [1003, 8, 21, 1001];
+const defaultSelectedBookIds = [1003, 8, 21, 2229, 2260, 2855, 2398, 76];
 const bovadaLogo = 'https://www.aplussportsandmore-fanshop-baseballfield.com/images/bovada-logo_0.png'
 const myBookieLogo = 'https://images.squarespace-cdn.com/content/v1/5ab4527b3c3a536a7a352c05/1631109644782-2TR7KXFGKPA84ZHFCI94/TRANSPARENT-MB.png'
 
@@ -73,6 +73,30 @@ class BookManager {
     }
     this.selectedBooks = this.allBooks.filter((b)=> {return this.selectedBookIds.includes(b.bookId)});
     App.cacheMyBooks(this.selectedBookIds);
+  }
+
+  getPPBookList(){
+    let bookList = [];
+
+    this.getSelectedBookIds().forEach(b => {
+      bookList.push(b);
+      switch (b) {
+        //dk pp
+        case 2260:
+          bookList.push(68);
+          break;
+        //fanduel
+        case 2229:
+          bookList.push(69);
+          break;
+        //mgm
+        case 2228:
+          bookList.push(75);
+          break;
+      }
+    });
+    
+    return bookList;
   }
 }
 

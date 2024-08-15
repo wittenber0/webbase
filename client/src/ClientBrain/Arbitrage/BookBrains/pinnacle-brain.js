@@ -45,7 +45,8 @@ export default class PinnacleBrain {
     let allGames = [];
     let sportCalls = [
       this.loadSport(3),
-      this.loadSport(4)
+      this.loadSport(4),
+      this.loadSport(15)
     ];
     return await Promise.all(sportCalls).then( sportTrees => {
       sportTrees.forEach( st => {

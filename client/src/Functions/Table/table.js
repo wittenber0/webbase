@@ -204,14 +204,15 @@ export default function EnhancedTable(props) {
   const createRow = (user) => {
     let row = {user, name: user.name, email: user.email};
     let hasNone = true;
-    props.roles.map( role => {
-      row[role.id] = user.roles.filter( r => {return r.id === role.id}).length > 0;
-      if(row[role.id]){
-        hasNone = false;
-      }
-    });
+    if(user.roles){
+      props.roles.map( role => {
+        row[role.id] = user.roles.filter( r => {return r.id === role.id}).length > 0;
+        if(row[role.id]){
+          hasNone = false;
+        }
+      });
+    }
     row.none = hasNone;
-
     return row;
   }
 
